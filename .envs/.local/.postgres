@@ -1,0 +1,7 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=0.0.0.0
+POSTGRES_PORT=5432
+POSTGRES_DB=chemreg
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=example
