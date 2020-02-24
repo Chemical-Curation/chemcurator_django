@@ -53,3 +53,19 @@ def validate_cid_checksum(cid: str) -> None:
     real_checksum = compute_checksum(i)
     if not given_checksum == real_checksum:
         raise ValidationError(f"Invalid checksum. Expected {real_checksum}.")
+
+
+def validate_inchikey_regex(inchikey: str) -> None:
+    """Validates that the CID contains a valid checksum.
+
+    Args:
+        inchikey: The InchiKey string
+
+    Raises:
+        ValidationError: If the InchiKey cannot be parsed.
+
+    """
+    if not re.match(r"^[A-Z]{14}-[A-Z]{10}-[A-Z]$", inchikey):
+        raise ValidationError(
+            "Invalid InchiKey format. Expected ##############-#########-# with only uppercase letters."
+        )
