@@ -1,6 +1,7 @@
-import pytest
 from django.conf import settings
 from django.test import RequestFactory
+
+import pytest
 
 from chemreg.users.views import UserRedirectView, UserUpdateView
 

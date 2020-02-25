@@ -3,8 +3,10 @@ from django.db.models import CharField
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
+from chemreg.common.models import CommonInfo
 
-class User(AbstractUser):
+
+class User(CommonInfo, AbstractUser):
 
     # First Name and Last Name do not cover name patterns
     # around the globe.

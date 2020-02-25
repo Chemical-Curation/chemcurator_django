@@ -11,6 +11,12 @@ Table of Contents:
 .. toctree::
    :maxdepth: 2
 
+   chemreg/chemreg.common
+   chemreg/chemreg.compound
+   chemreg/chemreg.users
+   chemreg/chemreg.utils
+
+
 
 Indices & Tables
 ================

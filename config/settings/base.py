@@ -69,10 +69,14 @@ THIRD_PARTY_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "rest_framework",
+    "polymorphic",
 ]
 
 LOCAL_APPS = [
+    "chemreg.common.apps.CommonConfig",
+    "chemreg.compound.apps.CompoundConfig",
     "chemreg.users.apps.UsersConfig",
+    "chemreg.utils.apps.UtilsConfig",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
