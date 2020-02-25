@@ -59,13 +59,13 @@ def validate_inchikey_regex(inchikey: str) -> None:
     """Validates that the CID contains a valid checksum.
 
     Args:
-        inchikey: The InchiKey string
+        inchikey: The InChIKey string
 
     Raises:
-        ValidationError: If the InchiKey cannot be parsed.
+        ValidationError: If the InChIKey cannot be parsed.
 
     """
     if not re.match(r"^[A-Z]{14}-[A-Z]{10}-[A-Z]$", inchikey):
         raise ValidationError(
-            "Invalid InchiKey format. Expected ##############-#########-# with only uppercase letters."
+            "Invalid InChIKey format. Expected ##############-#########-# with only uppercase letters."
         )

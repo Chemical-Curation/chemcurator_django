@@ -1,10 +1,10 @@
 import factory
 
 from chemreg.compound.models import BaseCompound, DefinedCompound
-from chemreg.compound.tests.fakers import CIDFaker, InchiKeyFaker
+from chemreg.compound.tests.fakers import CIDFaker, InChIKeyFaker
 
 factory.Faker.add_provider(CIDFaker)
-factory.Faker.add_provider(InchiKeyFaker)
+factory.Faker.add_provider(InChIKeyFaker)
 
 
 class BaseCompoundFactory(factory.DjangoModelFactory):

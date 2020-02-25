@@ -12,7 +12,7 @@ def test_invalid_cid(compound, invalid_cid):
 
 @pytest.mark.parametrize("compound", ["DefinedCompound"], indirect=["compound"])
 def test_invalid_inchikey(compound, invalid_inchikey):
-    """Test that bad InchiKeys will raise validation errors."""
+    """Test that bad InChIKeys will raise validation errors."""
     serializer = compound["serializer"]
     json_factory = compound["json_factory"]
     json = json_factory.build()

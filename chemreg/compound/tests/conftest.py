@@ -55,10 +55,10 @@ INVALID_INCHIKEYS = [
     f"{'A'*14}{'a'*10}-{'A'*1}",  # lowercase - 1
     f"{'A'*14}{'A'*10}-{'a'*1}",  # lowercase - 2
 ]
-"""A collection of invalid InchiKeys."""
+"""A collection of invalid InChIKeys."""
 
 
 @pytest.fixture(params=INVALID_INCHIKEYS)
 def invalid_inchikey(request) -> str:
-    """An invalid InchiKey string."""
+    """An invalid InChIKey string."""
     return request.param

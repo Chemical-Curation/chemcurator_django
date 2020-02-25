@@ -10,8 +10,8 @@ class CIDFaker(BaseProvider):
         return build_cid(self.random_int(2000000, 3000000))
 
 
-class InchiKeyFaker(BaseProvider):
-    """Provides an InchiKey provider to Faker.
+class InChIKeyFaker(BaseProvider):
+    """Provides an InChIKey provider to Faker.
 
     InChIKey consists of hyphen-separated three parts, of 14, 10 and one
     character(s), respectively, like XXXXXXXXXXXXXX-YYYYYYYYYY-Z. The first
