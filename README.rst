@@ -17,9 +17,7 @@ Chemical Curation and Data Management
 Settings
 --------
 
-Moved to settings_.
-
-.. _settings: http://cookiecutter-django.readthedocs.io/en/latest/settings.html
+See the "template.env" file for details of various settings. Make a copy of this file named ".env" to configure the application.
 
 Basic Commands
 --------------
