@@ -60,27 +60,19 @@ Running tests with py.test
 
   $ pytest
 
-Live reloading and Sass CSS compilation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Moved to `Live reloading and SASS compilation`_.
-
-.. _`Live reloading and SASS compilation`: http://cookiecutter-django.readthedocs.io/en/latest/live-reloading-and-sass-compilation.html
-
-
-
-
 
 Deployment
 ----------
 
 The following details how to deploy this application.
 
+First, set these environment variables. Alternatively, create a ".env" file with these variables.
 
+* `DATABASE_URL`
+* `SECRET_KEY`
 
-Docker
-^^^^^^
+Then, run the `docker-compose` script:
 
-See detailed `cookiecutter-django Docker documentation`_.
+::
 
-.. _`cookiecutter-django Docker documentation`: http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html
+  $ docker-compose up
