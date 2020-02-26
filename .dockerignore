@@ -1,4 +1,2 @@
 .*
-!.coveragerc
-!.env
-!.pylintrc
+collected_static
