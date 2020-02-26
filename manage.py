@@ -21,8 +21,6 @@ if __name__ == "__main__":
             )
 
         raise
-        # TODO: Add "--nostatic" to runserver
-        # http://whitenoise.evans.io/en/latest/django.html#using-whitenoise-in-development
 
     # This allows easy placement of apps within the interior
     # chemreg directory.
