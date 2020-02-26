@@ -17,6 +17,8 @@ services:
       SECRET_KEY: ${SECRET_KEY}
       URL_CONF: admin
       WEB_CONCURRENCY: 1
+    ports:
+      - 8000:8000
 
   redis:
     image: redis:5-alpine
