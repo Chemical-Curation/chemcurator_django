@@ -6,7 +6,8 @@ from django.db import models
 import pytest
 from polymorphic.models import PolymorphicModel
 
-from chemreg.compound.models import BaseCompound
+from chemreg.compound.fields import StructureAliasField
+from chemreg.compound.models import BaseCompound, DefinedCompound
 from chemreg.compound.settings import compound_settings
 from chemreg.compound.tests.factories import BaseCompoundFactory
 from chemreg.compound.utils import build_cid, extract_int
@@ -18,7 +19,7 @@ from chemreg.compound.validators import (
 
 
 def test_compound_attr():
-    """Test basic attributes of the BaseCompound model"""
+    """Test basic attributes of the `BaseCompound` model."""
     assert issubclass(BaseCompound, PolymorphicModel)
     assert hasattr(BaseCompound, "cid")
     assert hasattr(BaseCompound, "structure")
@@ -32,6 +33,16 @@ def test_compound_attr():
     assert validate_cid_prefix in cid.validators
     assert validate_cid_regex in cid.validators
     assert isinstance(structure, models.TextField)
+
+
+def test_definedcompound_attr():
+    """Test basic attributes of the `DefinedCompound` model."""
+    assert issubclass(DefinedCompound, BaseCompound)
+    molefile = DefinedCompound._meta.get_field("molefile")
+    inchikey = DefinedCompound._meta.get_field("inchikey")
+    assert isinstance(molefile, StructureAliasField)
+    assert isinstance(inchikey, models.CharField)
+    assert inchikey.max_length == 29
 
 
 @pytest.mark.django_db
