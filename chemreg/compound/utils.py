@@ -1,4 +1,5 @@
 import time
+from typing import Optional
 
 from django.apps import apps
 from django.core.cache import cache
@@ -8,7 +9,7 @@ from django.db.models.functions import Cast, Substr
 from chemreg.compound.settings import compound_settings
 
 
-def compute_checksum(i: int) -> int:
+def compute_checksum(i: Optional[int]) -> int:
     """Computes the checksum from the compound integer.
 
     Args:
@@ -68,7 +69,7 @@ def build_cid(i=None) -> str:
     return f"{compound_settings.PREFIX}CID{checksum}0{i}"
 
 
-def extract_int(cid: str) -> int:
+def extract_int(cid: str) -> Optional[int]:
     """Extracts the compound integer from the CID.
 
     Args:
@@ -85,7 +86,7 @@ def extract_int(cid: str) -> int:
         return None
 
 
-def extract_checksum(cid: str) -> int:
+def extract_checksum(cid: str) -> Optional[int]:
     """Extracts the compound checksum from the CID.
 
     Args:
