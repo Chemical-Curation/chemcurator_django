@@ -66,8 +66,7 @@ def test_query_structure_type():
     assert qst1.name == "ill-defined"
 
     qst2 = QueryStructureTypeFactory(name="$omething weird")
-    assert qst2.name ==
-     "omething-weird"
+    assert qst2.name == "omething-weird"
 
     # the name field needs to be unique
     with pytest.raises(IntegrityError):
