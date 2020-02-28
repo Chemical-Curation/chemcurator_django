@@ -20,6 +20,12 @@ def test_invalid_inchikey(compound, invalid_inchikey):
     assert not serializer(data=json).is_valid()
 
 
+def test_query_structure_type(query_structure_type):
+    """Test that a query structure type with a non-slugged name is invalid"""
+    serializer = query_structure_type["serializer"]
+    json_factory = query_structure_type["json_factory"]
+
+
 def test_compound_deserialize(compound):
     """Test that a compound JSON is properly deserialized."""
     serializer = compound["serializer"]

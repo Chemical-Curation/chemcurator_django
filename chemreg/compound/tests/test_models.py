@@ -2,7 +2,6 @@ import re
 
 from django.core.cache import cache
 from django.db import models
-from django.core.validators import validate_slug
 
 import pytest
 from polymorphic.models import PolymorphicModel
@@ -21,7 +20,6 @@ from chemreg.compound.validators import (
     validate_cid_regex,
 )
 from django.db.utils import IntegrityError
-from django.core.exceptions import ValidationError
 
 
 def test_compound_attr():
@@ -61,13 +59,7 @@ def test_query_structure_type():
             name="ill-defined", label="Ill-Defined", short_description=None
         )
 
-    # the name has to be free of reserved characters
-    qst1 = QueryStructureTypeFactory(name="ill defined", label="Ill Defined")
-    assert qst1.name == "ill-defined"
-
-    qst2 = QueryStructureTypeFactory(name="$omething weird")
-    assert qst2.name == "omething-weird"
-
+    qst2 = QueryStructureTypeFactory(name="ill-defined", label="Ill Defined")
     # the name field needs to be unique
     with pytest.raises(IntegrityError):
         qst3 = QueryStructureTypeFactory(name="ill-defined", label="Ill Defined")

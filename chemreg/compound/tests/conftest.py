@@ -1,11 +1,16 @@
 import pytest
 
 from chemreg.compound.models import DefinedCompound
-from chemreg.compound.serializers import DefinedCompoundSerializer
+from chemreg.compound.serializers import (
+    DefinedCompoundSerializer,
+    QueryStructureTypeSerializer,
+)
 from chemreg.compound.settings import compound_settings
 from chemreg.compound.tests.factories import (
     DefinedCompoundFactory,
     DefinedCompoundJSONFactory,
+    QueryStructureTypeFactory,
+    QueryStructureTypeJSONFactory,
 )
 
 COMPOUND_REGISTRY = {
@@ -14,7 +19,13 @@ COMPOUND_REGISTRY = {
         "json_factory": DefinedCompoundJSONFactory,
         "model": DefinedCompound,
         "serializer": DefinedCompoundSerializer,
-    }
+    },
+    "QueryStructureType": {
+        "factory": QueryStructureTypeFactory,
+        "json_factory": QueryStructureTypeJSONFactory,
+        "model": QueryStructureType,
+        "serializer": QueryStructureTypeSerializer,
+    },
 }
 
 

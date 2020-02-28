@@ -39,6 +39,7 @@ class DefinedCompoundJSONFactory(factory.DictFactory):
 class QueryStructureTypeFactory(factory.DjangoModelFactory):
     """Manufactures `QueryStructureType` models."""
 
+    name = factory.Faker("slug")
     label = factory.Sequence(lambda n: "label%s" % n)
     short_description = factory.Faker("text")
     long_description = factory.Faker("text")
@@ -46,3 +47,11 @@ class QueryStructureTypeFactory(factory.DjangoModelFactory):
     class Meta:
         model = QueryStructureType
 
+
+class QueryStructureTypeJSONFactory(factory.DictFactory):
+    """Manufactures `QueryStructureType` dictionaries."""
+
+    name = factory.Faker("slug")
+    label = factory.Faker("text")
+    short_description = factory.Faker("text")
+    long_description = factory.Faker("text")
