@@ -12,9 +12,6 @@ from chemreg.compound.validators import (
     validate_inchikey_regex,
 )
 
-import re
-from django.template.defaultfilters import slugify
-
 
 class BaseCompound(CommonInfo, PolymorphicModel):
     """The base class for compounds.

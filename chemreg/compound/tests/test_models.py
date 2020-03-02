@@ -9,17 +9,13 @@ from polymorphic.models import PolymorphicModel
 from chemreg.compound.fields import StructureAliasField
 from chemreg.compound.models import BaseCompound, DefinedCompound
 from chemreg.compound.settings import compound_settings
-from chemreg.compound.tests.factories import (
-    BaseCompoundFactory,
-    QueryStructureTypeFactory,
-)
+from chemreg.compound.tests.factories import BaseCompoundFactory
 from chemreg.compound.utils import build_cid, extract_int
 from chemreg.compound.validators import (
     validate_cid_checksum,
     validate_cid_prefix,
     validate_cid_regex,
 )
-from django.db.utils import IntegrityError
 
 
 def test_compound_attr():
@@ -47,22 +43,6 @@ def test_definedcompound_attr():
     assert isinstance(molefile, StructureAliasField)
     assert isinstance(inchikey, models.CharField)
     assert inchikey.max_length == 29
-
-
-@pytest.mark.django_db(transaction=True)
-def test_query_structure_type():
-    """Test creation of `QueryStructureType` objects."""
-
-    # all the fields are non-nullable
-    with pytest.raises(IntegrityError):
-        QueryStructureTypeFactory(
-            name="ill-defined", label="Ill-Defined", short_description=None
-        )
-
-    qst2 = QueryStructureTypeFactory(name="ill-defined", label="Ill Defined")
-    # the name field needs to be unique
-    with pytest.raises(IntegrityError):
-        qst3 = QueryStructureTypeFactory(name="ill-defined", label="Ill Defined")
 
 
 @pytest.mark.django_db
