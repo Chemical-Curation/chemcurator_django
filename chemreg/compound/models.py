@@ -53,7 +53,7 @@ class DefinedCompound(BaseCompound):
     inchikey = models.CharField(max_length=29, validators=[validate_inchikey_regex])
 
 
-class QueryStructureType(models.Model):
+class QueryStructureType(CommonInfo):
     """A controlled vocabulary
 
     Attributes:
