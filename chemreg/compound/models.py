@@ -84,6 +84,3 @@ class QueryStructureType(CommonInfo):
 
     def __str__(self):
         return self.label
-
-    # from chemreg.compound.models import QueryStructureType
-    # qst=QueryStructureType(name="$ slug",label="a label",short_description="something short",long_description="much longer" * 20)
