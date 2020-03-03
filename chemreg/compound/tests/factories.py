@@ -3,14 +3,10 @@ import factory
 from chemreg.compound.models import (
     BaseCompound,
     DefinedCompound,
-    QueryStructureType,
     IllDefinedCompound,
+    QueryStructureType,
 )
-from chemreg.compound.tests.fakers import (
-    CIDFaker,
-    InChIKeyFaker,
-    MRVFileFaker,
-)
+from chemreg.compound.tests.fakers import CIDFaker, InChIKeyFaker, MRVFileFaker
 
 factory.Faker.add_provider(CIDFaker)
 factory.Faker.add_provider(InChIKeyFaker)
@@ -72,13 +68,7 @@ class IllDefinedCompoundFactory(factory.DjangoModelFactory):
 
     cid = factory.Faker("cid")
     mrvfile = factory.Faker("mrvfile")
-    query_structure_type = factory.SubFactory(
-        QueryStructureTypeFactory,
-        name="ill-defined",
-        label="Ill Defined",
-        short_description="An ill-defined compound",
-        long_description="A longer description of an ill-defined compound",
-    )
+    query_structure_type = factory.SubFactory(QueryStructureTypeFactory)
 
     class Meta:
         model = IllDefinedCompound
@@ -90,7 +80,7 @@ class IllDefinedCompoundJSONFactory(factory.DictFactory):
     id = factory.Faker("cid")
     mrvfile = factory.Faker("text")
     query_structure_type = factory.build(
-        dict,
+        QueryStructureType,
         FACTORY_CLASS=QueryStructureTypeFactory,
         name="ill-defined",
         label="Ill Defined",

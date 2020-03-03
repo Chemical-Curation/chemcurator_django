@@ -2,8 +2,8 @@ import pytest
 
 from chemreg.compound.models import (
     DefinedCompound,
-    QueryStructureType,
     IllDefinedCompound,
+    QueryStructureType,
 )
 from chemreg.compound.serializers import (
     DefinedCompoundSerializer,

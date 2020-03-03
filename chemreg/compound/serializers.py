@@ -3,8 +3,8 @@ from rest_framework import serializers
 from chemreg.compound.models import (
     BaseCompound,
     DefinedCompound,
-    QueryStructureType,
     IllDefinedCompound,
+    QueryStructureType,
 )
 
 
@@ -30,6 +30,8 @@ class DefinedCompoundSerializer(BaseCompoundSerializer):
 
 class IllDefinedCompoundSerializer(BaseCompoundSerializer):
     """The serializer for ill-defined compounds."""
+
+    query_structure_type = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = IllDefinedCompound
