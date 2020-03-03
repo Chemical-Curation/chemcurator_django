@@ -21,7 +21,7 @@ def test_invalid_inchikey(compound, invalid_inchikey):
 
 
 @pytest.mark.parametrize("compound", ["IllDefinedCompound"], indirect=["compound"])
-def test_mrvfile(compound, mrvfile):
+def test_ill_Defined_compound(compound, mrvfile):
     """Test that an ill-defined compound can be created with the provided mrvfile."""
     serializer = compound["serializer"]
     json_factory = compound["json_factory"]
@@ -49,11 +49,6 @@ def test_query_structure_type(query_structure_type):
     json["name"] = "query-structure-type-2"
     json["label"] = "Query Structure Type 2"
     assert serializer(data=json).is_valid()
-
-    # a duplicate name or label should be invalid,
-    # so re-serializing the same data should not work
-    json["label"] = "Query Structure Type 2 duplicated"
-    assert not serializer(data=json).is_valid()
 
 
 @pytest.mark.django_db(transaction=True)
