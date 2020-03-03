@@ -48,3 +48,39 @@ class DefinedCompound(BaseCompound):
 
     molefile = StructureAliasField()
     inchikey = models.CharField(max_length=29, validators=[validate_inchikey_regex])
+
+
+class QueryStructureType(CommonInfo):
+    """A controlled vocabulary
+
+    Attributes:
+    Name = String (Less than 50 character, url safe, unique, required field)
+    Label = String (Less than 100 characters, unique, required field)
+    Short Description = String (Less than 500 characters, required field)
+    Long Description = TEXT (required field)
+    """
+
+    name = models.SlugField(
+        max_length=49,
+        verbose_name="name",
+        help_text="Query structure type name",
+        unique=True,
+    )
+    label = models.CharField(
+        max_length=99,
+        verbose_name="label",
+        help_text="Query structure type label",
+        unique=True,
+    )
+    short_description = models.CharField(
+        max_length=499,
+        verbose_name="short description",
+        help_text="Query structure type short description",
+    )
+    long_description = models.TextField(
+        verbose_name="long description",
+        help_text="Query structure type long description",
+    )
+
+    def __str__(self):
+        return self.label

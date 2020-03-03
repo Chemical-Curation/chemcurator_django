@@ -1,11 +1,16 @@
 import pytest
 
-from chemreg.compound.models import DefinedCompound
-from chemreg.compound.serializers import DefinedCompoundSerializer
+from chemreg.compound.models import DefinedCompound, QueryStructureType
+from chemreg.compound.serializers import (
+    DefinedCompoundSerializer,
+    QueryStructureTypeSerializer,
+)
 from chemreg.compound.settings import compound_settings
 from chemreg.compound.tests.factories import (
     DefinedCompoundFactory,
     DefinedCompoundJSONFactory,
+    QueryStructureTypeFactory,
+    QueryStructureTypeJSONFactory,
 )
 
 COMPOUND_REGISTRY = {
@@ -14,8 +19,23 @@ COMPOUND_REGISTRY = {
         "json_factory": DefinedCompoundJSONFactory,
         "model": DefinedCompound,
         "serializer": DefinedCompoundSerializer,
-    }
+    },
 }
+
+QUERY_STRUCTURE_TYPE_REGISTRY = {
+    "QueryStructureType": {
+        "factory": QueryStructureTypeFactory,
+        "json_factory": QueryStructureTypeJSONFactory,
+        "model": QueryStructureType,
+        "serializer": QueryStructureTypeSerializer,
+    },
+}
+
+
+@pytest.fixture(params=QUERY_STRUCTURE_TYPE_REGISTRY.keys())
+def querystructuretype(request):
+    """The registry entry for the `QueryStructureType`."""
+    return QUERY_STRUCTURE_TYPE_REGISTRY[request.param]
 
 
 @pytest.fixture(params=COMPOUND_REGISTRY.keys())

@@ -20,6 +20,24 @@ def test_invalid_inchikey(compound, invalid_inchikey):
     assert not serializer(data=json).is_valid()
 
 
+@pytest.mark.django_db
+def test_query_structure_type(querystructuretype):
+    """Test that a query structure type name with reserved chars is invalid"""
+    serializer = querystructuretype["serializer"]
+    json_factory = querystructuretype["json_factory"]
+    json = json_factory.build()
+    json["name"] = "query structure type"
+    assert not serializer(data=json).is_valid()
+
+    json["name"] = "querystructuretype1"
+    json["label"] = "Query Structure Type 1"
+    assert serializer(data=json).is_valid()
+
+    json["name"] = "query-structure-type-2"
+    json["label"] = "Query Structure Type 2"
+    assert serializer(data=json).is_valid()
+
+
 def test_compound_deserialize(compound):
     """Test that a compound JSON is properly deserialized."""
     serializer = compound["serializer"]
