@@ -20,11 +20,24 @@ def test_invalid_inchikey(compound, invalid_inchikey):
     assert not serializer(data=json).is_valid()
 
 
+@pytest.mark.parametrize("compound", ["IllDefinedCompound"], indirect=["compound"])
+def test_mrvfile(compound, mrvfile):
+    """Test that an ill-defined compound can be created with the provided mrvfile."""
+    serializer = compound["serializer"]
+    json_factory = compound["json_factory"]
+    json = json_factory.build()
+    json["mrvfile"] = mrvfile
+    print("Validating:")
+    print(serializer(data=json).is_valid())
+    print(serializer(data=json).__dict__)
+    assert serializer(data=json).is_valid()
+
+
 @pytest.mark.django_db(transaction=True)
-def test_query_structure_type(querystructuretype):
+def test_query_structure_type(query_structure_type):
     """Test that a query structure type name with reserved chars is invalid"""
-    serializer = querystructuretype["serializer"]
-    json_factory = querystructuretype["json_factory"]
+    serializer = query_structure_type["serializer"]
+    json_factory = query_structure_type["json_factory"]
     json = json_factory.build()
     json["name"] = "query structure type"
     assert not serializer(data=json).is_valid()
@@ -37,11 +50,13 @@ def test_query_structure_type(querystructuretype):
     json["label"] = "Query Structure Type 2"
     assert serializer(data=json).is_valid()
 
-    # a duplicate name or label should be invalid
-    json["name"] = "query-structure-type-2"
-    assert serializer(data=json).is_valid()
+    # a duplicate name or label should be invalid,
+    # so re-serializing the same data should not work
+    json["label"] = "Query Structure Type 2 duplicated"
+    assert not serializer(data=json).is_valid()
 
 
+@pytest.mark.django_db(transaction=True)
 def test_compound_deserialize(compound):
     """Test that a compound JSON is properly deserialized."""
     serializer = compound["serializer"]
@@ -50,6 +65,7 @@ def test_compound_deserialize(compound):
     assert serializer(data=json).is_valid()
 
 
+@pytest.mark.django_db(transaction=True)
 def test_compound_serialize(compound):
     """Test that a compound model is properly serialized."""
     serializer = compound["serializer"]

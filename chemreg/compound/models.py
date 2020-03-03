@@ -50,6 +50,21 @@ class DefinedCompound(BaseCompound):
     inchikey = models.CharField(max_length=29, validators=[validate_inchikey_regex])
 
 
+class IllDefinedCompound(BaseCompound):
+    """An ill-defined compound.
+
+    Attributes:
+        molefile (str): A v3000 molefile. Alias to definitive structure string.
+        inchikey (str): A hashed key based off of the chemical structure.
+
+    """
+
+    mrvfile = StructureAliasField()
+    query_structure_type = models.ForeignKey(
+        "QueryStructureType", on_delete=models.PROTECT
+    )
+
+
 class QueryStructureType(CommonInfo):
     """A controlled vocabulary
 
