@@ -1,7 +1,7 @@
 from django.apps import apps
 from django.conf import settings
 from django.db import models
-from django.test import RequestFactory
+from rest_framework.test import APIClient
 
 import pytest
 
@@ -14,22 +14,21 @@ def media_storage(settings, tmpdir):
 
 
 @pytest.fixture
+def client() -> APIClient:
+    return APIClient()
+
+
+@pytest.fixture
 def user() -> settings.AUTH_USER_MODEL:
     return UserFactory()
 
 
-@pytest.fixture
-def request_factory() -> RequestFactory:
-    return RequestFactory()
+def is_chemreg_model(model: models.Model) -> bool:
+    """Sees if a model is from the `chemreg` application."""
+    return model.__module__.startswith("chemreg")
 
 
-def get_chemreg_models():
-    for model in apps.get_models():
-        if model.__module__.startswith("chemreg"):
-            yield model
-
-
-@pytest.fixture(params=get_chemreg_models())
+@pytest.fixture(params=filter(is_chemreg_model, apps.get_models()))
 def chemreg_model(request) -> models.Model:
-    model = request.param
-    yield model
+    """A model from the chemreg application."""
+    return request.param

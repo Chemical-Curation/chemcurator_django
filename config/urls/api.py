@@ -1,11 +1,5 @@
-from django.http import HttpResponse
-from django.urls import path
-
-
-def apidoc_placeholder(request):
-    return HttpResponse("placeholder for api documentation")
-
+from django.urls import include, path
 
 urlpatterns = [
-    path("", apidoc_placeholder),
+    path("", include("chemreg.auth.urls")),
 ]
