@@ -12,6 +12,7 @@ env = environ.Env(
     SESSION_COOKIE_AGE=(int, 900),
     SECRET_KEY=(str, "secret"),
     URL_CONF=(str, "api"),
+    WHITELIST_CORS=(str, ""),
     WHITELIST_HOST=(str, ""),
     WHITELIST_LOCAL=(bool, True),
     WEB_CONCURRENCY=(int, 1),
@@ -58,10 +59,10 @@ MEDIA_ROOT = APPS_DIR("media")
 MEDIA_URL = "/media/"
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -124,6 +125,26 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 STATIC_ROOT = ROOT_DIR("collected_static")
 STATIC_URL = "/static/"
+
+#######################
+#    CORS Settings    #
+# django-cors-headers #
+#######################
+# https://github.com/adamchainz/django-cors-headers#configuration
+
+CORS_ORIGIN_REGEX_WHITELIST = []
+if env("WHITELIST_LOCAL"):
+    CORS_ORIGIN_REGEX_WHITELIST += [
+        r"^http://0\.0\.0\.0:\d+/$",
+        r"^https://0\.0\.0\.0:\d+/$",
+        r"^http://127\.0\.0\.1:\d+/$",
+        r"^https://127\.0\.0\.1:\d+/$",
+        r"^http://localhost:\d+/$",
+        r"^https://localhost:\d+/$",
+    ]
+CORS_ORIGIN_WHITELIST = []
+if env("WHITELIST_CORS"):
+    CORS_ORIGIN_WHITELIST += ["https://" + env("WHITELIST_CORS")]
 
 #######################
 #  Gunicorn Settings  #
