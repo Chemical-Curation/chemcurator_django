@@ -155,6 +155,19 @@ if env("WHITELIST_CORS"):
 
 WEB_CONCURRENCY = env("WEB_CONCURRENCY")
 
+####################################
+#  Django REST Framework Settings  #
+#          rest_framework          #
+####################################
+# https://www.django-rest-framework.org/api-guide/settings/
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "chemreg.auth.authentication.CsrfExemptSessionAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
+    ]
+}
+
 #########################
 #  WhiteNoise Settings  #
 #      whitenoise       #
