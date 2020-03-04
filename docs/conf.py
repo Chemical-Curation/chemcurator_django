@@ -14,7 +14,7 @@ import sys
 import django
 import sphinx_rtd_theme
 sys.path.insert(0, os.path.abspath('..'))
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
 
