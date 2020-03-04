@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "polymorphic",
     "rest_framework",
     # Local apps
+    "chemreg.auth.apps.AuthConfig",
     "chemreg.common.apps.CommonConfig",
     "chemreg.compound.apps.CompoundConfig",
     "chemreg.users.apps.UsersConfig",
