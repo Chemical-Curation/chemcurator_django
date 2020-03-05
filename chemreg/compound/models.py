@@ -54,8 +54,9 @@ class IllDefinedCompound(BaseCompound):
     """An ill-defined compound.
 
     Attributes:
-        molefile (str): A v3000 molefile. Alias to definitive structure string.
-        inchikey (str): A hashed key based off of the chemical structure.
+        mrvfile (str): Alias to definitive structure string.
+        query_structure_type (foreign key): A foreign key to the "ill-defined" item in the "query structure type"
+         controlled vocabulary
 
     """
 

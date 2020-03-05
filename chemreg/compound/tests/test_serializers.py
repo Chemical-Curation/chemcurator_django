@@ -27,13 +27,10 @@ def test_ill_Defined_compound(compound, mrvfile):
     json_factory = compound["json_factory"]
     json = json_factory.build()
     json["mrvfile"] = mrvfile
-    print("Validating:")
-    print(serializer(data=json).is_valid())
-    print(serializer(data=json).__dict__)
     assert serializer(data=json).is_valid()
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db
 def test_query_structure_type(query_structure_type):
     """Test that a query structure type name with reserved chars is invalid"""
     serializer = query_structure_type["serializer"]
@@ -51,7 +48,7 @@ def test_query_structure_type(query_structure_type):
     assert serializer(data=json).is_valid()
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db
 def test_compound_deserialize(compound):
     """Test that a compound JSON is properly deserialized."""
     serializer = compound["serializer"]
@@ -60,7 +57,7 @@ def test_compound_deserialize(compound):
     assert serializer(data=json).is_valid()
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db
 def test_compound_serialize(compound):
     """Test that a compound model is properly serialized."""
     serializer = compound["serializer"]
