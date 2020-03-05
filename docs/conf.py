@@ -13,8 +13,9 @@ import os
 import sys
 import django
 import sphinx_rtd_theme
-sys.path.insert(0, os.path.abspath('..'))
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
+
+sys.path.insert(0, os.path.abspath(".."))
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
 
@@ -186,13 +187,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    (
-        "index",
-        "chemreg.tex",
-        "chemreg Documentation",
-        """Dave Lyons""",
-        "manual",
-    )
+    ("index", "chemreg.tex", "chemreg Documentation", """Dave Lyons""", "manual",)
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -220,15 +215,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (
-        "index",
-        "chemreg",
-        "chemreg Documentation",
-        ["""Dave Lyons"""],
-        1,
-    )
-]
+man_pages = [("index", "chemreg", "chemreg Documentation", ["""Dave Lyons"""], 1,)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
