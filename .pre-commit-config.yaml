@@ -1,4 +1,4 @@
-exclude: 'docs|node_modules|migrations|.git|.tox'
+exclude: '\.eggs|\.git|\.hg|\.mypy_cache|\.tox|\.venv|_build|buck-out|build|dist|^[^\/]+\/migrations\/.*|^[^\/]+\/static\/CACHE/.*|docs|node_modules'
 default_stages: [commit]
 fail_fast: true
 
@@ -7,6 +7,8 @@ repos:
     rev: master
     hooks:
       - id: trailing-whitespace
+        files: (^|/)a/.+\.(py|html|sh|css|js)$
+      - id: end-of-file-fixer
         files: (^|/)a/.+\.(py|html|sh|css|js)$
 
 -   repo: local
