@@ -1,6 +1,11 @@
 from rest_framework import serializers
 
-from chemreg.compound.models import BaseCompound, DefinedCompound, QueryStructureType
+from chemreg.compound.models import (
+    BaseCompound,
+    DefinedCompound,
+    IllDefinedCompound,
+    QueryStructureType,
+)
 
 
 class BaseCompoundSerializer(serializers.ModelSerializer):
@@ -21,6 +26,16 @@ class DefinedCompoundSerializer(BaseCompoundSerializer):
     class Meta:
         model = DefinedCompound
         fields = ("id", "molefile", "inchikey")
+
+
+class IllDefinedCompoundSerializer(BaseCompoundSerializer):
+    """The serializer for ill-defined compounds."""
+
+    query_structure_type = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
+    class Meta:
+        model = IllDefinedCompound
+        fields = ("id", "mrvfile", "query_structure_type")
 
 
 class QueryStructureTypeSerializer(serializers.ModelSerializer):
