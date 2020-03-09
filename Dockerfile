@@ -12,9 +12,7 @@ RUN pip --no-cache-dir install -r /requirements.txt \
 
 COPY . /app/.
 WORKDIR /app
-RUN mv template.env .env \
- && python manage.py collectstatic \
- && mv .env template.env
+RUN python manage.py collectstatic
 
 CMD gunicorn config.wsgi -c config/gunicorn.py
 
