@@ -19,7 +19,12 @@ def compute_checksum(i: Optional[int]) -> int:
         The CID checksum.
 
     """
-    return 0
+    try:
+        loci = (x for x in range(1, len(str(i)) + 1))
+        vals = (int(x) for x in str(i))
+        return sum(x * y for x, y in zip(loci, vals)) % 10
+    except ValueError:
+        return None
 
 
 def build_cid(i=None) -> str:
