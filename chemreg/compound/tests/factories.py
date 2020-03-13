@@ -29,6 +29,7 @@ class DefinedCompoundFactory(factory.DjangoModelFactory):
     cid = factory.Faker("cid")
     molefile = factory.Faker("text")
     inchikey = factory.Faker("inchikey")
+    created_at = factory.Faker("date_time_this_century")
 
     class Meta:
         model = DefinedCompound

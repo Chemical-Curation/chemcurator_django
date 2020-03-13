@@ -1,7 +1,8 @@
 from django.apps import apps
 from django.conf import settings
 from django.db import models
-from rest_framework.test import APIClient
+from django.test import RequestFactory
+from rest_framework.test import APIClient, APIRequestFactory
 
 import pytest
 
@@ -16,6 +17,22 @@ def media_storage(settings, tmpdir):
 @pytest.fixture
 def client() -> APIClient:
     return APIClient()
+
+
+@pytest.fixture  # isn't this already in fixtures as "rf" | $ pytest --fixtures
+def request_factory() -> RequestFactory:
+    return RequestFactory()
+
+
+@pytest.fixture
+def api_request_factory() -> APIRequestFactory:
+    return APIRequestFactory(enforce_csrf_checks=True)
+
+
+def get_chemreg_models():
+    for model in apps.get_models():
+        if model.__module__.startswith("chemreg"):
+            yield model
 
 
 @pytest.fixture

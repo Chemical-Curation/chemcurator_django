@@ -36,6 +36,9 @@ class BaseCompound(CommonInfo, PolymorphicModel):
     )
     structure = models.TextField()
 
+    class Meta:  # without this pytest will throw a `UnorderedObjectListWarning`
+        ordering = ["created_at"]
+
 
 class DefinedCompound(BaseCompound):
     """A defined compound.
