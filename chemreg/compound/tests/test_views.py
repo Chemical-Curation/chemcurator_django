@@ -1,17 +1,12 @@
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
-from rest_framework.renderers import JSONRenderer
 
-from chemreg.compound.models import (
-    DefinedCompound,
-    QueryStructureType,
-    IllDefinedCompound,
-)
+from chemreg.compound.models import DefinedCompound, IllDefinedCompound
+from chemreg.compound.serializers import IllDefinedCompoundSerializer
 from chemreg.compound.tests.factories import (
     DefinedCompoundFactory,
     IllDefinedCompoundFactory,
 )
-from chemreg.compound.serializers import IllDefinedCompoundSerializer
 
 
 class TestDefinedCompoundViewSet(APITestCase):
