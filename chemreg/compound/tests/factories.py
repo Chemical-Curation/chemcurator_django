@@ -80,11 +80,11 @@ class IllDefinedCompoundJSONFactory(factory.DictFactory):
 
     id = factory.Faker("cid")
     mrvfile = factory.Faker("text")
-    query_structure_type = factory.build(
-        QueryStructureType,
-        FACTORY_CLASS=QueryStructureTypeFactory,
-        name="ill-defined",
-        label="Ill Defined",
-        short_description="An ill-defined compound",
-        long_description="A longer description of an ill-defined compound",
-    )
+    # query_structure_type = factory.build(
+    #     dict,
+    #     FACTORY_CLASS=QueryStructureTypeFactory,
+    #     name="ill-defined",
+    #     label="Ill Defined",
+    #     short_description="An ill-defined compound",
+    #     long_description="A longer description of an ill-defined compound",
+    # )

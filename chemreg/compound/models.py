@@ -53,22 +53,6 @@ class DefinedCompound(BaseCompound):
     inchikey = models.CharField(max_length=29, validators=[validate_inchikey_regex])
 
 
-class IllDefinedCompound(BaseCompound):
-    """An ill-defined compound.
-
-    Attributes:
-        mrvfile (str): Alias to definitive structure string.
-        query_structure_type (foreign key): A foreign key to the "ill-defined" item in the "query structure type"
-         controlled vocabulary
-
-    """
-
-    mrvfile = StructureAliasField()
-    query_structure_type = models.ForeignKey(
-        "QueryStructureType", on_delete=models.PROTECT
-    )
-
-
 class QueryStructureType(CommonInfo):
     """A controlled vocabulary
 
@@ -103,3 +87,32 @@ class QueryStructureType(CommonInfo):
 
     def __str__(self):
         return self.label
+
+
+def get_illdefined_qst():
+    qst, created = QueryStructureType.objects.get_or_create(
+        name="ill-defined",
+        defaults={"label": "Ill defined", "short_description": "Ill defined"},
+    )
+    if created:
+        qst.save()
+    return qst.pk
+
+
+class IllDefinedCompound(BaseCompound):
+    """An ill-defined compound.
+
+    Attributes:
+        mrvfile (str): Alias to definitive structure string.
+        query_structure_type (foreign key): A foreign key to the "ill-defined" record in the "query structure type"
+         controlled vocabulary
+
+    """
+
+    mrvfile = StructureAliasField()
+    query_structure_type = models.ForeignKey(
+        "QueryStructureType", on_delete=models.PROTECT, default=get_illdefined_qst
+    )
+
+    class Meta:
+        verbose_name = "ill-defined compound"

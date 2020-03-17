@@ -51,19 +51,20 @@ class DefinedCompoundSerializer(BaseCompoundSerializer, TypeSerializer):
         return rep
 
 
-class IllDefinedCompoundSerializer(BaseCompoundSerializer):
-    """The serializer for ill-defined compounds."""
-
-    query_structure_type = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-
-    class Meta:
-        model = IllDefinedCompound
-        fields = ("id", "mrvfile", "query_structure_type")
-
-
 class QueryStructureTypeSerializer(serializers.ModelSerializer):
     """The serializer for query structure type."""
 
     class Meta:
         model = QueryStructureType
         fields = ("name", "label", "short_description", "long_description")
+
+
+class IllDefinedCompoundSerializer(BaseCompoundSerializer, TypeSerializer):
+    """The serializer for ill-defined compounds."""
+
+    # query_structure_type = serializers.RelatedField(many=False, read_only=True)
+    query_structure_type = QueryStructureTypeSerializer(many=False, required=False)
+
+    class Meta:
+        model = IllDefinedCompound
+        fields = ("type", "id", "mrvfile", "query_structure_type")

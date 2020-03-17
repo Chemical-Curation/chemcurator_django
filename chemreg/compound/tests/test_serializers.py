@@ -21,7 +21,7 @@ def test_invalid_inchikey(compound, invalid_inchikey):
 
 
 @pytest.mark.parametrize("compound", ["IllDefinedCompound"], indirect=["compound"])
-def test_ill_Defined_compound(compound, mrvfile):
+def test_ill_defined_compound(compound, mrvfile):
     """Test that an ill-defined compound can be created with the provided mrvfile."""
     serializer = compound["serializer"]
     json_factory = compound["json_factory"]
