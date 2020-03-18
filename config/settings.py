@@ -136,12 +136,12 @@ STATIC_URL = "/static/"
 CORS_ORIGIN_REGEX_WHITELIST = []
 if env("WHITELIST_LOCAL"):
     CORS_ORIGIN_REGEX_WHITELIST += [
-        r"^http://0\.0\.0\.0:\d+/$",
-        r"^https://0\.0\.0\.0:\d+/$",
-        r"^http://127\.0\.0\.1:\d+/$",
-        r"^https://127\.0\.0\.1:\d+/$",
-        r"^http://localhost:\d+/$",
-        r"^https://localhost:\d+/$",
+        r"^http://0\.0\.0\.0:\d+$",
+        r"^https://0\.0\.0\.0:\d+$",
+        r"^http://127\.0\.0\.1:\d+$",
+        r"^https://127\.0\.0\.1:\d+$",
+        r"^http://localhost:\d+$",
+        r"^https://localhost:\d+$",
     ]
 CORS_ORIGIN_WHITELIST = []
 if env("WHITELIST_CORS"):
