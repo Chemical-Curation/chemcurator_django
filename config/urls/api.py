@@ -6,6 +6,7 @@ from chemreg.compound import views
 # Create a router and register our viewsets with it.
 router = DefaultRouter()
 router.register(r"defined-compounds", views.DefinedCompoundViewSet)
+router.register(r"ill-defined-compounds", views.IllDefinedCompoundViewSet)
 
 
 urlpatterns = [
