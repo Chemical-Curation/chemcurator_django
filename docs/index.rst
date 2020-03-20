@@ -11,6 +11,7 @@ Table of Contents:
 .. toctree::
    :maxdepth: 2
 
+   chemreg/chemreg.auth
    chemreg/chemreg.common
    chemreg/chemreg.compound
    chemreg/chemreg.users

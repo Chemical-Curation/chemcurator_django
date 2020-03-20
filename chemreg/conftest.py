@@ -2,6 +2,7 @@ from django.apps import apps
 from django.conf import settings
 from django.db import models
 from django.test import RequestFactory
+from rest_framework.test import APIClient, APIRequestFactory
 
 import pytest
 
@@ -14,13 +15,18 @@ def media_storage(settings, tmpdir):
 
 
 @pytest.fixture
-def user() -> settings.AUTH_USER_MODEL:
-    return UserFactory()
+def client() -> APIClient:
+    return APIClient()
+
+
+@pytest.fixture  # isn't this already in fixtures as "rf" | $ pytest --fixtures
+def request_factory() -> RequestFactory:
+    return RequestFactory()
 
 
 @pytest.fixture
-def request_factory() -> RequestFactory:
-    return RequestFactory()
+def api_request_factory() -> APIRequestFactory:
+    return APIRequestFactory(enforce_csrf_checks=True)
 
 
 def get_chemreg_models():
@@ -29,7 +35,17 @@ def get_chemreg_models():
             yield model
 
 
-@pytest.fixture(params=get_chemreg_models())
+@pytest.fixture
+def user() -> settings.AUTH_USER_MODEL:
+    return UserFactory()
+
+
+def is_chemreg_model(model: models.Model) -> bool:
+    """Sees if a model is from the `chemreg` application."""
+    return model.__module__.startswith("chemreg")
+
+
+@pytest.fixture(params=filter(is_chemreg_model, apps.get_models()))
 def chemreg_model(request) -> models.Model:
-    model = request.param
-    yield model
+    """A model from the chemreg application."""
+    return request.param
