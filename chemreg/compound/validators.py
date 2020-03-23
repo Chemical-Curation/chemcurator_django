@@ -2,24 +2,11 @@ import re
 
 from django.core.exceptions import ValidationError
 
+from indigo import IndigoException
+
 from chemreg.compound.settings import compound_settings
 from chemreg.compound.utils import compute_checksum, extract_checksum, extract_int
-
-
-def validate_cid_prefix(cid: str) -> None:
-    """Validates that the CID begins with a valid prefix.
-
-    Args:
-        cid: The CID string
-
-    Raises:
-        ValidationError: If the CID does not have a valid prefix.
-
-    """
-    if not cid.startswith(compound_settings.PREFIX):
-        raise ValidationError(
-            f"Invalid prefix. Expected {compound_settings.PREFIX}CID$0######."
-        )
+from chemreg.indigo.inchi import get_inchikey
 
 
 def validate_cid_regex(cid: str) -> None:
@@ -55,17 +42,30 @@ def validate_cid_checksum(cid: str) -> None:
         raise ValidationError(f"Invalid checksum. Expected {real_checksum}.")
 
 
-def validate_inchikey_regex(inchikey: str) -> None:
-    """Validates that the CID contains a valid checksum.
+def validate_inchikey_computable(molfile: str) -> None:
+    """Validates that an InChIKey can be computed from the provided molfile.
 
     Args:
         inchikey: The InChIKey string
 
     Raises:
-        ValidationError: If the InChIKey cannot be parsed.
-
+        ValidationError: If the InChIKey cannot be computed.
     """
-    if not re.match(r"^[A-Z]{14}-[A-Z]{10}-[A-Z]$", inchikey):
-        raise ValidationError(
-            "Invalid InChIKey format. Expected ##############-#########-# with only uppercase letters."
-        )
+    try:
+        get_inchikey(molfile)
+    except IndigoException:
+        raise ValidationError("InChIKey not computable for provided structure.")
+
+
+##############
+# Deprecated #
+##############
+# These validators cannot be removed due to being linked to the model in a previous migration.
+
+
+def validate_cid_prefix(x):
+    pass
+
+
+def validate_inchikey_regex(x):
+    pass

@@ -75,28 +75,6 @@ def invalid_cid(request) -> str:
     return request.param
 
 
-INVALID_INCHIKEYS = [
-    f"{'A'*13}-{'A'*10}-{'A'*1}",  # wrong character count - 0
-    f"{'A'*14}-{'A'*7}-{'A'*1}",  # wrong character count - 1
-    f"{'A'*14}-{'A'*10}-{'A'*2}",  # wrong character count - 2
-    f"{'A'*14}-{'A'*10}{'A'*1}",  # missing dash - 0
-    f"{'A'*14}{'A'*10}-{'A'*1}",  # missing dash - 1
-    f"{'1'*14}{'A'*10}-{'A'*1}",  # numbers not letters - 0
-    f"{'A'*14}{'1'*10}-{'A'*1}",  # numbers not letters - 1
-    f"{'A'*14}{'A'*10}-{'1'*1}",  # numbers not letters - 2
-    f"{'a'*14}{'A'*10}-{'A'*1}",  # lowercase - 0
-    f"{'A'*14}{'a'*10}-{'A'*1}",  # lowercase - 1
-    f"{'A'*14}{'A'*10}-{'a'*1}",  # lowercase - 2
-]
-"""A collection of invalid InChIKeys."""
-
-
-@pytest.fixture(params=INVALID_INCHIKEYS)
-def invalid_inchikey(request) -> str:
-    """An invalid InChIKey string."""
-    return request.param
-
-
 MRVFILES = [
     '<cml><MDocument><MChemicalStruct><molecule molID="m1"><atomArray><atom id="a1" elementType="C" x2="-1.1102230246251565e-16" y2="0"/><atom id="a2" elementType="O" x2="1.54" y2="1.1102230246251565e-16" lonePair="2"/></atomArray><bondArray><bond atomRefs2="a1 a2" order="2" id="b1"/></bondArray></molecule></MChemicalStruct><MElectronContainer occupation="0 0" radical="0" id="o1"><MElectron atomRefs="m1.a2" difLoc="0.0 0.0 0.0"/><MElectron atomRefs="m1.a2" difLoc="0.0 0.0 0.0"/></MElectronContainer><MElectronContainer occupation="0 0" radical="0" id="o2"><MElectron atomRefs="m1.a2" difLoc="0.0 0.0 0.0"/><MElectron atomRefs="m1.a2" difLoc="0.0 0.0 0.0"/></MElectronContainer></MDocument></cml>',
 ]

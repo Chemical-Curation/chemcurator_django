@@ -1,6 +1,7 @@
 import pytest
 
 
+@pytest.mark.django_db
 def test_invalid_cid(compound, invalid_cid):
     """Test that bad IDs will raise validation errors."""
     serializer = compound["serializer"]
@@ -10,16 +11,7 @@ def test_invalid_cid(compound, invalid_cid):
     assert not serializer(data=json).is_valid()
 
 
-@pytest.mark.parametrize("compound", ["DefinedCompound"], indirect=["compound"])
-def test_invalid_inchikey(compound, invalid_inchikey):
-    """Test that bad InChIKeys will raise validation errors."""
-    serializer = compound["serializer"]
-    json_factory = compound["json_factory"]
-    json = json_factory.build()
-    json["inchikey"] = invalid_inchikey
-    assert not serializer(data=json).is_valid()
-
-
+@pytest.mark.django_db
 @pytest.mark.parametrize("compound", ["IllDefinedCompound"], indirect=["compound"])
 def test_ill_defined_compound(compound, mrvfile):
     """Test that an ill-defined compound can be created with the provided mrvfile."""
