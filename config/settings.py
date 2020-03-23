@@ -16,6 +16,7 @@ env = environ.Env(
     WHITELIST_HOST=(str, ""),
     WHITELIST_LOCAL=(bool, True),
     WEB_CONCURRENCY=(int, 1),
+    CORS_ALLOW_CREDENTIALS=(bool, True),
 )
 if os.path.exists(ROOT_DIR(".env")):
     env.read_env(ROOT_DIR(".env"))
@@ -147,6 +148,7 @@ CORS_ORIGIN_WHITELIST = []
 if env("WHITELIST_CORS"):
     CORS_ORIGIN_WHITELIST += ["https://" + env("WHITELIST_CORS")]
 
+CORS_ALLOW_CREDENTIALS = env("CORS_ALLOW_CREDENTIALS")
 #######################
 #  Gunicorn Settings  #
 #      gunicorn       #
