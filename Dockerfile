@@ -1,10 +1,4 @@
-FROM python:3.8-alpine
-
-RUN apk add --no-cache \
-        gcc \
-        musl-dev \
-        libffi-dev \
-        postgresql-dev
+FROM python:3.8-buster
 
 COPY requirements.txt /requirements.txt
 RUN pip --no-cache-dir install -r /requirements.txt \

@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.staticfiles",
     # Third party apps
+    "computed_property",
     "polymorphic",
     "rest_framework",
     # Local apps
