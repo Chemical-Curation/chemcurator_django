@@ -8,7 +8,7 @@ djangorestframework==3.11.0  # https://github.com/encode/django-rest-framework
 epam.indigo==1.4.0b0  # https://github.com/epam/Indigo
 gunicorn[gevent,setproctitle]==20.0.4  # https://github.com/benoitc/gunicorn
 psycogreen==1.0.2  # https://github.com/psycopg/psycogreen/
-psycopg2==2.8.4  # https://github.com/psycopg/psycopg2
+psycopg2-binary==2.8.4  # https://github.com/psycopg/psycopg2
 redis==3.4.1  # https://github.com/antirez/redis
 whitenoise==5.0.1  # https://github.com/evansd/whitenoise
 
