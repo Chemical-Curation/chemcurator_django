@@ -10,7 +10,10 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("compound", "0007_rm_cid_prefix_valid"),
+        ("compound", "0004_illdefinedcompound"),
+    ]
+    run_before = [
+        ("compound", "0005_illdefinedcompoundquerystructuretype"),
     ]
 
     operations = [
