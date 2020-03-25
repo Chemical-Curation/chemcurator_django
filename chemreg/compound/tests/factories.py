@@ -57,7 +57,7 @@ class QueryStructureTypeJSONFactory(factory.DictFactory):
     """Manufactures `QueryStructureType` dictionaries."""
 
     name = factory.Faker("slug")
-    label = factory.Faker("text")
+    label = factory.Faker("pystr", max_chars=15)
     short_description = factory.Faker("text")
     long_description = factory.Faker("text")
 

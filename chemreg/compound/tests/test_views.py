@@ -8,6 +8,7 @@ from chemreg.compound.tests.factories import (
     DefinedCompoundJSONFactory,
     IllDefinedCompoundFactory,
     QueryStructureTypeFactory,
+    QueryStructureTypeJSONFactory,
 )
 
 
@@ -185,30 +186,19 @@ class TestQueryStructureTypeViewSet(APITestCase):
         self.paginated_url = f"{self.list_url}?size=5&page=2"
 
     def test_create_view(self):
-        new = {
-            "name": "new-querystructuretype",
-            "label": "a new query structure type",
-            "short_description": "described here",
-            "long_description": "described at greater length here",
-        }
+        validname = "test-querystructuretype"
+        new = QueryStructureTypeJSONFactory(name=validname)
         response = self.client.post(self.list_url, new)
         assert response.status_code == 201
 
-        new = {
-            "name": "new-querystructuretype",
-            "label": "a new query structure type",
-            "short_description": "described here",
-            "long_description": "described at greater length here",
-        }  # a duplicate name should be rejected
+        new["name"] = validname
+        # a duplicate name should be rejected
         response = self.client.post(self.list_url, new)
         assert response.status_code == 400
 
-        new = {
-            "name": "new querystructuretype",
-            "label": "a new query structure type",
-            "short_description": "described here",
-            "long_description": "described at greater length here",
-        }  # a name with spaces should be rejected
+        invalidname = "test querystructuretype"
+        new = QueryStructureTypeJSONFactory(name=invalidname)
+        # a name with spaces should be rejected
         response = self.client.post(self.list_url, new)
         assert response.status_code == 400
 
