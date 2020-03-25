@@ -12,6 +12,23 @@ import chemreg.compound.utils
 import chemreg.compound.validators
 
 
+def fwd_create_illdefined_querystructuretype(apps, schema_editor):
+    QueryStructureType = apps.get_model("compound", "QueryStructureType")
+    db_alias = schema_editor.connection.alias
+    QueryStructureType.objects.using(db_alias).create(
+        name="ill-defined",
+        label="Ill defined",
+        short_description="Ill defined",
+        long_description="Ill defined",
+    )
+
+
+def rev_create_illdefined_querystructuretype(apps, schema_editor):
+    QueryStructureType = apps.get_model("compound", "QueryStructureType")
+    db_alias = schema_editor.connection.alias
+    QueryStructureType.objects.using(db_alias).filter(name="ill-defined").delete()
+
+
 class Migration(migrations.Migration):
 
     initial = True
@@ -177,6 +194,10 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={"ordering": ["pk"], "abstract": False,},
+        ),
+        migrations.RunPython(
+            fwd_create_illdefined_querystructuretype,
+            rev_create_illdefined_querystructuretype,
         ),
         migrations.CreateModel(
             name="IllDefinedCompound",

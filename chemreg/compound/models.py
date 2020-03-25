@@ -97,13 +97,13 @@ class QueryStructureType(CommonInfo):
 
 
 def get_illdefined_qst():
-    qst, created = QueryStructureType.objects.get_or_create(
-        name="ill-defined",
-        defaults={"label": "Ill defined", "short_description": "Ill defined"},
-    )
-    if created:
-        qst.save()
-    return qst.pk
+    """Default value for `IllDefinedCompound.query_structure_type`.
+
+    This object is created in a data migration. Calling `get_or_create` here will
+    cause migrations to fail if `QueryStructureType` has been modified: the new model
+    would be used to create the model prior to new columns made in the database.
+    """
+    return QueryStructureType.objects.get(name="ill-defined").pk
 
 
 class IllDefinedCompound(BaseCompound):
