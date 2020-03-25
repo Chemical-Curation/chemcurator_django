@@ -21,7 +21,7 @@ class BaseCompound(CommonInfo, PolymorphicModel):
     This model shouldn't exist on it's own. It will always be subclassed
     by a concrete compound. The `chemreg.compound.fields.StructureAliasField`
     can be used to reference the `structure` field on subclassed models. This
-    field can then have a more sesnsible name and varied validation logic
+    field can then have a more sensible name and varied validation logic
     applied to it.
 
     Attributes:
@@ -37,9 +37,6 @@ class BaseCompound(CommonInfo, PolymorphicModel):
         validators=[validate_cid_regex, validate_cid_checksum],
     )
     structure = models.TextField()
-
-    class Meta:  # without this pytest will throw a `UnorderedObjectListWarning`
-        ordering = ["created_at"]
 
 
 class DefinedCompound(BaseCompound):
