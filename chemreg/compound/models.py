@@ -95,9 +95,6 @@ class QueryStructureType(CommonInfo):
         help_text="Query structure type long description",
     )
 
-    class Meta:  # without this pytest will throw a `UnorderedObjectListWarning`
-        ordering = ["created_at"]
-
     def __str__(self):
         return self.label
 
