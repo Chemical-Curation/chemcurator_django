@@ -55,17 +55,3 @@ def validate_inchikey_computable(molfile: str) -> None:
         get_inchikey(molfile)
     except IndigoException:
         raise ValidationError("InChIKey not computable for provided structure.")
-
-
-##############
-# Deprecated #
-##############
-# These validators cannot be removed due to being linked to the model in a previous migration.
-
-
-def validate_cid_prefix(x):
-    pass
-
-
-def validate_inchikey_regex(x):
-    pass

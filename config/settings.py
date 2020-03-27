@@ -68,6 +68,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "crum.CurrentRequestUserMiddleware",
 ]
 ROOT_URLCONF = "config.urls." + env("URL_CONF")
 SECRET_KEY = env("SECRET_KEY")
