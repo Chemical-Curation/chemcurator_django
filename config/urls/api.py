@@ -7,6 +7,7 @@ from chemreg.compound import views
 router = DefaultRouter()
 router.register(r"defined-compounds", views.DefinedCompoundViewSet)
 router.register(r"ill-defined-compounds", views.IllDefinedCompoundViewSet)
+router.register(r"query-structure-types", views.QueryStructureTypeViewSet)
 
 
 urlpatterns = [
