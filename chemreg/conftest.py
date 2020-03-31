@@ -40,6 +40,11 @@ def user() -> settings.AUTH_USER_MODEL:
     return UserFactory()
 
 
+@pytest.fixture
+def user_factory() -> UserFactory:
+    return UserFactory
+
+
 def is_chemreg_model(model: models.Model) -> bool:
     """Sees if a model is from the `chemreg` application."""
     return model.__module__.startswith("chemreg")

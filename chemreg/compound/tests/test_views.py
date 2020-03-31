@@ -7,6 +7,8 @@ from chemreg.compound.tests.factories import (
     DefinedCompoundFactory,
     DefinedCompoundJSONFactory,
     IllDefinedCompoundFactory,
+    QueryStructureTypeFactory,
+    QueryStructureTypeJSONFactory,
 )
 
 
@@ -167,6 +169,48 @@ class TestIllDefinedCompoundViewSet(APITestCase):
             self.idc.query_structure_type.name,
             response.data["query_structure_type"]["name"],
         )
+
+    def test_destroy_view(self):
+        response = self.client.delete(self.detail_url)
+        assert response.status_code == 204
+
+
+class TestQueryStructureTypeViewSet(APITestCase):
+    def setUp(self):
+        self.qst = QueryStructureTypeFactory()
+        self.qst2 = QueryStructureTypeFactory()
+        self.list_url = reverse("querystructuretype-list")
+        self.detail_url = reverse(
+            "querystructuretype-detail", kwargs={"name": self.qst.name}
+        )
+        self.paginated_url = f"{self.list_url}?size=5&page=2"
+
+    def test_create_view(self):
+        validname = "test-querystructuretype"
+        new = QueryStructureTypeJSONFactory(name=validname)
+        response = self.client.post(self.list_url, new)
+        assert response.status_code == 201
+
+        new["name"] = validname
+        # a duplicate name should be rejected
+        response = self.client.post(self.list_url, new)
+        assert response.status_code == 400
+
+        invalidname = "test querystructuretype"
+        new = QueryStructureTypeJSONFactory(name=invalidname)
+        # a name with spaces should be rejected
+        response = self.client.post(self.list_url, new)
+        assert response.status_code == 400
+
+    def test_list_view(self):
+        response = self.client.get(self.list_url, content_type="application/json")
+        self.assertEqual(response.status_code, 200)
+
+    def test_detail_view(self):
+        response = self.client.get(self.detail_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.qst.name, response.data["name"])
+        self.assertEqual(self.qst.label, response.data["label"])
 
     def test_destroy_view(self):
         response = self.client.delete(self.detail_url)

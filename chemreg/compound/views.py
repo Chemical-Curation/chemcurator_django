@@ -1,9 +1,14 @@
 from rest_framework import viewsets
 
-from chemreg.compound.models import DefinedCompound, IllDefinedCompound
+from chemreg.compound.models import (
+    DefinedCompound,
+    IllDefinedCompound,
+    QueryStructureType,
+)
 from chemreg.compound.serializers import (
     DefinedCompoundSerializer,
     IllDefinedCompoundSerializer,
+    QueryStructureTypeSerializer,
 )
 
 
@@ -23,3 +28,13 @@ class IllDefinedCompoundViewSet(viewsets.ModelViewSet):
 
     queryset = IllDefinedCompound.objects.all()
     serializer_class = IllDefinedCompoundSerializer
+
+
+class QueryStructureTypeViewSet(viewsets.ModelViewSet):
+    """
+    This viewset provides `list`, `detail` ,`update`, and `destroy` actions for the
+    QueryStructureType model
+    """
+
+    queryset = QueryStructureType.objects.all()
+    serializer_class = QueryStructureTypeSerializer

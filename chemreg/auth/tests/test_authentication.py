@@ -22,6 +22,9 @@ def test_settings(settings):
     # Prevents CSRF attacks
     assert settings.SESSION_COOKIE_SAMESITE == "Strict"
 
+    # Allows credentials to be sent on other subdomains
+    assert settings.CORS_ALLOW_CREDENTIALS
+
     # SessionAuthentication must not require CSRF checking
     assert (
         "rest_framework.authentication.SessionAuthentication"
