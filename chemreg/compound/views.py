@@ -1,7 +1,5 @@
 from rest_framework import viewsets
 
-from config.pagination import DefaultPagination
-
 from chemreg.compound.models import DefinedCompound, IllDefinedCompound
 from chemreg.compound.serializers import (
     DefinedCompoundSerializer,
@@ -16,8 +14,6 @@ class DefinedCompoundViewSet(viewsets.ModelViewSet):
 
     queryset = DefinedCompound.objects.all()
     serializer_class = DefinedCompoundSerializer
-    lookup_field = "cid"
-    pagination_class = DefaultPagination
 
 
 class IllDefinedCompoundViewSet(viewsets.ModelViewSet):
@@ -27,5 +23,3 @@ class IllDefinedCompoundViewSet(viewsets.ModelViewSet):
 
     queryset = IllDefinedCompound.objects.all()
     serializer_class = IllDefinedCompoundSerializer
-    lookup_field = "cid"
-    pagination_class = DefaultPagination
