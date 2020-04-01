@@ -37,7 +37,6 @@ class DefinedCompoundFactory(factory.DjangoModelFactory):
 class DefinedCompoundJSONFactory(factory.DictFactory):
     """Manufactures `DefinedCompound` dictionaries."""
 
-    id = factory.Faker("cid")
     molfile = factory.Faker("molfile_v3000")
 
 

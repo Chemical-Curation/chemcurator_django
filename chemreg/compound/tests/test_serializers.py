@@ -57,3 +57,17 @@ def test_compound_serialize(compound):
     model = factory.build()
     serialized = serializer(model)
     assert serialized.data["id"] == model.cid
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("compound", ["DefinedCompound"], indirect=["compound"])
+def test_unique_inchikey(compound):
+    serializer = compound["serializer"]
+    factory = compound["factory"]
+    json_factory = compound["json_factory"]
+    model = factory.create()
+    data = json_factory(molfile=model.molfile)
+    serialized = serializer(data=data)
+    assert not serialized.is_valid()
+    assert "molfile" in serialized.errors
+    assert str(serialized.errors["molfile"][0]) == "InChIKey already exists."
