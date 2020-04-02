@@ -21,16 +21,9 @@ class DefinedCompoundSerializer(serializers.ModelSerializer):
 class IllDefinedCompoundSerializer(serializers.ModelSerializer):
     """The serializer for ill-defined compounds."""
 
-    included_serializers = {
-        "query_structure_type": "chemreg.compound.serializers.QueryStructureTypeSerializer",
-    }
-
     class Meta:
         model = IllDefinedCompound
         fields = ("cid", "mrvfile", "query_structure_type")
-
-    class JSONAPIMeta:
-        included_resources = ["query_structure_type"]
 
 
 class QueryStructureTypeSerializer(serializers.ModelSerializer):
