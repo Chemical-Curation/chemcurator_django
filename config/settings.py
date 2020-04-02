@@ -182,6 +182,7 @@ REST_FRAMEWORK = {
         "rest_framework.parsers.FormParser",
         "rest_framework.parsers.MultiPartParser",
     ],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework_json_api.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
