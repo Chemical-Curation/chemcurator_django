@@ -11,7 +11,6 @@ from chemreg.compound.validators import (
     validate_cid_checksum,
     validate_cid_regex,
     validate_inchikey_computable,
-    validate_inchikey_unique,
 )
 from chemreg.indigo.inchi import get_inchikey
 
@@ -49,9 +48,7 @@ class DefinedCompound(BaseCompound):
 
     """
 
-    molfile = StructureAliasField(
-        validators=[validate_inchikey_computable, validate_inchikey_unique]
-    )
+    molfile = StructureAliasField(validators=[validate_inchikey_computable])
     inchikey = ComputedCharField(compute_from="_inchikey", max_length=29)
 
     @property
