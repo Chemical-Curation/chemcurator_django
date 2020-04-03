@@ -176,7 +176,7 @@ REST_FRAMEWORK = {
         "rest_framework.filters.SearchFilter",
     ],
     "DEFAULT_METADATA_CLASS": "rest_framework_json_api.metadata.JSONAPIMetadata",
-    "DEFAULT_PAGINATION_CLASS": "rest_framework_json_api.pagination.JsonApiPageNumberPagination",
+    "DEFAULT_PAGINATION_CLASS": "chemreg.common.jsonapi.JsonApiPageNumberPagination",
     "DEFAULT_PARSER_CLASSES": [
         "rest_framework_json_api.parsers.JSONParser",
         "rest_framework.parsers.FormParser",
