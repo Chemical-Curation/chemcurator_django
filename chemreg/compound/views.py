@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework_json_api import views
 
 from chemreg.compound.models import (
     DefinedCompound,
@@ -12,7 +12,7 @@ from chemreg.compound.serializers import (
 )
 
 
-class DefinedCompoundViewSet(viewsets.ModelViewSet):
+class DefinedCompoundViewSet(views.ModelViewSet):
     """
     This viewset automatically provides `list`, `detail` ,`update`, `destroy` actions.
     """
@@ -21,7 +21,7 @@ class DefinedCompoundViewSet(viewsets.ModelViewSet):
     serializer_class = DefinedCompoundSerializer
 
 
-class IllDefinedCompoundViewSet(viewsets.ModelViewSet):
+class IllDefinedCompoundViewSet(views.ModelViewSet):
     """
     This viewset automatically provides `list`, `detail` ,`update`, `destroy` actions.
     """
@@ -30,7 +30,11 @@ class IllDefinedCompoundViewSet(viewsets.ModelViewSet):
     serializer_class = IllDefinedCompoundSerializer
 
 
-class QueryStructureTypeViewSet(viewsets.ModelViewSet):
+class IllDefinedCompoundRelationshipView(views.RelationshipView):
+    queryset = IllDefinedCompound.objects
+
+
+class QueryStructureTypeViewSet(views.ModelViewSet):
     """
     This viewset provides `list`, `detail` ,`update`, and `destroy` actions for the
     QueryStructureType model
