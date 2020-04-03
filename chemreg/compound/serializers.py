@@ -1,5 +1,4 @@
-from rest_framework_json_api import serializers
-
+from chemreg.common import jsonapi
 from chemreg.compound.models import (
     DefinedCompound,
     IllDefinedCompound,
@@ -7,7 +6,7 @@ from chemreg.compound.models import (
 )
 
 
-class DefinedCompoundSerializer(serializers.ModelSerializer):
+class DefinedCompoundSerializer(jsonapi.ModelSerializer):
     """The serializer for defined compounds."""
 
     class Meta:
@@ -18,7 +17,7 @@ class DefinedCompoundSerializer(serializers.ModelSerializer):
         }
 
 
-class IllDefinedCompoundSerializer(serializers.ModelSerializer):
+class IllDefinedCompoundSerializer(jsonapi.ModelSerializer):
     """The serializer for ill-defined compounds."""
 
     class Meta:
@@ -26,7 +25,7 @@ class IllDefinedCompoundSerializer(serializers.ModelSerializer):
         fields = ("cid", "mrvfile", "query_structure_type")
 
 
-class QueryStructureTypeSerializer(serializers.ModelSerializer):
+class QueryStructureTypeSerializer(jsonapi.ModelSerializer):
     """The serializer for query structure type."""
 
     class Meta:
