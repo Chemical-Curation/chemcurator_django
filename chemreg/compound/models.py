@@ -1,5 +1,7 @@
 from django.db import models
 
+from computed_property import ComputedCharField
+from indigo import IndigoException
 from polymorphic.models import PolymorphicModel
 
 from chemreg.common.models import CommonInfo
@@ -7,10 +9,10 @@ from chemreg.compound.fields import StructureAliasField
 from chemreg.compound.utils import build_cid
 from chemreg.compound.validators import (
     validate_cid_checksum,
-    validate_cid_prefix,
     validate_cid_regex,
-    validate_inchikey_regex,
+    validate_inchikey_computable,
 )
+from chemreg.indigo.inchi import get_inchikey
 
 
 class BaseCompound(CommonInfo, PolymorphicModel):
@@ -19,7 +21,7 @@ class BaseCompound(CommonInfo, PolymorphicModel):
     This model shouldn't exist on it's own. It will always be subclassed
     by a concrete compound. The `chemreg.compound.fields.StructureAliasField`
     can be used to reference the `structure` field on subclassed models. This
-    field can then have a more sesnsible name and varied validation logic
+    field can then have a more sensible name and varied validation logic
     applied to it.
 
     Attributes:
@@ -32,25 +34,30 @@ class BaseCompound(CommonInfo, PolymorphicModel):
         default=build_cid,
         max_length=50,
         unique=True,
-        validators=[validate_cid_prefix, validate_cid_regex, validate_cid_checksum],
+        validators=[validate_cid_regex, validate_cid_checksum],
     )
     structure = models.TextField()
-
-    class Meta:  # without this pytest will throw a `UnorderedObjectListWarning`
-        ordering = ["created_at"]
 
 
 class DefinedCompound(BaseCompound):
     """A defined compound.
 
     Attributes:
-        molefile (str): A v3000 molefile. Alias to definitive structure string.
+        molfile (str): A v3000 molfile. Alias to definitive structure string.
         inchikey (str): A hashed key based off of the chemical structure.
 
     """
 
-    molefile = StructureAliasField()
-    inchikey = models.CharField(max_length=29, validators=[validate_inchikey_regex])
+    molfile = StructureAliasField(validators=[validate_inchikey_computable])
+    inchikey = ComputedCharField(compute_from="_inchikey", max_length=29)
+
+    @property
+    def _inchikey(self):
+        """Computes the inchikey from the molfile."""
+        try:
+            return get_inchikey(self.molfile)
+        except IndigoException:
+            return None
 
 
 class QueryStructureType(CommonInfo):
@@ -90,13 +97,13 @@ class QueryStructureType(CommonInfo):
 
 
 def get_illdefined_qst():
-    qst, created = QueryStructureType.objects.get_or_create(
-        name="ill-defined",
-        defaults={"label": "Ill defined", "short_description": "Ill defined"},
-    )
-    if created:
-        qst.save()
-    return qst.pk
+    """Default value for `IllDefinedCompound.query_structure_type`.
+
+    This object is created in a data migration. Calling `get_or_create` here will
+    cause migrations to fail if `QueryStructureType` has been modified: the new model
+    would be used to create the model prior to new columns made in the database.
+    """
+    return QueryStructureType.objects.get(name="ill-defined").pk
 
 
 class IllDefinedCompound(BaseCompound):

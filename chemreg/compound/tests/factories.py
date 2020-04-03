@@ -6,10 +6,10 @@ from chemreg.compound.models import (
     IllDefinedCompound,
     QueryStructureType,
 )
-from chemreg.compound.tests.fakers import CIDFaker, InChIKeyFaker, MRVFileFaker
+from chemreg.compound.tests.fakers import CIDFaker, MolfileFaker, MRVFileFaker
 
 factory.Faker.add_provider(CIDFaker)
-factory.Faker.add_provider(InChIKeyFaker)
+factory.Faker.add_provider(MolfileFaker)
 factory.Faker.add_provider(MRVFileFaker)
 
 
@@ -27,8 +27,7 @@ class DefinedCompoundFactory(factory.DjangoModelFactory):
     """Manufactures `DefinedCompound` models."""
 
     cid = factory.Faker("cid")
-    molefile = factory.Faker("text")
-    inchikey = factory.Faker("inchikey")
+    molfile = factory.Faker("molfile_v3000")
     created_at = factory.Faker("date_time_this_century")
 
     class Meta:
@@ -39,8 +38,7 @@ class DefinedCompoundJSONFactory(factory.DictFactory):
     """Manufactures `DefinedCompound` dictionaries."""
 
     id = factory.Faker("cid")
-    molefile = factory.Faker("text")
-    inchikey = factory.Faker("inchikey")
+    molfile = factory.Faker("molfile_v3000")
 
 
 class QueryStructureTypeFactory(factory.DjangoModelFactory):
@@ -59,7 +57,7 @@ class QueryStructureTypeJSONFactory(factory.DictFactory):
     """Manufactures `QueryStructureType` dictionaries."""
 
     name = factory.Faker("slug")
-    label = factory.Faker("text")
+    label = factory.Faker("pystr", max_chars=15)
     short_description = factory.Faker("text")
     long_description = factory.Faker("text")
 

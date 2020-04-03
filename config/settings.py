@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.staticfiles",
     # Third party apps
+    "computed_property",
     "polymorphic",
     "rest_framework",
     # Local apps
@@ -67,6 +68,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "crum.CurrentRequestUserMiddleware",
 ]
 ROOT_URLCONF = "config.urls." + env("URL_CONF")
 SECRET_KEY = env("SECRET_KEY")
@@ -133,6 +135,7 @@ STATIC_URL = "/static/"
 #######################
 # https://github.com/adamchainz/django-cors-headers#configuration
 
+CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_REGEX_WHITELIST = []
 if env("WHITELIST_LOCAL"):
     CORS_ORIGIN_REGEX_WHITELIST += [

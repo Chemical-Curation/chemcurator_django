@@ -7,23 +7,21 @@ from chemreg.compound.models import (
     QueryStructureType,
 )
 
-# from rest_framework.validators import UniqueValidator
-
 
 class BaseCompoundSerializer(serializers.ModelSerializer):
     """The base class for serializing compounds."""
-
-    id = serializers.CharField(
-        source="cid",
-        validators=BaseCompound._meta.get_field("cid").validators,
-        # + [UniqueValidator(queryset=BaseCompound.objects.all())], # this will fail tests
-        required=False,
-    )
 
     class Meta:
         model = BaseCompound
         fields = ("cid", "structure", "id")
         lookup_field = "cid"
+
+    def __new__(cls, *args, **kwargs):
+        """Patch in source of ID to `Compound.cid`."""
+        if not hasattr(cls.Meta, "extra_kwargs"):
+            cls.Meta.extra_kwargs = {}
+        cls.Meta.extra_kwargs.update({"id": {"source": "cid"}})
+        return super().__new__(cls, *args, **kwargs)
 
 
 class TypeSerializer(serializers.ModelSerializer):
@@ -40,12 +38,13 @@ class DefinedCompoundSerializer(BaseCompoundSerializer, TypeSerializer):
 
     class Meta:
         model = DefinedCompound
-        fields = ("type", "id", "molefile", "inchikey")
+        fields = ("type", "id", "molfile", "inchikey")
+        extra_kwargs = {"molfile": {"style": {"base_template": "textarea.html"}}}
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         rep["attributes"] = {
-            "molfile-v3000": rep.pop("molefile"),
+            "molfile-v3000": rep.pop("molfile"),
             "inchikey": rep.pop("inchikey"),
         }
         return rep
@@ -68,3 +67,4 @@ class IllDefinedCompoundSerializer(BaseCompoundSerializer, TypeSerializer):
     class Meta:
         model = IllDefinedCompound
         fields = ("type", "id", "mrvfile", "query_structure_type")
+        extra_kwargs = {"mrvfile": {"style": {"base_template": "textarea.html"}}}
