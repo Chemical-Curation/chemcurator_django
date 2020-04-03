@@ -188,7 +188,7 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.BrowsableAPIRenderer",
     ],
     "EXCEPTION_HANDLER": "rest_framework_json_api.exceptions.exception_handler",
-    "PAGE_SIZE": 10,
+    "PAGE_SIZE": 100,
     "SEARCH_PARAM": "filter[search]",
     "TEST_REQUEST_DEFAULT_FORMAT": "vnd.api+json",
     "TEST_REQUEST_RENDERER_CLASSES": [
