@@ -29,7 +29,7 @@ class IllDefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):
         self_link_view_name="ill-defined-compounds-relationships",
     )
 
-    related_serializers = {
+    included_serializers = {
         "query_structure_type": "chemreg.compound.serializers.QueryStructureTypeSerializer",
     }
 
