@@ -3,9 +3,9 @@ django-computed-property==0.3.0  # https://github.com/brechin/django-computed-pr
 django-cors-headers==3.2.1  # https://github.com/adamchainz/django-cors-headers
 django-crum==0.7.5  # https://github.com/ninemoreminutes/django-crum
 django-environ==0.4.5  # https://github.com/joke2k/django-environ
-django-polymorphic==2.1.2  # https://github.com/django-polymorphic/django-polymorphic
 django-redis==4.11.0  # https://github.com/niwinz/django-redis
 djangorestframework==3.11.0  # https://github.com/encode/django-rest-framework
+djangorestframework-jsonapi[django-filter,django-polymorphic]==3.1.0  # https://github.com/django-json-api/django-rest-framework-json-api
 epam.indigo==1.4.0b0  # https://github.com/epam/Indigo
 gunicorn[gevent,setproctitle]==20.0.4  # https://github.com/benoitc/gunicorn
 psycogreen==1.0.2  # https://github.com/psycopg/psycogreen/
@@ -28,6 +28,7 @@ mypy==0.761  # https://github.com/python/mypy
 pre-commit==2.1.1  # https://github.com/pre-commit/pre-commit
 pytest==5.3.5  # https://github.com/pytest-dev/pytest
 pytest-django==3.8.0  # https://github.com/pytest-dev/pytest-django
+pytest-factoryboy==2.0.3  # https://github.com/pytest-dev/pytest-factoryboy
 pytest-sugar==0.9.2  # https://github.com/Frozenball/pytest-sugar
 sphinx==2.4.3  # https://github.com/sphinx-doc/sphinx
 sphinx-rtd-theme==0.4.3  # https://github.com/readthedocs/sphinx_rtd_theme

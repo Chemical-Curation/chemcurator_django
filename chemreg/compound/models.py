@@ -43,19 +43,19 @@ class DefinedCompound(BaseCompound):
     """A defined compound.
 
     Attributes:
-        molfile (str): A v3000 molfile. Alias to definitive structure string.
+        molfile_v3000 (str): A v3000 molfile. Alias to definitive structure string.
         inchikey (str): A hashed key based off of the chemical structure.
 
     """
 
-    molfile = StructureAliasField(validators=[validate_inchikey_computable])
+    molfile_v3000 = StructureAliasField(validators=[validate_inchikey_computable])
     inchikey = ComputedCharField(compute_from="_inchikey", max_length=29)
 
     @property
     def _inchikey(self):
         """Computes the inchikey from the molfile."""
         try:
-            return get_inchikey(self.molfile)
+            return get_inchikey(self.molfile_v3000)
         except IndigoException:
             return None
 

@@ -1,6 +1,4 @@
-from rest_framework import viewsets
-
-from config.pagination import DefaultPagination
+from rest_framework_json_api import views
 
 from chemreg.compound.models import (
     DefinedCompound,
@@ -14,29 +12,29 @@ from chemreg.compound.serializers import (
 )
 
 
-class DefinedCompoundViewSet(viewsets.ModelViewSet):
+class DefinedCompoundViewSet(views.ModelViewSet):
     """
     This viewset automatically provides `list`, `detail` ,`update`, `destroy` actions.
     """
 
     queryset = DefinedCompound.objects.all()
     serializer_class = DefinedCompoundSerializer
-    lookup_field = "cid"
-    pagination_class = DefaultPagination
 
 
-class IllDefinedCompoundViewSet(viewsets.ModelViewSet):
+class IllDefinedCompoundViewSet(views.ModelViewSet):
     """
     This viewset automatically provides `list`, `detail` ,`update`, `destroy` actions.
     """
 
     queryset = IllDefinedCompound.objects.all()
     serializer_class = IllDefinedCompoundSerializer
-    lookup_field = "cid"
-    pagination_class = DefaultPagination
 
 
-class QueryStructureTypeViewSet(viewsets.ModelViewSet):
+class IllDefinedCompoundRelationshipView(views.RelationshipView):
+    queryset = IllDefinedCompound.objects
+
+
+class QueryStructureTypeViewSet(views.ModelViewSet):
     """
     This viewset provides `list`, `detail` ,`update`, and `destroy` actions for the
     QueryStructureType model
@@ -44,5 +42,3 @@ class QueryStructureTypeViewSet(viewsets.ModelViewSet):
 
     queryset = QueryStructureType.objects.all()
     serializer_class = QueryStructureTypeSerializer
-    lookup_field = "name"
-    pagination_class = DefaultPagination

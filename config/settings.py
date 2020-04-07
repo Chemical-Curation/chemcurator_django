@@ -168,8 +168,42 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "chemreg.auth.authentication.CsrfExemptSessionAuthentication",
         "rest_framework.authentication.BasicAuthentication",
-    ]
+    ],
+    "DEFAULT_FILTER_BACKENDS": [
+        "rest_framework_json_api.filters.QueryParameterValidationFilter",
+        "rest_framework_json_api.filters.OrderingFilter",
+        "rest_framework_json_api.django_filters.DjangoFilterBackend",
+        "rest_framework.filters.SearchFilter",
+    ],
+    "DEFAULT_METADATA_CLASS": "rest_framework_json_api.metadata.JSONAPIMetadata",
+    "DEFAULT_PAGINATION_CLASS": "chemreg.common.jsonapi.JsonApiPageNumberPagination",
+    "DEFAULT_PARSER_CLASSES": [
+        "rest_framework_json_api.parsers.JSONParser",
+        "rest_framework.parsers.FormParser",
+        "rest_framework.parsers.MultiPartParser",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework_json_api.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    ],
+    "EXCEPTION_HANDLER": "rest_framework_json_api.exceptions.exception_handler",
+    "PAGE_SIZE": 100,
+    "SEARCH_PARAM": "filter[search]",
+    "TEST_REQUEST_DEFAULT_FORMAT": "vnd.api+json",
+    "TEST_REQUEST_RENDERER_CLASSES": [
+        "rest_framework_json_api.renderers.JSONRenderer",
+    ],
 }
+
+#############################################
+#  Django REST Framework JSON API Settings  #
+#          rest_framework_json_api          #
+#############################################
+# https://django-rest-framework-json-api.readthedocs.io/en/stable/usage.html#configuration
+
+JSON_API_FORMAT_FIELD_NAMES = "camelize"
+JSON_API_FORMAT_TYPES = "camelize"
 
 #########################
 #  WhiteNoise Settings  #
