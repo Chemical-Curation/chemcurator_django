@@ -41,3 +41,11 @@ def test_validate_inchikey_computable(defined_compound_factory):
     assert "InChIKey not computable for provided structure." in (
         str(err) for err in serializer.errors["molfile_v3000"]
     )
+
+
+@pytest.mark.django_db
+def test_validate_smiles(smiles_factory):
+    serializer = defined_compound_factory.build(
+        cid=f"{compound_settings.PREFIX}CID00123"
+    )
+    assert not serializer.is_valid()

@@ -3,5 +3,6 @@
   "python.linting.pycodestyleEnabled": false,
   "python.linting.flake8Enabled": true,
   "python.linting.enabled": true,
-  "python.formatting.provider": "black"
+"python.formatting.provider": "black",
+"python.pythonPath": "/Applications/anaconda3/envs/chemcurator/bin/python"
 }

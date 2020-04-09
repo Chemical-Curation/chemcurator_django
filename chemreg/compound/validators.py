@@ -3,6 +3,11 @@ import re
 from django.core.exceptions import ValidationError
 
 from indigo import IndigoException
+from partialsmiles import ParseSmiles
+
+"""N.M. O'Boyle. partialsmiles
+Available from https://github.com/baoilleach/partialsmiles.
+"""
 
 from chemreg.compound.settings import compound_settings
 from chemreg.compound.utils import compute_checksum, extract_checksum, extract_int
@@ -46,7 +51,7 @@ def validate_inchikey_computable(molfile: str) -> None:
     """Validates that an InChIKey can be computed from the provided molfile.
 
     Args:
-        inchikey: The InChIKey string
+        molfile: The molfile string
 
     Raises:
         ValidationError: If the InChIKey cannot be computed.
@@ -55,3 +60,19 @@ def validate_inchikey_computable(molfile: str) -> None:
         get_inchikey(molfile)
     except IndigoException:
         raise ValidationError("InChIKey not computable for provided structure.")
+
+
+def validate_smiles(smiles: str) -> None:
+    """Validates that the SMILES string posted to a defined compound
+    is formatted properly
+
+    Args:
+        smiles: The SMILES string
+
+    Raises:
+        ValidationError: If the SMILES string is not properly formatted
+    """
+    try:
+        mol = ParseSmiles(smiles, partial=False)
+    except:
+        raise
