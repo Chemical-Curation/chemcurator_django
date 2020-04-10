@@ -1,13 +1,10 @@
 import re
 
 from django.core.exceptions import ValidationError
+from rest_framework import serializers
 
+import partialsmiles as ps
 from indigo import IndigoException
-from partialsmiles import ParseSmiles
-
-"""N.M. O'Boyle. partialsmiles
-Available from https://github.com/baoilleach/partialsmiles.
-"""
 
 from chemreg.compound.settings import compound_settings
 from chemreg.compound.utils import compute_checksum, extract_checksum, extract_int
@@ -73,6 +70,8 @@ def validate_smiles(smiles: str) -> None:
         ValidationError: If the SMILES string is not properly formatted
     """
     try:
-        mol = ParseSmiles(smiles, partial=False)
-    except:
-        raise
+        ps.ParseSmiles(smiles, partial=False)
+    except ps.ValenceError:
+        pass
+    except ps.SMILESSyntaxError as e:
+        raise serializers.ValidationError(e)

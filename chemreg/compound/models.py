@@ -11,7 +11,6 @@ from chemreg.compound.validators import (
     validate_cid_checksum,
     validate_cid_regex,
     validate_inchikey_computable,
-    validate_smiles,
 )
 from chemreg.indigo.inchi import get_inchikey
 

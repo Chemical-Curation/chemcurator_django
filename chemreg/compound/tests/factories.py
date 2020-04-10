@@ -20,6 +20,15 @@ class DefinedCompoundFactory(DjangoSerializerFactory):
         model = DefinedCompoundSerializer
 
 
+class DefinedCompoundSmilesFactory(DjangoSerializerFactory):
+    """Manufactures `DefinedCompound` models without molfile input."""
+
+    smiles = "CC(=O)NC1=CC=C(O)C=C1"
+
+    class Meta:
+        model = DefinedCompoundSerializer
+
+
 class IllDefinedCompoundFactory(DjangoSerializerFactory):
     """Manufactures `IllDefinedCompound` models."""
 
