@@ -81,14 +81,18 @@ def validate_inchikey_unique(molfile: str) -> None:
 
 
 def validate_smiles(smiles: str) -> None:
-    """Validates that the SMILES string posted to a defined compound
-    is formatted properly
+    """Validates that the `partialsmiles` library can convert the POST's SMILES string
+    to a structure. This validator will ignore PartialSmiles' rejection of uncommon 
+    valences like `[S]` but will raise an error when it hits chirality described with 
+    `@@(`. For example, `[C@H](...` is valid but `C@@(...` is not. 
 
     Args:
         smiles: The SMILES string
 
     Raises:
-        ValidationError: If the SMILES string is not properly formatted
+        ParseError: If the SMILES string cannot be interpreted according to the SMILES
+        dialect used by `partialsmiles`. The error message includes the index at which
+        the parser encountered an invalid character.
     """
     try:
         ps.ParseSmiles(smiles, partial=False)
