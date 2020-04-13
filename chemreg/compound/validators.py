@@ -1,5 +1,6 @@
 import re
 
+from django.apps import apps
 from django.core.exceptions import ValidationError
 
 import partialsmiles as ps
@@ -56,6 +57,27 @@ def validate_inchikey_computable(molfile: str) -> None:
         get_inchikey(molfile)
     except IndigoException:
         raise ValidationError("InChIKey not computable for provided structure.")
+
+
+def validate_inchikey_unique(molfile: str) -> None:
+    """Validates that an InChIKey computed from the provided molfile is unique.
+
+    Typically, we'd use unique=True to enforce this at the database level, however,
+    sometimes a non-unique inchikey can exist. An admin must verify this is allowed.
+
+    Args:
+        molfile: The molfile string
+
+    Raises:
+        ValidationError: If the InChIKey is not unique.
+    """
+    DefinedCompound = apps.get_model("compound", "DefinedCompound")
+    try:
+        inchikey = get_inchikey(molfile)
+        if DefinedCompound.objects.filter(inchikey=inchikey).exists():
+            raise ValidationError("InChIKey already exists.")
+    except IndigoException:
+        pass
 
 
 def validate_smiles(smiles: str) -> None:

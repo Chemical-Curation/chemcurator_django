@@ -33,6 +33,18 @@ def test_query_structure_type(query_structure_type_factory):
 
 
 @pytest.mark.django_db
+def test_unique_inchikey(defined_compound_factory):
+    serializer = defined_compound_factory.build()
+    DefinedCompoundSerializer = type(serializer)
+    assert serializer.is_valid()
+    serializer.save()
+    serialized = DefinedCompoundSerializer(data=serializer.initial_data)
+    assert not serialized.is_valid()
+    assert "molfile_v3000" in serialized.errors
+    assert str(serialized.errors["molfile_v3000"][0]) == "InChIKey already exists."
+
+
+@pytest.mark.django_db
 def test_defined_compound_from_smiles(defined_compound_smiles_factory):
     VALID_SMILES = (
         "CC(=O)OC1=C(C=CC=C1)C(O)=O",
