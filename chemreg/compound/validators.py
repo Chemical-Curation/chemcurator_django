@@ -1,7 +1,6 @@
 import re
 
 from django.core.exceptions import ValidationError
-from rest_framework import serializers
 
 import partialsmiles as ps
 from indigo import IndigoException
@@ -74,4 +73,4 @@ def validate_smiles(smiles: str) -> None:
     except ps.ValenceError:
         pass
     except ps.SMILESSyntaxError as e:
-        raise serializers.ValidationError(e)
+        raise e

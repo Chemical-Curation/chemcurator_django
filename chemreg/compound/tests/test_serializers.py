@@ -57,9 +57,8 @@ def test_defined_compound_from_smiles(defined_compound_smiles_factory):
     with pytest.raises(Exception) as e:
         serializer = defined_compound_smiles_factory.build(smiles=invalid_smiles)
         serializer.is_valid()
-    assert (
-        str(e.value)[0:40]
-        == f"The SMILES string cannot be converted to a molfile.\n[ErrorDetail"[0:40]
+    assert "The SMILES string cannot be converted to a molfile." in str(
+        e.value.detail["smiles"]
     )
 
     # Test a valence that partialsmiles doesn't like but we are accepting anyway
@@ -76,9 +75,8 @@ def test_defined_compound_from_smiles(defined_compound_smiles_factory):
         )
         serializer.is_valid()
     assert e.typename == "ParseError"
-    assert (
-        str(e.value)[0:40]
-        == f"The SMILES string cannot be converted to a molfile.\n[ErrorDetail"[0:40]
+    assert "The SMILES string cannot be converted to a molfile." in str(
+        e.value.detail["smiles"]
     )
 
     # CC(=O)N1CCN(CC1)C1=CC=C(OC[C@H]2CO[C@H](O2)C2=CC=C(Cl)C=C2Cl)C=C1
