@@ -150,7 +150,7 @@ if env("WHITELIST_LOCAL"):
     ]
 CORS_ORIGIN_WHITELIST = []
 if env("WHITELIST_CORS"):
-    CORS_ORIGIN_WHITELIST += ["https://" + env("WHITELIST_CORS")]
+    CORS_ORIGIN_WHITELIST += ["http://" + env("WHITELIST_CORS")]
 
 #######################
 #  Gunicorn Settings  #
