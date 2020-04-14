@@ -1,3 +1,4 @@
+import logging.config
 import os
 
 import environ
@@ -214,3 +215,43 @@ JSON_API_FORMAT_TYPES = "camelize"
 
 WHITENOISE_AUTOREFRESH = DEBUG
 WHITENOISE_USE_FINDERS = DEBUG
+
+
+#############################################
+#          Logging Configuration            #
+#                 logging                   #
+#############################################
+# https://docs.python.org/3/library/logging.html
+# https://docs.gunicorn.org/en/stable/settings.html#access-log-format
+
+LOGGING_CONFIG = None
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "console": {
+            "format": "%(asctime)s [%(levelname)s] %(message)s",
+            "datefmt": "[%d/%b/%Y %H:%M:%S]",
+            "class": "logging.Formatter",
+        },
+    },
+    "handlers": {
+        "console": {"class": "logging.StreamHandler", "formatter": "console"},
+    },
+    "loggers": {
+        "django": {"level": "INFO", "handlers": ["console"], "propagate": False},
+        "gunicorn.access": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        "gunicorn.error": {
+            "level": "INFO",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+    },
+}
+
+logging.config.dictConfig(LOGGING)
