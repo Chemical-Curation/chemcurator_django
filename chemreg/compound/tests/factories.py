@@ -19,6 +19,9 @@ class DefinedCompoundFactory(DjangoSerializerFactory):
     class Meta:
         model = DefinedCompoundSerializer
 
+    class Params:
+        V2000 = factory.Trait(molfile_v3000=factory.Faker("molfile", v2000=True))
+
 
 class DefinedCompoundSmilesFactory(DjangoSerializerFactory):
     """Manufactures `DefinedCompound` models without molfile input."""

@@ -36,8 +36,17 @@ def test_validate_cid_checksum(defined_compound_factory):
 
 @pytest.mark.django_db
 def test_validate_inchikey_computable(defined_compound_factory):
-    serializer = defined_compound_factory.build(molfile_v3000="foo")
+    serializer = defined_compound_factory.build(molfile_v3000="\n\n\nfoo")
     assert not serializer.is_valid()
     assert "InChIKey not computable for provided structure." in (
+        str(err) for err in serializer.errors["molfile_v3000"]
+    )
+
+
+@pytest.mark.django_db
+def test_validate_molfile_V3000(defined_compound_factory):
+    serializer = defined_compound_factory.build(V2000=True)
+    assert not serializer.is_valid()
+    assert "Structure is not in V3000 format." in (
         str(err) for err in serializer.errors["molfile_v3000"]
     )

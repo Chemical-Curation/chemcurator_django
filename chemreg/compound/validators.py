@@ -100,3 +100,21 @@ def validate_smiles(smiles: str) -> None:
         pass
     except ps.SMILESSyntaxError as e:
         raise e
+
+
+def validate_molfile_v3000(molfile: str) -> None:
+    """Validates that a molfile specifies version V3000.
+
+    Args:
+        molfile: The molfile string
+
+    Raises:
+        ValidationError: The counts line does not specify V3000.
+    """
+    try:
+        # last 5 non-whitespace chars of the 4th line.
+        # page 9, here:  https://www.daylight.com/meetings/mug05/Kappler/ctfile.pdf
+        version = molfile.split("\n")[3].strip()[-5:]
+        assert version == "V3000"
+    except (AssertionError, IndexError):
+        raise ValidationError("Structure is not in V3000 format.")
