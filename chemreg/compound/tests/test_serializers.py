@@ -96,4 +96,4 @@ def test_defined_compound_from_smiles(defined_compound_smiles_factory):
     serializer = defined_compound_smiles_factory.build(
         smiles="CC(=O)N1CCN(CC1)C1=CC=C(OC[C@H]2CO[C@H](O2)C2=CC=C(Cl)C=C2Cl)C=C1"
     )
-    serializer.is_valid()
+    assert not serializer.is_valid()

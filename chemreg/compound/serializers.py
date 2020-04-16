@@ -1,6 +1,3 @@
-from rest_framework.exceptions import ParseError
-
-import partialsmiles as ps
 from indigo import Indigo
 from rest_framework_json_api.relations import ResourceRelatedField
 
@@ -34,20 +31,11 @@ class DefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):
     def to_internal_value(self, data):
         if data.get("smiles"):  # if the json contains a SMILES value...
             smiles = data["smiles"]  # ...assign it to a local var
-            try:
-                validate_smiles(smiles)
-                indigo = Indigo()
-                indigo.setOption("molfile-saving-mode", "3000")
-                struct = indigo.loadStructure(
-                    structureStr=smiles,
-                )  # ...create a structure from it
-                data[
-                    "molfile_v3000"
-                ] = struct.molfile()  # store the structure in the molfile_v3000 field
-            except ps.SMILESSyntaxError as e:
-                # the SMILES is invalid
-                message = f"The SMILES string cannot be converted to a molfile.\n {e}"
-                raise ParseError({"smiles": message})
+            validate_smiles(smiles)
+            indigo = Indigo()
+            indigo.setOption("molfile-saving-mode", "3000")
+            struct = indigo.loadStructure(structureStr=smiles,)  # ...create a structure
+            data["molfile_v3000"] = struct.molfile()  # store in molfile_v3000
         else:
             pass
         return super().to_internal_value(data)

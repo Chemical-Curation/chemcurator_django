@@ -2,6 +2,7 @@ import re
 
 from django.apps import apps
 from django.core.exceptions import ValidationError
+from rest_framework.exceptions import ParseError
 
 import partialsmiles as ps
 from indigo import IndigoException
@@ -90,7 +91,7 @@ def validate_smiles(smiles: str) -> None:
         smiles: The SMILES string
 
     Raises:
-        SMILESSyntaxError: If the SMILES string cannot be interpreted according to the SMILES
+        ParseError: If the SMILES string cannot be interpreted according to the SMILES
         dialect used by `partialsmiles`. The error message includes the index at which
         the parser encountered an invalid character.
     """
@@ -99,7 +100,8 @@ def validate_smiles(smiles: str) -> None:
     except ps.ValenceError:
         pass
     except ps.SMILESSyntaxError as e:
-        raise e
+        message = f"The SMILES string cannot be converted to a molfile.\n {e}"
+        raise ParseError({"smiles": message})
 
 
 def validate_molfile_v3000(molfile: str) -> None:
