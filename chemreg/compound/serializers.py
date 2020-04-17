@@ -1,70 +1,68 @@
-from rest_framework import serializers
+from indigo import Indigo
+from rest_framework_json_api.relations import ResourceRelatedField
 
+from chemreg.common import jsonapi
 from chemreg.compound.models import (
-    BaseCompound,
     DefinedCompound,
     IllDefinedCompound,
     QueryStructureType,
 )
+from chemreg.compound.validators import validate_smiles
 
 
-class BaseCompoundSerializer(serializers.ModelSerializer):
-    """The base class for serializing compounds."""
-
-    class Meta:
-        model = BaseCompound
-        fields = ("cid", "structure", "id")
-        lookup_field = "cid"
-
-    def __new__(cls, *args, **kwargs):
-        """Patch in source of ID to `Compound.cid`."""
-        if not hasattr(cls.Meta, "extra_kwargs"):
-            cls.Meta.extra_kwargs = {}
-        cls.Meta.extra_kwargs.update({"id": {"source": "cid"}})
-        return super().__new__(cls, *args, **kwargs)
-
-
-class TypeSerializer(serializers.ModelSerializer):
-    """Serializer to add the model type to the object."""
-
-    type = serializers.SerializerMethodField()
-
-    def get_type(self, obj):
-        return self.Meta.model._meta.verbose_name
-
-
-class DefinedCompoundSerializer(BaseCompoundSerializer, TypeSerializer):
+class DefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):
     """The serializer for defined compounds."""
 
     class Meta:
         model = DefinedCompound
-        fields = ("type", "id", "molfile", "inchikey")
-        extra_kwargs = {"molfile": {"style": {"base_template": "textarea.html"}}}
-
-    def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        rep["attributes"] = {
-            "molfile-v3000": rep.pop("molfile"),
-            "inchikey": rep.pop("inchikey"),
+        fields = (
+            "cid",
+            "molfile_v3000",
+            "inchikey",
+        )
+        extra_kwargs = {
+            "molfile_v3000": {"style": {"base_template": "textarea.html", "rows": 10}},
+            "smiles": {
+                "write_only": True,
+                "style": {"base_template": "textarea.html", "rows": 5},
+            },
         }
-        return rep
+
+    def to_internal_value(self, data):
+        if data.get("smiles"):  # if the json contains a SMILES value...
+            smiles = data["smiles"]  # ...assign it to a local var
+            validate_smiles(smiles)
+            indigo = Indigo()
+            indigo.setOption("molfile-saving-mode", "3000")
+            struct = indigo.loadStructure(structureStr=smiles,)  # ...create a structure
+            data["molfile_v3000"] = struct.molfile()  # store in molfile_v3000
+        else:
+            pass
+        return super().to_internal_value(data)
 
 
-class QueryStructureTypeSerializer(serializers.ModelSerializer):
+class IllDefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):
+    """The serializer for ill-defined compounds."""
+
+    query_structure_type = ResourceRelatedField(
+        queryset=QueryStructureType.objects,
+        related_link_view_name="ill-defined-compounds-related",
+        required=False,
+        self_link_view_name="ill-defined-compounds-relationships",
+    )
+
+    included_serializers = {
+        "query_structure_type": "chemreg.compound.serializers.QueryStructureTypeSerializer",
+    }
+
+    class Meta:
+        model = IllDefinedCompound
+        fields = ("cid", "mrvfile", "query_structure_type")
+
+
+class QueryStructureTypeSerializer(jsonapi.HyperlinkedModelSerializer):
     """The serializer for query structure type."""
 
     class Meta:
         model = QueryStructureType
         fields = ("name", "label", "short_description", "long_description")
-
-
-class IllDefinedCompoundSerializer(BaseCompoundSerializer, TypeSerializer):
-    """The serializer for ill-defined compounds."""
-
-    # query_structure_type = serializers.RelatedField(many=False, read_only=True)
-    query_structure_type = QueryStructureTypeSerializer(many=False, required=False)
-
-    class Meta:
-        model = IllDefinedCompound
-        fields = ("type", "id", "mrvfile", "query_structure_type")
-        extra_kwargs = {"mrvfile": {"style": {"base_template": "textarea.html"}}}
