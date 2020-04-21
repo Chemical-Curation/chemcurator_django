@@ -7,7 +7,7 @@ from chemreg.compound.models import (
     IllDefinedCompound,
     QueryStructureType,
 )
-from chemreg.compound.validators import validate_smiles
+from chemreg.compound.validators import validate_inchikey_unique, validate_smiles
 
 
 class DefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):
@@ -22,6 +22,7 @@ class DefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):
         )
         extra_kwargs = {
             "molfile_v3000": {"style": {"base_template": "textarea.html", "rows": 10}},
+            "override": {"write_only": True, "style": {"base_template": "radio.html"}},
             "smiles": {
                 "write_only": True,
                 "style": {"base_template": "textarea.html", "rows": 5},
@@ -39,6 +40,11 @@ class DefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):
         else:
             pass
         return super().to_internal_value(data)
+
+    def validate(self, attrs):
+        if not self.initial_data.get("override"):  # validate uniqueness of inchikey
+            validate_inchikey_unique(self.initial_data["molfile_v3000"])
+        return attrs
 
 
 class IllDefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):

@@ -2,6 +2,7 @@ import re
 
 from django.apps import apps
 from django.core.exceptions import ValidationError
+from rest_framework import serializers
 from rest_framework.exceptions import ParseError
 
 import partialsmiles as ps
@@ -76,7 +77,9 @@ def validate_inchikey_unique(molfile: str) -> None:
     try:
         inchikey = get_inchikey(molfile)
         if DefinedCompound.objects.filter(inchikey=inchikey).exists():
-            raise ValidationError("InChIKey already exists.")
+            raise serializers.ValidationError(
+                {"molfile_v3000": "InChIKey already exists."}
+            )
     except IndigoException:
         pass
 
