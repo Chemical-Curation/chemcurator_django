@@ -31,3 +31,8 @@ class CompoundFaker(BaseProvider):
 
     def mrvfile(self):
         return self.molecule().cml()
+
+    def molfile_v2000(self):
+        smiles_str = self.random_element(self.compounds)
+        self.indigo.setOption("molfile-saving-mode", "2000")
+        return self.indigo.loadMolecule(smiles_str).molfile()
