@@ -162,5 +162,7 @@ def validate_single_structure(structures) -> None:
         assert len(structures) == 1
     except (AssertionError):
         raise serializers.ValidationError(
-            f"The data includes too many potential non-V3000 molfile structures in {structures}."
+            {
+                f"The data includes too many potential non-V3000 molfile structures in {structures}."
+            }
         )

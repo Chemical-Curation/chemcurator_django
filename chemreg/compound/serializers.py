@@ -36,6 +36,15 @@ class DefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):
         }
 
     def to_internal_value(self, data):
+        # Only one structure field should be provided.
+        alt_structure_keys = {
+            "molfile_v2000",
+            "smiles",
+            "molfile_v3000",
+        }
+        keys_matched = alt_structure_keys.intersection(self.initial_data.keys())
+        if bool(keys_matched):
+            validate_single_structure(keys_matched)
         if data.get("smiles"):  # if the json contains a SMILES value...
             smiles = data["smiles"]  # ...assign it to a local var
             validate_smiles(smiles)
@@ -55,12 +64,6 @@ class DefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):
         return super().to_internal_value(data)
 
     def validate(self, attrs):
-        # If legacy structure fields were provided in the data, make sure only
-        # one was given.
-        alt_structure_keys = {"molfile_v2000", "smiles"}
-        keys_matched = alt_structure_keys.intersection(self.initial_data.keys())
-        if bool(keys_matched):
-            validate_single_structure(keys_matched)
         if not self.initial_data.get("override"):  # validate uniqueness of inchikey
             validate_inchikey_unique(self.initial_data["molfile_v3000"])
         return attrs

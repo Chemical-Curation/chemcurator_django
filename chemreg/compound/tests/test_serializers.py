@@ -124,6 +124,7 @@ def test_override_unique_inchikey_via_smiles(defined_compound_smiles_factory):
     assert not serialized.is_valid()  # fails without override
 
     data["override"] = True
+    data.pop("molfile_v3000")
     serialized = defined_compound_smiles_factory.build(**data)
     assert serialized.is_valid()  # succeeds with override
     two = serialized.save()
