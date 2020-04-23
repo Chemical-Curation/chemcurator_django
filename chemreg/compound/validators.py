@@ -140,7 +140,9 @@ def validate_molfile_v2000(molfile: str) -> None:
         assert version == "V2000"
     except AssertionError:
         raise serializers.ValidationError(
-            "MolFile format is invalid. Molfile v2000 format expected."
+            {
+                "molfile_v3000": "MolFile format is invalid. Molfile v2000 format expected."
+            }
         )
 
 
