@@ -35,13 +35,26 @@ def test_query_structure_type(query_structure_type_factory):
 @pytest.mark.django_db
 def test_unique_inchikey(defined_compound_factory):
     serializer = defined_compound_factory.build()
-    DefinedCompoundSerializer = type(serializer)
     assert serializer.is_valid()
     serializer.save()
-    serialized = DefinedCompoundSerializer(data=serializer.initial_data)
+    serialized = defined_compound_factory.build(**serializer.initial_data)
     assert not serialized.is_valid()
     assert "molfile_v3000" in serialized.errors
     assert str(serialized.errors["molfile_v3000"][0]) == "InChIKey already exists."
+
+
+@pytest.mark.django_db
+def test_override_unique_inchikey(defined_compound_factory):
+    serializer = defined_compound_factory.build()
+    assert serializer.is_valid()
+    one = serializer.save()
+    data = serializer.initial_data
+    data["override"] = True
+    serialized = defined_compound_factory.build(**data)
+    assert serialized.is_valid()
+    two = serialized.save()
+    assert one.cid != two.cid
+    assert one.inchikey == two.inchikey
 
 
 @pytest.mark.django_db
@@ -97,3 +110,22 @@ def test_defined_compound_from_smiles(defined_compound_smiles_factory):
         smiles="CC(=O)N1CCN(CC1)C1=CC=C(OC[C@H]2CO[C@H](O2)C2=CC=C(Cl)C=C2Cl)C=C1"
     )
     assert not serializer.is_valid()
+
+
+@pytest.mark.django_db
+def test_override_unique_inchikey_via_smiles(defined_compound_smiles_factory):
+    serializer = defined_compound_smiles_factory.build(
+        smiles="CC(=O)OC1=C(C=CC=C1)C(O)=O"
+    )
+    assert serializer.is_valid()
+    one = serializer.save()
+    data = serializer.initial_data
+    serialized = defined_compound_smiles_factory.build(**data)
+    assert not serialized.is_valid()  # fails without override
+
+    data["override"] = True
+    serialized = defined_compound_smiles_factory.build(**data)
+    assert serialized.is_valid()  # succeeds with override
+    two = serialized.save()
+    assert one.cid != two.cid
+    assert one.inchikey == two.inchikey
