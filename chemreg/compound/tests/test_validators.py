@@ -91,3 +91,13 @@ def test_validate_single_structure(
         str(dcsmiles.errors.get("molfile_v3000"))
         == "The data includes too many potential non-V3000 molfile structures in ['molfile_v2000', 'smiles']."
     )
+
+    # check for no structure strings at all
+
+    # a v2000 serializer whose v2000 string has been removed
+    dc = defined_compound_v2000_factory.build()
+    dc.initial_data.pop("molfile_v2000")
+    assert not dc.is_valid()
+    assert str(dc.errors.get("molfile_v3000")[0]) == "This field is required."
+    # why is this error returned as a list?  ^ ^ Should we be doing this with our
+    # other error messages?
