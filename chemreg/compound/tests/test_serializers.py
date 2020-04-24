@@ -133,20 +133,6 @@ def test_override_unique_inchikey_via_smiles(defined_compound_smiles_factory):
 
 
 @pytest.mark.django_db
-def test_invalid_v2000_molfile(defined_compound_v2000_factory):
-    # make a valid V2000 molfile string
-    dc = defined_compound_v2000_factory.build()
-    assert dc.is_valid()
-
-    str_v2k = dc.initial_data["molfile_v2000"]
-    str_v2k_invalid = str_v2k.replace("V2000", "V2x00")
-    dc_invalid = defined_compound_v2000_factory.build(molfile_v2000=str_v2k_invalid)
-
-    assert not dc_invalid.is_valid()
-    # fails because the V2000 molfile string is no longer valid
-
-
-@pytest.mark.django_db
 def test_defined_compound_from_v2000_molfile(defined_compound_v2000_factory):
     dc = defined_compound_v2000_factory.build()
     assert dc.is_valid()
@@ -154,25 +140,3 @@ def test_defined_compound_from_v2000_molfile(defined_compound_v2000_factory):
     # test inchikey creation
     assert "inchikey" not in dc.initial_data
     assert re.match(r"^[A-Z]{14}-[A-Z]{10}-[A-Z]$", instance.inchikey)
-
-
-@pytest.mark.django_db
-def test_too_many_structures(
-    defined_compound_v2000_factory, defined_compound_smiles_factory
-):
-    dc2k = defined_compound_v2000_factory.build()
-    assert dc2k.is_valid()
-
-    # a v2000 serializer with an added SMILES string
-    dc = defined_compound_v2000_factory.build()
-    # assign the smiles
-    dc.initial_data["smiles"] = "CC(=O)OC1=C(C=CC=C1)C(O)=O"
-    assert not dc.is_valid()
-
-    # a smiles serializer with an added V2000 string
-    dcsmiles = defined_compound_smiles_factory.build(
-        smiles="CC(=O)OC1=C(C=CC=C1)C(O)=O"
-    )
-    # assign the V2000 molfile from the first object
-    dcsmiles.initial_data["molfile_v2000"] = dc2k.initial_data.get("molfile_v2000")
-    assert not dc.is_valid()

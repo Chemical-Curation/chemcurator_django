@@ -9,7 +9,7 @@ from indigo import IndigoException
 
 from chemreg.compound.settings import compound_settings
 from chemreg.compound.utils import compute_checksum, extract_checksum, extract_int
-from chemreg.indigo.inchi import get_inchikey
+from chemreg.indigo.inchi import get_inchikey, load_structure
 
 
 def validate_cid_regex(cid: str) -> None:
@@ -159,10 +159,28 @@ def validate_single_structure(structures) -> None:
         ValidationError: Too many potential structures provided.
     """
     try:
-        assert len(structures) == 1
-    except (AssertionError):
+        alt_structure_keys = ["molfile_v3000", "molfile_v2000", "smiles"]
+        matched = [x for x in alt_structure_keys if x in structures]
+        assert len(matched) == 1
+    except AssertionError:
         raise serializers.ValidationError(
             {
-                f"The data includes too many potential non-V3000 molfile structures in {structures}."
+                "molfile_v3000": f"The data includes too many potential non-V3000 molfile structures in {matched}."
             }
         )
+
+
+def validate_structure(structure: str) -> None:
+    """Validates that the structure can be loaded into Indigo
+    without exception.
+
+    Args:
+        structure: the structure string ("molfile_v2000", "smiles")
+
+    Raises:
+        ValidationError: The error thrown by Indigo.
+    """
+    try:
+        load_structure(structure)
+    except IndigoException as e:
+        raise ValidationError({"molfile_v3000": e})

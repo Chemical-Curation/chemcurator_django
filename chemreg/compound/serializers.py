@@ -1,4 +1,3 @@
-from indigo import Indigo
 from rest_framework_json_api.relations import ResourceRelatedField
 
 from chemreg.common import jsonapi
@@ -12,7 +11,9 @@ from chemreg.compound.validators import (
     validate_molfile_v2000,
     validate_single_structure,
     validate_smiles,
+    validate_structure,
 )
+from chemreg.indigo.inchi import load_structure
 
 
 class DefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):
@@ -36,31 +37,19 @@ class DefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):
         }
 
     def to_internal_value(self, data):
-        # Only one structure field should be provided.
-        alt_structure_keys = {
-            "molfile_v2000",
-            "smiles",
-            "molfile_v3000",
-        }
-        keys_matched = alt_structure_keys.intersection(self.initial_data.keys())
-        if bool(keys_matched):
-            validate_single_structure(keys_matched)
+        if data.keys():  # False will pass on to *required
+            validate_single_structure(data.keys())
         if data.get("smiles"):  # if the json contains a SMILES value...
-            smiles = data["smiles"]  # ...assign it to a local var
-            validate_smiles(smiles)
-            indigo = Indigo()
-            indigo.setOption("molfile-saving-mode", "3000")
-            struct = indigo.loadStructure(structureStr=smiles,)  # ...create a structure
-            data["molfile_v3000"] = struct.molfile()  # store in molfile_v3000
+            compound = data["smiles"]  # ...assign it to a local var
+            validate_smiles(compound)
         elif data.get("molfile_v2000"):  # if the json contains a molfile_v2000 value...
-            v2k = str(data["molfile_v2000"])  # ...assign it to a local var
-            validate_molfile_v2000(v2k)
-            indigo = Indigo()
-            indigo.setOption("molfile-saving-mode", "3000")
-            struct = indigo.loadStructure(structureStr=v2k,)  # ...create a structure
-            data["molfile_v3000"] = struct.molfile()  # store in molfile_v3000
+            compound = str(data["molfile_v2000"])  # ...assign it to a local var
+            validate_molfile_v2000(compound)
         else:
-            pass
+            return super().to_internal_value(data)
+        validate_structure(compound)
+        struct = load_structure(compound)
+        data["molfile_v3000"] = struct.molfile()  # store in molfile_v3000
         return super().to_internal_value(data)
 
     def validate(self, attrs):
