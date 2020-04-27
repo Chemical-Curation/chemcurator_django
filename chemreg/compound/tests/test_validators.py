@@ -45,11 +45,27 @@ def test_validate_inchikey_computable(defined_compound_factory):
 
 @pytest.mark.django_db
 def test_validate_molfile_V3000(defined_compound_factory):
+    # the V2000=True argument creates a DefinedCompound JSON object
+    # where the `molfile_v3000` field uses the V2000 format and is
+    # therefore invalid.
     serializer = defined_compound_factory.build(V2000=True)
     assert not serializer.is_valid()
     assert "Structure is not in V3000 format." in (
         str(err) for err in serializer.errors["molfile_v3000"]
     )
+
+
+@pytest.mark.django_db
+def test_validate_no_structure(defined_compound_v2000_factory):
+    # check for no provided structure strings at all
+
+    # Build a DefinedCompound JSON object with a valid V2000
+    # molfile, then remove the molfile_v2000 attribute, leaving
+    # no structure string at all.
+    dc = defined_compound_v2000_factory.build()
+    dc.initial_data.pop("molfile_v2000")
+    assert not dc.is_valid()
+    assert str(dc.errors.get("molfile_v3000")[0]) == "This field is required."
 
 
 @pytest.mark.django_db
@@ -91,13 +107,3 @@ def test_validate_single_structure(
         str(dcsmiles.errors.get("molfile_v3000"))
         == "The data includes too many potential non-V3000 molfile structures in ['molfile_v2000', 'smiles']."
     )
-
-    # check for no structure strings at all
-
-    # a v2000 serializer whose v2000 string has been removed
-    dc = defined_compound_v2000_factory.build()
-    dc.initial_data.pop("molfile_v2000")
-    assert not dc.is_valid()
-    assert str(dc.errors.get("molfile_v3000")[0]) == "This field is required."
-    # why is this error returned as a list?  ^ ^ Should we be doing this with our
-    # other error messages?
