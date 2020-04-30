@@ -138,10 +138,10 @@ def validate_molfile_v2000(molfile: str) -> None:
         # page 9, here:  https://www.daylight.com/meetings/mug05/Kappler/ctfile.pdf
         version = molfile.split("\n")[3].strip()[-5:]
         assert version == "V2000"
-    except AssertionError:
+    except (AssertionError, IndexError):
         raise serializers.ValidationError(
             {
-                "molfile_v3000": "MolFile format is invalid. Molfile v2000 format expected."
+                "molfile_v3000": "Molfile format is invalid. Molfile v2000 format expected."
             }
         )
 

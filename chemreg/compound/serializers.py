@@ -1,6 +1,3 @@
-from rest_framework_json_api.relations import ResourceRelatedField
-
-from chemreg.common import jsonapi
 from chemreg.compound.models import (
     DefinedCompound,
     IllDefinedCompound,
@@ -14,9 +11,11 @@ from chemreg.compound.validators import (
     validate_structure,
 )
 from chemreg.indigo.inchi import load_structure
+from chemreg.jsonapi.relations import ResourceRelatedField
+from chemreg.jsonapi.serializers import HyperlinkedModelSerializer
 
 
-class DefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):
+class DefinedCompoundSerializer(HyperlinkedModelSerializer):
     """The serializer for defined compounds."""
 
     class Meta:
@@ -27,13 +26,8 @@ class DefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):
             "inchikey",
         )
         extra_kwargs = {
-            "molfile_v3000": {"style": {"base_template": "textarea.html", "rows": 10}},
-            "override": {"write_only": True, "style": {"base_template": "radio.html"}},
-            "smiles": {
-                "write_only": True,
-                "style": {"base_template": "textarea.html", "rows": 5},
-            },
-            "molfile_v2000": {"style": {"base_template": "textarea.html", "rows": 10}},
+            "override": {"write_only": True},
+            "smiles": {"write_only": True},
         }
 
     def to_internal_value(self, data):
@@ -58,7 +52,7 @@ class DefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):
         return attrs
 
 
-class IllDefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):
+class IllDefinedCompoundSerializer(HyperlinkedModelSerializer):
     """The serializer for ill-defined compounds."""
 
     query_structure_type = ResourceRelatedField(
@@ -77,7 +71,7 @@ class IllDefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):
         fields = ("cid", "mrvfile", "query_structure_type")
 
 
-class QueryStructureTypeSerializer(jsonapi.HyperlinkedModelSerializer):
+class QueryStructureTypeSerializer(HyperlinkedModelSerializer):
     """The serializer for query structure type."""
 
     class Meta:

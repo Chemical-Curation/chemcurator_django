@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "chemreg.auth.apps.AuthConfig",
     "chemreg.common.apps.CommonConfig",
     "chemreg.compound.apps.CompoundConfig",
+    "chemreg.openapi.apps.OpenAPIConfig",
     "chemreg.users.apps.UsersConfig",
     "chemreg.utils.apps.UtilsConfig",
 ]
@@ -178,17 +179,10 @@ REST_FRAMEWORK = {
         "rest_framework.filters.SearchFilter",
     ],
     "DEFAULT_METADATA_CLASS": "rest_framework_json_api.metadata.JSONAPIMetadata",
-    "DEFAULT_PAGINATION_CLASS": "chemreg.common.jsonapi.JsonApiPageNumberPagination",
-    "DEFAULT_PARSER_CLASSES": [
-        "rest_framework_json_api.parsers.JSONParser",
-        "rest_framework.parsers.FormParser",
-        "rest_framework.parsers.MultiPartParser",
-    ],
+    "DEFAULT_PAGINATION_CLASS": "chemreg.jsonapi.pagination.JsonApiPageNumberPagination",
+    "DEFAULT_PARSER_CLASSES": ["rest_framework_json_api.parsers.JSONParser"],
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
-    "DEFAULT_RENDERER_CLASSES": [
-        "rest_framework_json_api.renderers.JSONRenderer",
-        "rest_framework.renderers.BrowsableAPIRenderer",
-    ],
+    "DEFAULT_RENDERER_CLASSES": ["rest_framework_json_api.renderers.JSONRenderer"],
     "EXCEPTION_HANDLER": "rest_framework_json_api.exceptions.exception_handler",
     "PAGE_SIZE": 100,
     "SEARCH_PARAM": "filter[search]",
