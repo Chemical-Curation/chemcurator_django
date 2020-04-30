@@ -28,6 +28,11 @@ class OpenAPIView(View):
     )
 
     def get(self, request, *args, **kwargs):
-        base_server = f"{request.scheme}://{request.get_host()}"
+        request_host = request.get_host()
+        if request_host[-4:] == ".gov":
+            request_scheme = "https"
+        else:
+            request_scheme = request.scheme
+        base_server = f"{request_scheme}://{request_host}"
         spec = self.base_spec.replace("__BASE_SERVER__", base_server)
         return HttpResponse(spec, content_type="application/json")
