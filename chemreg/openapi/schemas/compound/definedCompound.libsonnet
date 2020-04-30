@@ -8,8 +8,8 @@ local baseCompound = import 'baseCompound.libsonnet';
     cid: baseCompound.attributes.cid,
     molfileV3000: {
       type: 'string',
-      description: 'A [v3000 MDL Molfile](https://en.wikipedia.org/wiki/Chemical_table_file#The_Extended_Connection_Table_(V3000)) representing this compound. Newlines must be escaped (e.g. \\n) and spaces preserved.',
-      example: '\\n  -CHEMREG-04212015202D\\n\\n  0  0  0  0  0  0  0  0  0  0  0 V3000\\nM  V30 BEGIN CTAB\\nM  V30 COUNTS 2 1 0 0 0\\nM  V30 BEGIN ATOM\\nM  V30 1 O 0.0 0.0 0.0 0\\nM  V30 2 O 0.0 0.0 0.0 0\\nM  V30 END ATOM\\nM  V30 BEGIN BOND\\nM  V30 1 2 1 2\\nM  V30 END BOND\\nM  V30 END CTAB\\nM  END\\n',
+      description: 'A [v3000 MDL Molfile](https://en.wikipedia.org/wiki/Chemical_table_file#The_Extended_Connection_Table_(V3000)) representing this compound. Newlines must be escaped (e.g. `\\n`) and spaces preserved.',
+      example: '\n  -INDIGO-04212015202D\n\n  0  0  0  0  0  0  0  0  0  0  0 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 2 1 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 O 0.0 0.0 0.0 0\nM  V30 2 O 0.0 0.0 0.0 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 1 2 1 2\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n',
       oneOfGroup: 'structure',
     },
     smiles: {
@@ -22,7 +22,7 @@ local baseCompound = import 'baseCompound.libsonnet';
     molfileV2000: {
       type: 'any',
       description: 'A [v2000 MDL Molfile](https://en.wikipedia.org/wiki/Chemical_table_file#Molfile) representing the compound.',
-      example: '\\n  -CHEMREG-04292017242D\\n\\n  2  1  0  0  0  0  0  0  0  0999 V2000\\n    0.0000    0.0000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\\n    0.0000    0.0000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\\n  1  2  2  0  0  0  0\\nM  END\\n',
+      example: '\n  -INDIGO-04292017242D\n\n  2  1  0  0  0  0  0  0  0  0999 V2000\n    0.0000    0.0000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n    0.0000    0.0000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n  1  2  2  0  0  0  0\nM  END\n',
       writeOnly: true,
       oneOfGroup: 'structure',
     },
