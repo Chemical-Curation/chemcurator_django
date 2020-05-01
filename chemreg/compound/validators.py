@@ -1,15 +1,15 @@
 import re
 
 from django.apps import apps
-from django.core.exceptions import ValidationError
-from rest_framework.exceptions import ParseError
+from rest_framework import serializers
+from rest_framework.exceptions import ParseError, ValidationError
 
 import partialsmiles as ps
 from indigo import IndigoException
 
 from chemreg.compound.settings import compound_settings
 from chemreg.compound.utils import compute_checksum, extract_checksum, extract_int
-from chemreg.indigo.inchi import get_inchikey
+from chemreg.indigo.inchi import get_inchikey, load_structure
 
 
 def validate_cid_regex(cid: str) -> None:
@@ -76,7 +76,9 @@ def validate_inchikey_unique(molfile: str) -> None:
     try:
         inchikey = get_inchikey(molfile)
         if DefinedCompound.objects.filter(inchikey=inchikey).exists():
-            raise ValidationError("InChIKey already exists.")
+            raise serializers.ValidationError(
+                {"molfile_v3000": "InChIKey already exists."}
+            )
     except IndigoException:
         pass
 
@@ -120,3 +122,65 @@ def validate_molfile_v3000(molfile: str) -> None:
         assert version == "V3000"
     except (AssertionError, IndexError):
         raise ValidationError("Structure is not in V3000 format.")
+
+
+def validate_molfile_v2000(molfile: str) -> None:
+    """Validates that a molfile specifies version V2000.
+
+    Args:
+        molfile: The molfile string
+
+    Raises:
+        ValidationError: The counts line does not specify "V2000"
+    """
+    try:
+        # last 5 non-whitespace chars of the 4th line.
+        # page 9, here:  https://www.daylight.com/meetings/mug05/Kappler/ctfile.pdf
+        version = molfile.split("\n")[3].strip()[-5:]
+        assert version == "V2000"
+    except (AssertionError, IndexError):
+        raise serializers.ValidationError(
+            {
+                "molfile_v3000": "Molfile format is invalid. Molfile v2000 format expected."
+            }
+        )
+
+
+def validate_single_structure(structures) -> None:
+    """Validates that the initial JSON data for a defined compound
+    only includes data in one of the fields that can be used for
+    structure.
+
+    Args:
+        structures: the list of populated structure fields
+        other than molfile_v3000 passed from the serializer
+
+    Raises:
+        ValidationError: Too many potential structures provided.
+    """
+    try:
+        alt_structure_keys = ["molfile_v3000", "molfile_v2000", "smiles"]
+        matched = [x for x in alt_structure_keys if x in structures]
+        assert len(matched) == 1
+    except AssertionError:
+        raise serializers.ValidationError(
+            {
+                "molfile_v3000": f"The data includes too many potential non-V3000 molfile structures in {matched}."
+            }
+        )
+
+
+def validate_structure(structure: str) -> None:
+    """Validates that the structure can be loaded into Indigo
+    without exception.
+
+    Args:
+        structure: the structure string ("molfile_v2000", "smiles")
+
+    Raises:
+        ValidationError: The error thrown by Indigo.
+    """
+    try:
+        load_structure(structure)
+    except IndigoException as e:
+        raise ValidationError({"molfile_v3000": e})

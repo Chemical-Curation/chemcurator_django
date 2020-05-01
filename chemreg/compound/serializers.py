@@ -1,16 +1,21 @@
-from indigo import Indigo
-from rest_framework_json_api.relations import ResourceRelatedField
-
-from chemreg.common import jsonapi
 from chemreg.compound.models import (
     DefinedCompound,
     IllDefinedCompound,
     QueryStructureType,
 )
-from chemreg.compound.validators import validate_smiles
+from chemreg.compound.validators import (
+    validate_inchikey_unique,
+    validate_molfile_v2000,
+    validate_single_structure,
+    validate_smiles,
+    validate_structure,
+)
+from chemreg.indigo.inchi import load_structure
+from chemreg.jsonapi.relations import ResourceRelatedField
+from chemreg.jsonapi.serializers import HyperlinkedModelSerializer
 
 
-class DefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):
+class DefinedCompoundSerializer(HyperlinkedModelSerializer):
     """The serializer for defined compounds."""
 
     class Meta:
@@ -21,27 +26,33 @@ class DefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):
             "inchikey",
         )
         extra_kwargs = {
-            "molfile_v3000": {"style": {"base_template": "textarea.html", "rows": 10}},
-            "smiles": {
-                "write_only": True,
-                "style": {"base_template": "textarea.html", "rows": 5},
-            },
+            "override": {"write_only": True},
+            "smiles": {"write_only": True},
         }
 
     def to_internal_value(self, data):
+        if data.keys():  # False will pass on to *required
+            validate_single_structure(data.keys())
         if data.get("smiles"):  # if the json contains a SMILES value...
-            smiles = data["smiles"]  # ...assign it to a local var
-            validate_smiles(smiles)
-            indigo = Indigo()
-            indigo.setOption("molfile-saving-mode", "3000")
-            struct = indigo.loadStructure(structureStr=smiles,)  # ...create a structure
-            data["molfile_v3000"] = struct.molfile()  # store in molfile_v3000
+            compound = data["smiles"]  # ...assign it to a local var
+            validate_smiles(compound)
+        elif data.get("molfile_v2000"):  # if the json contains a molfile_v2000 value...
+            compound = str(data["molfile_v2000"])  # ...assign it to a local var
+            validate_molfile_v2000(compound)
         else:
-            pass
+            return super().to_internal_value(data)
+        validate_structure(compound)
+        struct = load_structure(compound)
+        data["molfile_v3000"] = struct.molfile()  # store in molfile_v3000
         return super().to_internal_value(data)
 
+    def validate(self, attrs):
+        if not self.initial_data.get("override"):  # validate uniqueness of inchikey
+            validate_inchikey_unique(self.initial_data["molfile_v3000"])
+        return attrs
 
-class IllDefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):
+
+class IllDefinedCompoundSerializer(HyperlinkedModelSerializer):
     """The serializer for ill-defined compounds."""
 
     query_structure_type = ResourceRelatedField(
@@ -60,7 +71,7 @@ class IllDefinedCompoundSerializer(jsonapi.HyperlinkedModelSerializer):
         fields = ("cid", "mrvfile", "query_structure_type")
 
 
-class QueryStructureTypeSerializer(jsonapi.HyperlinkedModelSerializer):
+class QueryStructureTypeSerializer(HyperlinkedModelSerializer):
     """The serializer for query structure type."""
 
     class Meta:

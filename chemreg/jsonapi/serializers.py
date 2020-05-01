@@ -1,4 +1,4 @@
-from rest_framework_json_api import pagination, serializers
+from rest_framework_json_api import serializers
 
 
 class RootMetaMixin:
@@ -39,7 +39,3 @@ class PolymorphicModelSerializer(
     metaclass=serializers.PolymorphicSerializerMetaclass,
 ):
     pass
-
-
-class JsonApiPageNumberPagination(pagination.JsonApiPageNumberPagination):
-    max_page_size = 1000
