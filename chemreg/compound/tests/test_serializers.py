@@ -4,6 +4,8 @@ from rest_framework.exceptions import ParseError
 
 import pytest
 
+from chemreg.compound.settings import compound_settings
+
 
 @pytest.mark.django_db
 def test_defined_compound(defined_compound_factory):
@@ -140,3 +142,34 @@ def test_defined_compound_from_v2000_molfile(defined_compound_v2000_factory):
     # test inchikey creation
     assert "inchikey" not in dc.initial_data
     assert re.match(r"^[A-Z]{14}-[A-Z]{10}-[A-Z]$", instance.inchikey)
+
+
+@pytest.mark.django_db
+def test_defined_compound_prefix(defined_compound_factory):
+    serializer = defined_compound_factory.build()
+    assert serializer.is_valid()
+    instance = serializer.save()
+    # assert that the prefix of the serialized defined compound is equivalent to
+    # the prefix generated in compound_settings
+    assert instance.cid[0 : instance.cid.find("CID")] == compound_settings.PREFIX
+
+
+@pytest.mark.django_db
+def test_defined_compound_custom_prefix(defined_compound_factory):
+    compound_settings.PREFIX = "XTX"
+    serializer = defined_compound_factory.build()
+    assert serializer.is_valid()
+    instance = serializer.save()
+    # assert that the prefix of the serialized defined compound is equivalent to
+    # the prefix assigned for testing purposes
+    assert instance.cid[0 : instance.cid.find("CID")] == compound_settings.PREFIX
+
+
+@pytest.mark.django_db
+def test_ill_defined_compound_prefix(ill_defined_compound_factory):
+    serializer = ill_defined_compound_factory.build()
+    assert serializer.is_valid()
+    instance = serializer.save()
+    # assert that the prefix of the serialized ill defined compound is equivalent to
+    # the prefix generated in compound_settings
+    assert instance.cid[0 : instance.cid.find("CID")] == compound_settings.PREFIX

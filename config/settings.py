@@ -8,6 +8,7 @@ APPS_DIR = ROOT_DIR.path("chemreg")
 
 env = environ.Env(
     CACHE_URL=(str, "locmemcache://"),
+    COMPOUND_PREFIX=(str, ""),
     DATABASE_URL=(str, "sqlite:///.sqlite3"),
     DEBUG=(bool, True),
     SESSION_COOKIE_AGE=(int, 900),
@@ -37,6 +38,7 @@ if env.bool("WHITELIST_LOCAL"):
 if env("WHITELIST_HOST"):
     ALLOWED_HOSTS += [env("WHITELIST_HOST")]
 CACHES = {"default": env.cache_url("CACHE_URL", env("CACHE_URL"))}
+COMPOUND = {"PREFIX": env("COMPOUND_PREFIX", default="DTX")}
 DATABASES = {"default": env.db_url("DATABASE_URL", env("DATABASE_URL"))}
 DEBUG = env("DEBUG")
 INSTALLED_APPS = [
