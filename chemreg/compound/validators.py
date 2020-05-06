@@ -101,9 +101,7 @@ def validate_smiles(smiles: str) -> None:
     except ps.ValenceError:
         pass
     except ps.SMILESSyntaxError as e:
-        raise ValidationError(
-            f"The SMILES string cannot be converted to a molfile: {e}"
-        )
+        raise ValidationError(f"Structure is not in SMILES format: {e}")
 
 
 def validate_molfile_v3000(molfile: str) -> None:

@@ -81,7 +81,7 @@ def test_defined_compound_from_smiles(defined_compound_smiles_factory):
     invalid_smiles = "AN(INVALID(STRING"
     serializer = defined_compound_smiles_factory.build(smiles=invalid_smiles)
     assert not serializer.is_valid()
-    assert "The SMILES string cannot be converted to a molfile" in str(
+    assert "Structure is not in SMILES format" in str(
         serializer.errors.get("smiles")[0]
     )
 
@@ -97,7 +97,7 @@ def test_defined_compound_from_smiles(defined_compound_smiles_factory):
         smiles="CC(=O)N1CCN(CC1)C1=CC=C(OC[C@H]2COC@@(O2)C2=CC=C(Cl)C=C2Cl)C=C1"
     )
     assert not serializer.is_valid()
-    assert "The SMILES string cannot be converted to a molfile" in str(
+    assert "Structure is not in SMILES format" in str(
         serializer.errors.get("smiles")[0]
     )
 

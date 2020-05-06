@@ -4,6 +4,12 @@ local baseCompound = import 'baseCompound.libsonnet';
   app: 'Compound',
   type: 'definedCompound',
   description: 'Everything about defined compounds.',
+  queryParams: [
+    {
+      parameter: 'override',
+      description: 'The computed InChIKey typically must be unique. However, in some circumstances, a non-unique InChIKey is allowed. An admin may add this query parameter in order to bypass uniqueness checks.',
+    },
+  ],
   attributes: {
     cid: baseCompound.attributes.cid,
     molfileV3000: {
@@ -13,7 +19,7 @@ local baseCompound = import 'baseCompound.libsonnet';
       oneOfGroup: 'structure',
     },
     smiles: {
-      type: 'any',
+      type: 'string',
       description: 'A [SMILES string](https://en.wikipedia.org/wiki/Simplified_molecular-input_line-entry_system) representing the compound.',
       example: 'O=O',
       writeOnly: true,
@@ -33,12 +39,6 @@ local baseCompound = import 'baseCompound.libsonnet';
       description: 'The computed [InChIKey](https://en.wikipedia.org/wiki/International_Chemical_Identifier#InChIKey) for this compound.',
       example: 'MYMOFIZGZYHOMD-UHFFFAOYSA-N',
     },
-    override: {
-      type: 'any',
-      required: false,
-      writeOnly: true,
-      description: 'The computed InChIKey typically must be unique. However, in some circumstances, a non-unique InChIKey is allowed. Any logged in user may set this to `true` (or any other "truthy" value) in order to bypass uniqueness checks.',
-    },
   },
   errors: [
     {
@@ -56,19 +56,25 @@ local baseCompound = import 'baseCompound.libsonnet';
     {
       status: 400,
       detail: 'InChIKey not computable for provided structure.',
-      pointer: '/data/attributes/inchikey',
+      pointer: '/data/attributes/{structureField}',
       code: 'invalid',
     },
     {
       status: 400,
       detail: 'InChIKey already exists.',
-      pointer: '/data/attributes/molfileV3000',
+      pointer: '/data/attributes/{structureField}',
       code: 'invalid',
     },
     {
       status: 400,
-      detail: 'The SMILES string cannot be converted to a molfile.\n {location of smiles error}',
+      detail: 'Structure is not in SMILES format: {location of smiles error}',
       pointer: '/data/attributes/smiles',
+      code: 'invalid',
+    },
+    {
+      status: 400,
+      detail: 'Cannot be converted into a molfile.',
+      pointer: '/data/attributes/{structure}',
       code: 'invalid',
     },
     {
@@ -79,14 +85,20 @@ local baseCompound = import 'baseCompound.libsonnet';
     },
     {
       status: 400,
-      detail: 'Molfile format is invalid. Molfile v2000 format expected.',
-      pointer: '/data/attributes/molfileV3000',
+      detail: 'Structure is not in V2000 format.',
+      pointer: '/data/attributes/molfileV2000',
       code: 'invalid',
     },
     {
       status: 400,
-      detail: 'The data includes too many potential non-V3000 molfile structures in {matched}.',
-      pointer: '/data/attributes/molfileV3000',
+      detail: "Only one of ['molfileV2000', 'molfileV3000', 'smiles'] allowed. Recieved {fields}.",
+      pointer: '/data/attributes/nonFieldErrors',
+      code: 'invalid',
+    },
+    {
+      status: 400,
+      detail: "One of ['molfileV2000', 'molfileV3000', 'smiles'] required.",
+      pointer: '/data/attributes/nonFieldErrors',
       code: 'invalid',
     },
   ],
