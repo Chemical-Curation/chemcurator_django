@@ -1,3 +1,5 @@
+from rest_framework.permissions import IsAdminUser
+
 from chemreg.compound.models import (
     DefinedCompound,
     IllDefinedCompound,
@@ -15,6 +17,21 @@ class DefinedCompoundViewSet(ModelViewSet):
 
     queryset = DefinedCompound.objects.all()
     serializer_class = DefinedCompoundSerializer
+    query_params = ["overrides"]
+
+    @property
+    def override(self):
+        return "override" in self.request.query_params
+
+    def get_permissions(self):
+        if self.override:
+            return [IsAdminUser()]
+        return super().get_permissions()
+
+    def get_serializer(self, *args, **kwargs):
+        if self.override:
+            kwargs["admin_override"] = True
+        return super().get_serializer(*args, **kwargs)
 
 
 class IllDefinedCompoundViewSet(ModelViewSet):
