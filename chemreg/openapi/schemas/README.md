@@ -18,6 +18,12 @@ A definition file is a representation of an OpenAPI schema. It includes some fea
     type: "The schema type. This is usually a camelCase version of the model the schema represents.",
     pluralType: "Optional. The plural version of the schema type.",
     description: "A description of the schema.",
+    queryParams: [
+        {
+            parameter: "The query parameter string allowed in POST requests.",
+            description: "A description of what passing this parameter does."
+        }
+    ]
     attributes: {
         attributeName: {
             // all of https://swagger.io/docs/specification/data-models/keywords/

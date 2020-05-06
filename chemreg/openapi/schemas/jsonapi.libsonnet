@@ -18,6 +18,7 @@ local ModelTemplate = {
   attributes:: error 'Must set "attributes"',
   typePlural:: self.type + 's',
   relationships:: [],
+  queryParams:: [],
   errors:: [],
   hasRelationships:: std.length(self.relationships) > 0,
   defaultRelationships:: [relatedObj for relatedObj in self.relationships if relatedObj.default != null],
@@ -209,6 +210,18 @@ local buildParameters(obj) = {
       },
     },
   },
+  objParams:: [
+    {
+      name: queryParam.parameter,
+      'in': 'query',
+      description: queryParam.description,
+      required: false,
+      type: 'boolean',
+      allowEmptyValue: true,
+    }
+    for queryParam in obj.queryParams
+  ],
+  post:: self.objParams,
   write:: [self.id],
   read:: [self.id, self.fields],
   readList:: [self.sort, self.fields, self.page],
@@ -850,6 +863,7 @@ local buildPaths(obj) =
       post: {
         tags: [obj.type],
         summary: 'Add resource',
+        parameters: builtParameters.post,
         responses: builtErrors.write {
           '201': {
             description: 'Created',
