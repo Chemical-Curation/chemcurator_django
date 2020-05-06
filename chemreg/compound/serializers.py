@@ -1,57 +1,80 @@
+from rest_framework import serializers
+
+from chemreg.common.validators import OneOfValidator
+from chemreg.compound.fields import StructureAliasField
 from chemreg.compound.models import (
     DefinedCompound,
     IllDefinedCompound,
     QueryStructureType,
 )
 from chemreg.compound.validators import (
+    validate_inchikey_computable,
     validate_inchikey_unique,
     validate_molfile_v2000,
-    validate_single_structure,
+    validate_molfile_v3000_computable,
     validate_smiles,
-    validate_structure,
 )
-from chemreg.indigo.inchi import load_structure
-from chemreg.jsonapi.relations import ResourceRelatedField
+from chemreg.indigo.molfile import get_molfile_v3000
 from chemreg.jsonapi.serializers import HyperlinkedModelSerializer
 
 
-class DefinedCompoundSerializer(HyperlinkedModelSerializer):
+class BaseCompoundSerializer(HyperlinkedModelSerializer):
+    """The base serializer for compounds."""
+
+    serializer_field_mapping = HyperlinkedModelSerializer.serializer_field_mapping
+    serializer_field_mapping.update({StructureAliasField: serializers.CharField})
+
+
+class DefinedCompoundSerializer(BaseCompoundSerializer):
     """The serializer for defined compounds."""
+
+    molfile_v2000 = serializers.CharField(
+        write_only=True,
+        required=False,
+        validators=[
+            validate_molfile_v2000,
+            validate_inchikey_computable,
+            validate_molfile_v3000_computable,
+        ],
+        trim_whitespace=False,
+    )
+    smiles = serializers.CharField(
+        write_only=True,
+        required=False,
+        validators=[
+            validate_smiles,
+            validate_inchikey_computable,
+            validate_molfile_v3000_computable,
+        ],
+        trim_whitespace=False,
+    )
 
     class Meta:
         model = DefinedCompound
         fields = (
             "cid",
-            "molfile_v3000",
             "inchikey",
+            "molfile_v2000",
+            "molfile_v3000",
+            "smiles",
         )
-        extra_kwargs = {
-            "override": {"write_only": True},
-            "smiles": {"write_only": True},
-        }
+        extra_kwargs = {"molfile_v3000": {"required": False, "trim_whitespace": False}}
+        validators = [
+            OneOfValidator("molfile_v2000", "molfile_v3000", "smiles", required=True)
+        ]
 
-    def to_internal_value(self, data):
-        if data.keys():  # False will pass on to *required
-            validate_single_structure(data.keys())
-        if data.get("smiles"):  # if the json contains a SMILES value...
-            compound = data["smiles"]  # ...assign it to a local var
-            validate_smiles(compound)
-        elif data.get("molfile_v2000"):  # if the json contains a molfile_v2000 value...
-            compound = str(data["molfile_v2000"])  # ...assign it to a local var
-            validate_molfile_v2000(compound)
-        else:
-            return super().to_internal_value(data)
-        validate_structure(compound)
-        struct = load_structure(compound)
-        data["molfile_v3000"] = struct.molfile()  # store in molfile_v3000
-        return super().to_internal_value(data)
+    def __init__(self, *args, admin_override=False, **kwargs):
+        if not admin_override:
+            for structrue in ("molfile_v2000", "molfile_v3000", "smiles"):
+                field = self.fields[structrue]
+                field.validators.append(validate_inchikey_unique)
+        super().__init__(*args, **kwargs)
 
-    def validate(self, attrs):
-        if not self.initial_data.get("override"):  # validate uniqueness of inchikey
-            validate_inchikey_unique(self.initial_data["molfile_v3000"])
-        return attrs
-
-
+    def validate(self, data):
+        alt_structures = ("molfile_v2000", "molfile_v3000", "smiles")
+        alt_structure = next(k for k in alt_structures if k in data)
+        data["molfile_v3000"] = get_molfile_v3000(data.pop(alt_structure))
+        return data
 
 
 class QueryStructureTypeSerializer(HyperlinkedModelSerializer):

@@ -2,14 +2,15 @@ import re
 
 from django.apps import apps
 from rest_framework import serializers
-from rest_framework.exceptions import ParseError, ValidationError
+from rest_framework.exceptions import ValidationError
 
 import partialsmiles as ps
 from indigo import IndigoException
 
 from chemreg.compound.settings import compound_settings
 from chemreg.compound.utils import compute_checksum, extract_checksum, extract_int
-from chemreg.indigo.inchi import get_inchikey, load_structure
+from chemreg.indigo.inchi import get_inchikey
+from chemreg.indigo.molfile import get_molfile_v3000
 
 
 def validate_cid_regex(cid: str) -> None:
@@ -60,25 +61,23 @@ def validate_inchikey_computable(molfile: str) -> None:
         raise ValidationError("InChIKey not computable for provided structure.")
 
 
-def validate_inchikey_unique(molfile: str) -> None:
+def validate_inchikey_unique(structure: str) -> None:
     """Validates that an InChIKey computed from the provided molfile is unique.
 
     Typically, we'd use unique=True to enforce this at the database level, however,
     sometimes a non-unique inchikey can exist. An admin must verify this is allowed.
 
     Args:
-        molfile: The molfile string
+        structure: The defined compound structure.
 
     Raises:
         ValidationError: If the InChIKey is not unique.
     """
     DefinedCompound = apps.get_model("compound", "DefinedCompound")
     try:
-        inchikey = get_inchikey(molfile)
+        inchikey = get_inchikey(structure)
         if DefinedCompound.objects.filter(inchikey=inchikey).exists():
-            raise serializers.ValidationError(
-                {"molfile_v3000": "InChIKey already exists."}
-            )
+            raise ValidationError("InChIKey already exists.")
     except IndigoException:
         pass
 
@@ -102,8 +101,9 @@ def validate_smiles(smiles: str) -> None:
     except ps.ValenceError:
         pass
     except ps.SMILESSyntaxError as e:
-        message = f"The SMILES string cannot be converted to a molfile.\n {e}"
-        raise ParseError({"smiles": message})
+        raise ValidationError(
+            f"The SMILES string cannot be converted to a molfile: {e}"
+        )
 
 
 def validate_molfile_v3000(molfile: str) -> None:
@@ -139,48 +139,19 @@ def validate_molfile_v2000(molfile: str) -> None:
         version = molfile.split("\n")[3].strip()[-5:]
         assert version == "V2000"
     except (AssertionError, IndexError):
-        raise serializers.ValidationError(
-            {
-                "molfile_v3000": "Molfile format is invalid. Molfile v2000 format expected."
-            }
-        )
+        raise serializers.ValidationError("Structure is not in V2000 format.")
 
 
-def validate_single_structure(structures) -> None:
-    """Validates that the initial JSON data for a defined compound
-    only includes data in one of the fields that can be used for
-    structure.
-
-    Args:
-        structures: the list of populated structure fields
-        other than molfile_v3000 passed from the serializer
-
-    Raises:
-        ValidationError: Too many potential structures provided.
-    """
-    try:
-        alt_structure_keys = ["molfile_v3000", "molfile_v2000", "smiles"]
-        matched = [x for x in alt_structure_keys if x in structures]
-        assert len(matched) == 1
-    except AssertionError:
-        raise serializers.ValidationError(
-            {
-                "molfile_v3000": f"The data includes too many potential non-V3000 molfile structures in {matched}."
-            }
-        )
-
-
-def validate_structure(structure: str) -> None:
-    """Validates that the structure can be loaded into Indigo
-    without exception.
+def validate_molfile_v3000_computable(structure: str) -> None:
+    """Validates that the structure can be loaded into Indigo without exception.
 
     Args:
         structure: the structure string ("molfile_v2000", "smiles")
 
     Raises:
-        ValidationError: The error thrown by Indigo.
+        ValidationError: If the InChIKey cannot be computed.
     """
     try:
-        load_structure(structure)
-    except IndigoException as e:
-        raise ValidationError({"molfile_v3000": e})
+        get_molfile_v3000(structure)
+    except IndigoException:
+        raise ValidationError("Cannot be converted into a molfile.")
