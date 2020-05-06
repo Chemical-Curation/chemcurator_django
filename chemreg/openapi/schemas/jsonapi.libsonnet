@@ -450,7 +450,7 @@ local buildLinks(obj) = {
           type: 'string',
           format: 'uri',
           description: 'The link to the resource that represents the relationship itself.',
-          example: std.extVar('baseServer') + '/' + obj.typePlural + '1/' + relatedObjType,
+          example: std.extVar('baseServer') + '/' + obj.typePlural + '/1/' + relatedObjType,
         },
         related: {
           type: 'string',
@@ -460,7 +460,7 @@ local buildLinks(obj) = {
               'The link to the resource representing the related resource objects.'
             else
               'The link to the resource representing the related resource object.',
-          example: std.extVar('baseServer') + '/' + obj.typePlural + '1/relationships' + relatedObjType,
+          example: std.extVar('baseServer') + '/' + obj.typePlural + '/1/relationships/' + relatedObjType,
         },
       },
       required: ['self', 'related'],

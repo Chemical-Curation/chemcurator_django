@@ -52,23 +52,6 @@ class DefinedCompoundSerializer(HyperlinkedModelSerializer):
         return attrs
 
 
-class IllDefinedCompoundSerializer(HyperlinkedModelSerializer):
-    """The serializer for ill-defined compounds."""
-
-    query_structure_type = ResourceRelatedField(
-        queryset=QueryStructureType.objects,
-        related_link_view_name="ill-defined-compounds-related",
-        required=False,
-        self_link_view_name="ill-defined-compounds-relationships",
-    )
-
-    included_serializers = {
-        "query_structure_type": "chemreg.compound.serializers.QueryStructureTypeSerializer",
-    }
-
-    class Meta:
-        model = IllDefinedCompound
-        fields = ("cid", "mrvfile", "query_structure_type")
 
 
 class QueryStructureTypeSerializer(HyperlinkedModelSerializer):
@@ -77,3 +60,13 @@ class QueryStructureTypeSerializer(HyperlinkedModelSerializer):
     class Meta:
         model = QueryStructureType
         fields = ("name", "label", "short_description", "long_description")
+
+
+class IllDefinedCompoundSerializer(BaseCompoundSerializer):
+    """The serializer for ill-defined compounds."""
+
+    query_structure_type = QueryStructureTypeSerializer
+
+    class Meta:
+        model = IllDefinedCompound
+        fields = ("cid", "mrvfile", "query_structure_type")
