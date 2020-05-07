@@ -17,7 +17,7 @@ class DefinedCompoundViewSet(ModelViewSet):
 
     queryset = DefinedCompound.objects.all()
     serializer_class = DefinedCompoundSerializer
-    query_params = ["overrides"]
+    query_params = ["override"]
 
     @property
     def override(self):
