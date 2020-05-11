@@ -31,7 +31,10 @@ class AutoRelatedMixin:
             for key, val in cls.__dict__.items()
             if key in cls.Meta.fields
             and inspect.isclass(val)
-            and issubclass(val, serializers.ModelSerializer)
+            and (
+                issubclass(val, serializers.ModelSerializer)
+                or issubclass(val, serializers.HyperlinkedModelSerializer)
+            )
         }
         for key in included_serializers:
             delattr(cls, key)
