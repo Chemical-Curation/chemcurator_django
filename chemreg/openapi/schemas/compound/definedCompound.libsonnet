@@ -61,7 +61,7 @@ local baseCompound = import 'baseCompound.libsonnet';
     },
     {
       status: 400,
-      detail: 'InChIKey already exists.',
+      detail: 'InChIKey already exists.\nCompound ID: {compound.id}',
       pointer: '/data/attributes/{structureField}',
       code: 'invalid',
     },

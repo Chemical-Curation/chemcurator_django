@@ -76,8 +76,11 @@ def validate_inchikey_unique(structure: str) -> None:
     DefinedCompound = apps.get_model("compound", "DefinedCompound")
     try:
         inchikey = get_inchikey(structure)
-        if DefinedCompound.objects.filter(inchikey=inchikey).exists():
-            raise ValidationError("InChIKey already exists.")
+        qs = DefinedCompound.objects.filter(inchikey=inchikey)
+        if qs.exists():
+            raise serializers.ValidationError(
+                f"InChIKey already exists.\nConflicting compound ID: {qs.last().pk}"
+            )
     except IndigoException:
         pass
 
