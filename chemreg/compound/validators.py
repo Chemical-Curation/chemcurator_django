@@ -75,10 +75,10 @@ def validate_inchikey_unique(molfile: str) -> None:
     DefinedCompound = apps.get_model("compound", "DefinedCompound")
     try:
         inchikey = get_inchikey(molfile)
-        if DefinedCompound.objects.filter(inchikey=inchikey).exists():
-            raise serializers.ValidationError(
-                {"molfile_v3000": "InChIKey already exists."}
-            )
+        qs = DefinedCompound.objects.filter(inchikey=inchikey)
+        if qs.exists():
+            msg = f"InChIKey already exists.\nConflicting compound ID: {qs.last().pk}"
+            raise serializers.ValidationError({"inchikey": msg})
     except IndigoException:
         pass
 

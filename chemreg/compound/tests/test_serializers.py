@@ -38,11 +38,12 @@ def test_query_structure_type(query_structure_type_factory):
 def test_unique_inchikey(defined_compound_factory):
     serializer = defined_compound_factory.build()
     assert serializer.is_valid()
-    serializer.save()
+    compound = serializer.save()
     serialized = defined_compound_factory.build(**serializer.initial_data)
     assert not serialized.is_valid()
-    assert "molfile_v3000" in serialized.errors
-    assert str(serialized.errors["molfile_v3000"][0]) == "InChIKey already exists."
+    assert "inchikey" in serialized.errors
+    conflict = f"Conflicting compound ID: {compound.id}"
+    assert conflict in str(serialized.errors["inchikey"][0])
 
 
 @pytest.mark.django_db
