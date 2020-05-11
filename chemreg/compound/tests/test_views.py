@@ -22,7 +22,7 @@ def test_definedcompound_override():
             validate_inchikey_unique in view.get_serializer().fields[field].validators
         )
 
-    view.request = view.initialize_request(factory.post("/definedCompounds?overRide"))
+    view.request = view.initialize_request(factory.post("/definedCompounds?override"))
     assert any(isinstance(p, IsAdminUser) for p in view.get_permissions())
     for field in ("molfile_v2000", "molfile_v3000", "smiles"):
         assert (
@@ -30,9 +30,9 @@ def test_definedcompound_override():
             not in view.get_serializer().fields[field].validators
         )
 
-    view.request = view.initialize_request(factory.post("/definedCompounds?override"))
+    view.request = view.initialize_request(factory.post("/definedCompounds?overRide"))
     with pytest.raises(ValidationError) as err:
         view.create(view.request)
     assert err.value.status_code == 400
     assert err.value.default_code == "invalid"
-    assert err.value.args[0] == "invalid query parameter: override"
+    assert err.value.args[0] == "invalid query parameter: overRide"

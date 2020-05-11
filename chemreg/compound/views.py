@@ -17,11 +17,11 @@ class DefinedCompoundViewSet(ModelViewSet):
 
     queryset = DefinedCompound.objects.all()
     serializer_class = DefinedCompoundSerializer
-    valid_post_query_params = ["overRide"]
+    valid_post_query_params = ["override"]
 
     @property
     def override(self):
-        return "overRide" in self.request.query_params
+        return "override" in self.request.query_params
 
     def get_permissions(self):
         if self.override:

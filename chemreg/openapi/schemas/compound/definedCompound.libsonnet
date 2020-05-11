@@ -6,7 +6,7 @@ local baseCompound = import 'baseCompound.libsonnet';
   description: 'Everything about defined compounds.',
   queryParams: [
     {
-      parameter: 'overRide',
+      parameter: 'override',
       description: 'The computed InChIKey typically must be unique. However, in some circumstances, a non-unique InChIKey is allowed. An admin may add this query parameter in order to bypass uniqueness checks.',
     },
   ],
