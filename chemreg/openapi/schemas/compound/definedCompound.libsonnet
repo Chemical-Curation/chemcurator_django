@@ -26,7 +26,7 @@ local baseCompound = import 'baseCompound.libsonnet';
       oneOfGroup: 'structure',
     },
     molfileV2000: {
-      type: 'any',
+      type: 'string',
       description: 'A [v2000 MDL Molfile](https://en.wikipedia.org/wiki/Chemical_table_file#Molfile) representing the compound.',
       example: '\n  -INDIGO-04292017242D\n\n  2  1  0  0  0  0  0  0  0  0999 V2000\n    0.0000    0.0000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n    0.0000    0.0000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n  1  2  2  0  0  0  0\nM  END\n',
       writeOnly: true,
