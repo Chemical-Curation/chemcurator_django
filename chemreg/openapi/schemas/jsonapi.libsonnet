@@ -25,10 +25,10 @@ local ModelTemplate = {
   allRelationshipsDefault:: std.length(self.defaultRelationships) == std.length(self.relationships),
   relatedTypes:: [relatedObj.object.type for relatedObj in self.relationships],
   allTypes:: std.set([self.type] + self.relatedTypes),
-  readableAttributes(type)::
+  readableAttributes(type, detail=true)::
     if type == self.type then
       std.filter(
-        (function(k) !self.attributes[k].writeOnly),
+        (function(k) !self.attributes[k].writeOnly && (detail || !self.attributes[k].detailRead)),
         std.objectFields(self.attributes)
       )
     else
@@ -49,6 +49,7 @@ local AttributeTemplate(attributeObj) = {
   oneOfGroup:: '',
   default:: null,
   required:: self.default == null,
+  detailRead:: false,
   nullable: false,
   [if attributeObj.type == 'string' then 'minLength']: 1,
 };
@@ -142,11 +143,11 @@ local buildParameters(obj) = {
       pattern: '\\d+',
     },
   },
-  fields:: {
+  fields(detail=false):: {
     name: 'fields',
     'in': 'query',
     description: '[sparse fieldsets](https://jsonapi.org/format/#fetching-sparse-fieldsets)',
-    example: { [obj.type]: obj.readableAttributes(obj.type)[0] },
+    example: { [obj.type]: obj.readableAttributes(obj.type, detail=detail)[0] },
     explode: true,
     required: false,
     style: 'deepObject',
@@ -157,7 +158,7 @@ local buildParameters(obj) = {
           type: 'array',
           items: {
             type: 'string',
-            enum: obj.readableAttributes(k),
+            enum: obj.readableAttributes(k, detail=detail),
           },
         }
         for k in obj.allTypes
@@ -197,15 +198,15 @@ local buildParameters(obj) = {
     description: '[list of fields to sort by](https://jsonapi.org/format/#fetching-sorting)',
     required: false,
     style: 'form',
-    example: [obj.readableAttributes(obj.type)[0]],
+    example: [obj.readableAttributes(obj.type, detail=false)[0]],
     schema: {
       type: 'array',
       items: {
         type: 'string',
         enum:
-          obj.readableAttributes(obj.type) + [
+          obj.readableAttributes(obj.type, detail=false) + [
             '-' + k
-            for k in obj.readableAttributes(obj.type)
+            for k in obj.readableAttributes(obj.type, detail=false)
           ],
       },
     },
@@ -223,8 +224,8 @@ local buildParameters(obj) = {
   ],
   post:: self.objParams,
   write:: [self.id],
-  read:: [self.id, self.fields],
-  readList:: [self.sort, self.fields, self.page],
+  read:: [self.id, self.fields(detail=true)],
+  readList:: [self.sort, self.fields(detail=false), self.page],
 };
 
 local responseCodeDescriptions = {
@@ -536,10 +537,16 @@ local getAttributes = {
     },
   read(obj)::
     local keys = std.filter(
-      (function(k) !obj.attributes[k].writeOnly),
+      (function(k) !obj.attributes[k].writeOnly || obj.attributes[k].detailRead),
       std.objectFields(obj.attributes)
     );
-    $.utils.buildArray(obj, keys, required=false),
+    [$.utils.buildObject(obj, keys)],
+  readList(obj)::
+    local keys = std.filter(
+      (function(k) !obj.attributes[k].writeOnly && !obj.attributes[k].detailRead),
+      std.objectFields(obj.attributes)
+    );
+    [$.utils.buildObject(obj, keys)],
   write(obj, required=true)::
     local keys = std.filter(
       (function(k) !obj.attributes[k].readOnly),
@@ -630,6 +637,17 @@ local getResource = {
       },
       required: ['type', 'id', 'attributes', 'links'],
     },
+  readList(obj)::
+    local attributes = getAttributes.readList(obj);
+    buildResourceIdentifier(obj) {
+      description: 'The requested resource.',
+      properties+: {
+        attributes: $.buildAttributes(attributes),
+        links: buildLinks(obj).read,
+        [if obj.hasRelationships then 'relationships']: buildRelationships(obj, includeLinks=true),
+      },
+      required: ['type', 'id', 'attributes', 'links'],
+    },
   included(obj)::
     local relatedResources = [
       $.read(relatedObj.object) {
@@ -692,7 +710,7 @@ local buildSchema(obj) = {
       links: buildLinks(obj).readList,
       data: {
         type: 'array',
-        items: getResource.read(obj),
+        items: getResource.readList(obj),
       },
       [if obj.hasRelationships then 'included']: {
         type: 'array',
@@ -869,7 +887,7 @@ local buildPaths(obj) =
             description: 'Created',
             content: {
               'application/vnd.api+json': {
-                schema: builtSchema.read,
+                schema: builtSchema.readList,
               },
             },
           },

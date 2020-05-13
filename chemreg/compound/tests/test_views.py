@@ -1,6 +1,6 @@
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAdminUser
-from rest_framework.test import APIRequestFactory
+from rest_framework.test import APIRequestFactory, force_authenticate
 
 import pytest
 
@@ -36,3 +36,35 @@ def test_definedcompound_override():
     assert err.value.status_code == 400
     assert err.value.default_code == "invalid"
     assert err.value.args[0] == "invalid query parameter: overRide"
+
+
+@pytest.mark.django_db
+def test_definedcompound_detail_attrs(user_factory, defined_compound_factory):
+    """Test that detail view includes extra SerializerMethodField attributes."""
+    factory = APIRequestFactory()
+    view = DefinedCompoundViewSet.as_view({"get": "list"})
+    serializer = defined_compound_factory.build()
+    assert serializer.is_valid()
+    compound = serializer.save()
+    request = factory.get("/definedCompounds")
+    user = user_factory.build()
+    force_authenticate(request, user=user)
+    response = view(request)
+    attrs = response.data["results"].pop()
+    assert list(attrs.keys()) == ["cid", "inchikey", "molfile_v3000", "url"]
+
+    view = DefinedCompoundViewSet.as_view({"get": "retrieve"})
+    request = factory.get("/definedCompounds/")
+    force_authenticate(request, user=user)
+    response = view(request, pk=compound.pk)
+    attrs = response.data
+    assert list(attrs.keys()) == [
+        "cid",
+        "inchikey",
+        "molfile_v3000",
+        "smiles",
+        "molecular_weight",
+        "molecular_formula",
+        "calculated_inchikey",
+        "url",
+    ]

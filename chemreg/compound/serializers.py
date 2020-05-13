@@ -14,6 +14,7 @@ from chemreg.compound.validators import (
     validate_molfile_v3000_computable,
     validate_smiles,
 )
+from chemreg.indigo.inchi import get_inchikey
 from chemreg.indigo.molfile import get_molfile_v3000
 from chemreg.jsonapi.serializers import HyperlinkedModelSerializer
 
@@ -75,6 +76,33 @@ class DefinedCompoundSerializer(BaseCompoundSerializer):
         alt_structure = next(k for k in alt_structures if k in data)
         data["molfile_v3000"] = get_molfile_v3000(data.pop(alt_structure))
         return data
+
+
+class DefinedCompoundDetailSerializer(DefinedCompoundSerializer):
+    molecular_weight = serializers.SerializerMethodField()
+    molecular_formula = serializers.SerializerMethodField()
+    smiles = serializers.SerializerMethodField()
+    calculated_inchikey = serializers.SerializerMethodField()
+
+    class Meta(DefinedCompoundSerializer.Meta):
+        fields = DefinedCompoundSerializer.Meta.fields + (
+            "molecular_weight",
+            "molecular_formula",
+            "smiles",
+            "calculated_inchikey",
+        )
+
+    def get_molecular_weight(self, obj):
+        return obj.indigo_structure.molecularWeight()
+
+    def get_molecular_formula(self, obj):
+        return obj.indigo_structure.grossFormula()
+
+    def get_smiles(self, obj):
+        return obj.indigo_structure.smiles()
+
+    def get_calculated_inchikey(self, obj):
+        return get_inchikey(obj.molfile_v3000)
 
 
 class QueryStructureTypeSerializer(HyperlinkedModelSerializer):

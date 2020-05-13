@@ -22,7 +22,7 @@ local baseCompound = import 'baseCompound.libsonnet';
       type: 'string',
       description: 'A [SMILES string](https://en.wikipedia.org/wiki/Simplified_molecular-input_line-entry_system) representing the compound.',
       example: 'O=O',
-      writeOnly: true,
+      detailRead: true,
       oneOfGroup: 'structure',
     },
     molfileV2000: {
@@ -36,9 +36,33 @@ local baseCompound = import 'baseCompound.libsonnet';
       type: 'string',
       maxLength: 29,
       readOnly: true,
-      description: 'The computed [InChIKey](https://en.wikipedia.org/wiki/International_Chemical_Identifier#InChIKey) for this compound.',
+      description: 'The [InChIKey](https://en.wikipedia.org/wiki/International_Chemical_Identifier#InChIKey) computed at the time of storage for this compound.',
       example: 'MYMOFIZGZYHOMD-UHFFFAOYSA-N',
     },
+    molecularWeight: {
+      type: 'number',
+      format: 'float',
+      detailRead: true,
+      readOnly: true,
+      description: "The compound's molecular weight [g/mol].",
+      example: 31.99880027770996,
+    },
+    molecularFormula: {
+      type: 'string',
+      detailRead: true,
+      readOnly: true,
+      description: "The compound's gross formula.",
+      example: 'O2',
+    },
+    calculatedInchikey: {
+      type: 'string',
+      maxLength: 29,
+      detailRead: true,
+      readOnly: true,
+      description: 'The [InChIKey](https://en.wikipedia.org/wiki/International_Chemical_Identifier#InChIKey) as calculated at the time of the request.',
+      example: 'MYMOFIZGZYHOMD-UHFFFAOYSA-N',
+    },
+
   },
   errors: [
     {

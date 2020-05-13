@@ -6,6 +6,7 @@ from chemreg.compound.models import (
     QueryStructureType,
 )
 from chemreg.compound.serializers import (
+    DefinedCompoundDetailSerializer,
     DefinedCompoundSerializer,
     IllDefinedCompoundSerializer,
     QueryStructureTypeSerializer,
@@ -17,7 +18,16 @@ class DefinedCompoundViewSet(ModelViewSet):
 
     queryset = DefinedCompound.objects.all()
     serializer_class = DefinedCompoundSerializer
+    serializer_action_classes = {
+        "retrieve": DefinedCompoundDetailSerializer,
+    }
     valid_post_query_params = ["override"]
+
+    def get_serializer_class(self, *args, **kwargs):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return self.serializer_class
 
     @property
     def override(self):
