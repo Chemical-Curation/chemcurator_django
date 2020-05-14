@@ -3,6 +3,7 @@ from rest_framework import serializers
 from chemreg.common.validators import OneOfValidator
 from chemreg.compound.fields import StructureAliasField
 from chemreg.compound.models import (
+    BaseCompound,
     DefinedCompound,
     IllDefinedCompound,
     QueryStructureType,
@@ -16,7 +17,10 @@ from chemreg.compound.validators import (
 )
 from chemreg.indigo.inchi import get_inchikey
 from chemreg.indigo.molfile import get_molfile_v3000
-from chemreg.jsonapi.serializers import HyperlinkedModelSerializer
+from chemreg.jsonapi.serializers import (
+    HyperlinkedModelSerializer,
+    PolymorphicModelSerializer,
+)
 
 
 class BaseCompoundSerializer(HyperlinkedModelSerializer):
@@ -121,3 +125,13 @@ class IllDefinedCompoundSerializer(BaseCompoundSerializer):
     class Meta:
         model = IllDefinedCompound
         fields = ("cid", "mrvfile", "query_structure_type")
+
+
+class CompoundSerializer(PolymorphicModelSerializer):
+    """The serializer for both ill-defined and defined compounds."""
+
+    polymorphic_serializers = [DefinedCompoundSerializer, IllDefinedCompoundSerializer]
+
+    class Meta:
+        model = BaseCompound
+        fields = ["cid"]

@@ -15,31 +15,86 @@ local ModelTemplate = {
   app:: error 'Must set "app"',
   type:: error 'Must set "type"',
   description:: '',
-  attributes:: error 'Must set "attributes"',
+  attributes:: {},
   typePlural:: self.type + 's',
-  relationships:: [],
+  relationships::
+    if self.isPolymorphic then
+      std.flattenArrays([o.relationships for o in self.polymorphicObjects])
+    else
+      [],
+  readOnly:: false,
+  writeOnly:: false,
+  polymorphicObjects:: [],
+  polymorphicTypes:: [obj.type for obj in self.polymorphicObjects],
+  isPolymorphic:: std.length(self.polymorphicObjects) > 0,
   queryParams:: [],
   errors:: [],
   hasRelationships:: std.length(self.relationships) > 0,
   defaultRelationships:: [relatedObj for relatedObj in self.relationships if relatedObj.default != null],
   allRelationshipsDefault:: std.length(self.defaultRelationships) == std.length(self.relationships),
-  relatedTypes:: [relatedObj.object.type for relatedObj in self.relationships],
-  allTypes:: std.set([self.type] + self.relatedTypes),
+  relatedObjects:: [relatedObj.object for relatedObj in self.relationships],
+  relatedTypes:: [relatedObj.type for relatedObj in self.relatedObjects],
+  allTypes::
+    local embeddedTypes = self.relatedTypes + self.polymorphicTypes;
+    if self.isPolymorphic then
+      std.set(embeddedTypes)
+    else
+      std.set([self.type] + embeddedTypes),
+  commonAttributes(detail=false)::
+    local allAttributes =
+      if self.isPolymorphic then
+        [[a for a in std.objectFields(o.attributes) if detail || !o.getAttribute(a).detailRead] for o in self.polymorphicObjects]
+      else
+        [[a for a in std.objectFields(self.attributes) if detail || !self.getAttribute(a).detailRead]];
+    std.foldl(
+      (function(x, y) std.setInter(std.set(x), std.set(y))),
+      allAttributes,
+      allAttributes[0],
+    ),
+  getAttribute(name)::
+    local objectWithField = std.filter((function(o) std.objectHas(o.attributes, name)), [self] + self.polymorphicObjects + self.relatedObjects);
+    objectWithField[0].attributes[name],
   readableAttributes(type, detail=true)::
     if type == self.type then
-      std.filter(
-        (function(k) !self.attributes[k].writeOnly && (detail || !self.attributes[k].detailRead)),
-        std.objectFields(self.attributes)
+      std.set(
+        std.filter(
+          (function(k) !self.attributes[k].writeOnly && (detail || !self.attributes[k].detailRead)),
+          std.objectFields(self.attributes),
+        ) + std.flattenArrays(
+          [
+            std.filter(
+              (function(k) !o.attributes[k].writeOnly && (detail || !o.attributes[k].detailRead)),
+              std.objectFields(o.attributes)
+            )
+            for o in self.polymorphicObjects
+          ]
+        )
       )
     else
       local obj = std.filter(
-        (function(x) x.object.type == type),
-        self.relationships
-      )[0].object;
+        (function(x) x.type == type),
+        self.relatedObjects + self.polymorphicObjects
+      )[0];
       std.filter(
-        (function(k) !obj.attributes[k].writeOnly),
+        (function(k) !obj.attributes[k].writeOnly && (detail || !obj.attributes[k].detailRead)),
         std.objectFields(obj.attributes)
       ),
+  filterAttributes::
+    std.set(
+      std.filter(
+        (function(k) self.attributes[k].filter),
+        std.objectFields(self.attributes),
+      ) + std.flattenArrays(
+        [
+          std.filter(
+            (function(k) o.attributes[k].filter),
+            std.objectFields(o.attributes)
+          )
+          for o in self.polymorphicObjects
+        ]
+      )
+    ),
+
 };
 
 local AttributeTemplate(attributeObj) = {
@@ -50,6 +105,7 @@ local AttributeTemplate(attributeObj) = {
   default:: null,
   required:: self.default == null,
   detailRead:: false,
+  filter:: false,
   nullable: false,
   [if attributeObj.type == 'string' then 'minLength']: 1,
 };
@@ -80,9 +136,12 @@ local RelationshipProcessor = {
 
 local ModelProcessor = BaseModelProcessor {
   relationships: [
-
     RelationshipTemplate($) + relationship + RelationshipProcessor
     for relationship in super.relationships
+  ],
+  polymorphicObjects: [
+    ModelTemplate + polymorphicObject + BaseModelProcessor
+    for polymorphicObject in super.polymorphicObjects
   ],
 };
 
@@ -147,7 +206,7 @@ local buildParameters(obj) = {
     name: 'fields',
     'in': 'query',
     description: '[sparse fieldsets](https://jsonapi.org/format/#fetching-sparse-fieldsets)',
-    example: { [obj.type]: obj.readableAttributes(obj.type, detail=detail)[0] },
+    example: { [obj.allTypes[0]]: obj.readableAttributes(obj.allTypes[0], detail=detail)[0] },
     explode: true,
     required: false,
     style: 'deepObject',
@@ -198,16 +257,49 @@ local buildParameters(obj) = {
     description: '[list of fields to sort by](https://jsonapi.org/format/#fetching-sorting)',
     required: false,
     style: 'form',
-    example: [obj.readableAttributes(obj.type, detail=false)[0]],
+    example: [obj.commonAttributes(detail=false)[0]],
     schema: {
       type: 'array',
       items: {
         type: 'string',
         enum:
-          obj.readableAttributes(obj.type, detail=false) + [
+          obj.commonAttributes(detail=false) + [
             '-' + k
-            for k in obj.readableAttributes(obj.type, detail=false)
+            for k in obj.commonAttributes(detail=false)
           ],
+      },
+    },
+  },
+  include:: {
+    name: 'include',
+    'in': 'query',
+    description: '[list of related resources to include](https://jsonapi.org/format/#fetching-includes)',
+    required: false,
+    style: 'form',
+    example: [obj.relatedTypes[0]],
+    schema: {
+      type: 'array',
+      items: {
+        type: 'string',
+        enum: obj.relatedTypes,
+      },
+    },
+  },
+  filter:: {
+    name: 'filter',
+    'in': 'query',
+    description: '[filter by attribute](https://jsonapi.org/format/#fetching-filtering)',
+    explode: true,
+    required: false,
+    style: 'deepObject',
+    example: { [obj.filterAttributes[0]]: obj.getAttribute(obj.filterAttributes[0]).example },
+    schema: {
+      type: 'object',
+      properties: {
+        [k]: {
+          type: obj.getAttribute(k).type,
+        }
+        for k in obj.filterAttributes
       },
     },
   },
@@ -224,8 +316,13 @@ local buildParameters(obj) = {
   ],
   post:: self.objParams,
   write:: [self.id],
-  read:: [self.id, self.fields(detail=true)],
-  readList:: [self.sort, self.fields(detail=false), self.page],
+  read::
+    local includeParam = if obj.hasRelationships then [self.include] else [];
+    [self.id, self.fields(detail=true)] + includeParam,
+  readList::
+    local includeParam = if obj.hasRelationships then [self.include] else [];
+    local filterParam = if std.length(obj.filterAttributes) > 0 then [self.filter] else [];
+    [self.sort, self.fields(detail=false), self.page] + includeParam + filterParam,
 };
 
 local responseCodeDescriptions = {
@@ -557,6 +654,7 @@ local getAttributes = {
 
 local buildResourceIdentifier(obj, required=false) = {
   type: 'object',
+  title: obj.type,
   properties: {
     type: {
       type: 'string',
@@ -626,7 +724,7 @@ local getResource = {
       attributes[0]
     else
       { oneOf: attributes },
-  read(obj)::
+  readSingle(obj)::
     local attributes = getAttributes.read(obj);
     buildResourceIdentifier(obj) {
       description: 'The requested resource.',
@@ -637,7 +735,7 @@ local getResource = {
       },
       required: ['type', 'id', 'attributes', 'links'],
     },
-  readList(obj)::
+  readSingleList(obj)::
     local attributes = getAttributes.readList(obj);
     buildResourceIdentifier(obj) {
       description: 'The requested resource.',
@@ -661,7 +759,7 @@ local getResource = {
       relatedResources[0]
     else
       relatedResources,
-  post(obj)::
+  postSingle(obj)::
     local attributes = getAttributes.write(obj, required=true);
     buildResourceIdentifier(obj) {
       properties+: {
@@ -675,7 +773,7 @@ local getResource = {
         else
           ['type', 'attributes'],
     },
-  patch(obj)::
+  patchSingle(obj)::
     local attributes = getAttributes.write(obj, required=false);
     buildResourceIdentifier(obj) {
       properties+: {
@@ -689,6 +787,34 @@ local getResource = {
     buildResourceIdentifier(obj, required=true) {
       [if nullable then 'nullable']: true,
     },
+  read(obj)::
+    if obj.isPolymorphic then
+      {
+        oneOf: [$.readSingle(o) for o in obj.polymorphicObjects],
+      }
+    else
+      self.readSingle(obj),
+  readList(obj)::
+    if obj.isPolymorphic then
+      {
+        oneOf: [$.readSingleList(o) for o in obj.polymorphicObjects],
+      }
+    else
+      self.readSingleList(obj),
+  post(obj)::
+    if obj.isPolymorphic then
+      {
+        oneOf: [$.postSingle(o) for o in obj.polymorphicObjects],
+      }
+    else
+      self.postSingle(obj),
+  patch(obj)::
+    if obj.isPolymorphic then
+      {
+        oneOf: [$.patchSingle(o) for o in obj.polymorphicObjects],
+      }
+    else
+      self.patchSingle(obj),
 };
 
 local buildSchema(obj) = {
@@ -814,7 +940,7 @@ local buildPaths(obj) =
   local builtErrors = buildErrors(obj);
   {
     ['/' + obj.typePlural + '/{id}']: {
-      get: {
+      [if !obj.writeOnly then 'get']: {
         tags: [obj.type],
         summary: 'Fetch resource',
         parameters: builtParameters.read,
@@ -829,7 +955,7 @@ local buildPaths(obj) =
           },
         },
       },
-      patch: {
+      [if !obj.readOnly then 'patch']: {
         tags: [obj.type],
         summary: 'Update resource',
         parameters: builtParameters.write,
@@ -851,7 +977,7 @@ local buildPaths(obj) =
           },
         },
       },
-      delete: {
+      [if !obj.readOnly then 'delete']: {
         tags: [obj.type],
         summary: 'Delete resource',
         parameters: builtParameters.write,
@@ -863,7 +989,7 @@ local buildPaths(obj) =
       },
     },
     ['/' + obj.typePlural]: {
-      get: {
+      [if !obj.writeOnly then 'get']: {
         tags: [obj.type],
         summary: 'List resources',
         parameters: builtParameters.readList,
@@ -878,7 +1004,7 @@ local buildPaths(obj) =
           },
         },
       },
-      post: {
+      [if !obj.readOnly then 'post']: {
         tags: [obj.type],
         summary: 'Add resource',
         parameters: builtParameters.post,
@@ -903,7 +1029,7 @@ local buildPaths(obj) =
     },
   } + {
     ['/' + obj.typePlural + '/{id}/relationships/' + relatedObj.object.typePlural]: {
-      get: {
+      [if !obj.writeOnly then 'get']: {
         tags: [obj.type],
         summary: 'Fetch related resource identifiers',
         parameters: builtParameters.write,
@@ -918,7 +1044,7 @@ local buildPaths(obj) =
           },
         },
       },
-      post: {
+      [if !obj.readOnly then 'post']: {
         tags: [obj.type],
         summary: 'Add new related resource',
         parameters: builtParameters.write,
@@ -935,7 +1061,7 @@ local buildPaths(obj) =
           },
         },
       },
-      patch: {
+      [if !obj.readOnly then 'patch']: {
         tags: [obj.type],
         summary: 'Update related resources',
         parameters: builtParameters.write,
@@ -952,7 +1078,7 @@ local buildPaths(obj) =
           },
         },
       },
-      delete: {
+      [if !obj.readOnly then 'delete']: {
         tags: [obj.type],
         summary: 'Delete related resources',
         parameters: builtParameters.write,
@@ -973,7 +1099,7 @@ local buildPaths(obj) =
     for relatedObj in std.filter((function(x) x.many), obj.relationships)
   } + {
     ['/' + obj.typePlural + '/{id}/' + relatedObj.object.typePlural]: {
-      get: {
+      [if !obj.writeOnly then 'get']: {
         tags: [obj.type],
         summary: 'Fetch related resources',
         parameters: builtParameters.write,
@@ -992,7 +1118,7 @@ local buildPaths(obj) =
     for relatedObj in std.filter((function(x) x.many), obj.relationships)
   } + {
     ['/' + obj.typePlural + '/{id}/relationships/' + relatedObj.object.type]: {
-      get: {
+      [if !obj.writeOnly then 'get']: {
         tags: [obj.type],
         summary: 'Fetch related resource identifier',
         parameters: builtParameters.write,
@@ -1007,7 +1133,7 @@ local buildPaths(obj) =
           },
         },
       },
-      patch: {
+      [if !obj.readOnly then 'patch']: {
         tags: [obj.type],
         summary: 'Update related resource',
         parameters: builtParameters.write,
@@ -1028,7 +1154,7 @@ local buildPaths(obj) =
     for relatedObj in std.filter((function(x) x.many == false), obj.relationships)
   } + {
     ['/' + obj.typePlural + '/{id}/' + relatedObj.object.type]: {
-      get: {
+      [if !obj.writeOnly then 'get']: {
         tags: [obj.type],
         summary: 'Fetch related resource',
         parameters: builtParameters.write,

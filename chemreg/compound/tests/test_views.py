@@ -5,7 +5,8 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 import pytest
 
 from chemreg.compound.validators import validate_inchikey_unique
-from chemreg.compound.views import DefinedCompoundViewSet
+from chemreg.compound.views import CompoundViewSet, DefinedCompoundViewSet
+from chemreg.jsonapi.views import ReadOnlyModelViewSet
 
 
 def test_definedcompound_override():
@@ -68,3 +69,9 @@ def test_definedcompound_detail_attrs(user_factory, defined_compound_factory):
         "calculated_inchikey",
         "url",
     ]
+
+
+def test_compound_view():
+    """Tests that the Compound View Set, is ReadOnly and has the inclusion of cid as a filterset field."""
+    assert issubclass(CompoundViewSet, ReadOnlyModelViewSet)
+    assert CompoundViewSet.filterset_fields == ["cid"]

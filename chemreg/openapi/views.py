@@ -3,9 +3,12 @@ import os
 from django.http import HttpResponse
 from django.views.generic.base import TemplateView, View
 
-import _jsonnet as jsonnet
-
 from chemreg.compound.settings import compound_settings
+
+try:
+    import _jsonnet as jsonnet
+except ImportError:
+    print("[WARNING] Documentation disabled. Only unix systems can build jsonnet.\n")
 
 
 class RedocView(TemplateView):
@@ -13,19 +16,29 @@ class RedocView(TemplateView):
 
     template_name = "redoc.html"
 
+    def get_context_data(self, **kwargs):
+        try:
+            jsonnet
+            return {"jsonnet": True}
+        except NameError:
+            return {"jsonnet": False}
+
 
 class OpenAPIView(View):
     """The OpenAPI spec file."""
 
     http_method_names = ["get"]
 
-    base_spec = jsonnet.evaluate_file(
-        os.path.join(os.path.dirname(__file__), "schemas", "schema.jsonnet"),
-        ext_vars={
-            "baseServer": "__BASE_SERVER__",
-            "COMPOUND_PREFIX": compound_settings.PREFIX,
-        },
-    )
+    try:
+        base_spec = jsonnet.evaluate_file(
+            os.path.join(os.path.dirname(__file__), "schemas", "schema.jsonnet"),
+            ext_vars={
+                "baseServer": "__BASE_SERVER__",
+                "COMPOUND_PREFIX": compound_settings.PREFIX,
+            },
+        )
+    except NameError:
+        base_spec = ""
 
     def get(self, request, *args, **kwargs):
         request_host = request.get_host()

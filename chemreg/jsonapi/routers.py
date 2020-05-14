@@ -13,17 +13,23 @@ class SimpleRouter(routers.SimpleRouter):
     def __init__(self):
         super().__init__(trailing_slash=False)
 
-    def register(self, viewset):
-        if hasattr(viewset, "resource_name"):
-            prefix = viewset.resource_name
-        else:
-            prefix = utils.get_resource_type_from_serializer(viewset.serializer_class)
-        return super().register(inflection.pluralize(prefix), viewset)
+    def register(self, viewset, prefix=None):
+        if not prefix:
+            if hasattr(viewset, "resource_name"):
+                prefix_singular = viewset.resource_name
+            else:
+                prefix_singular = utils.get_resource_type_from_serializer(
+                    viewset.serializer_class
+                )
+            prefix = inflection.pluralize(prefix_singular)
+        return super().register(prefix, viewset)
 
     def get_urls(self):
         urls = super().get_urls()
         for prefix, viewset, basename in self.registry:
-            if issubclass(viewset, views.ModelViewSet):
+            if issubclass(viewset, views.ModelViewSet) or issubclass(
+                viewset, views.ReadOnlyModelViewSet
+            ):
                 relationship_viewset = type(
                     f"{basename}RelationshipViewset",
                     (RelationshipView,),

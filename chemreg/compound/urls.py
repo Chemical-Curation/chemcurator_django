@@ -8,6 +8,7 @@ router = SimpleRouter()
 router.register(views.DefinedCompoundViewSet)
 router.register(views.IllDefinedCompoundViewSet)
 router.register(views.QueryStructureTypeViewSet)
+router.register(views.CompoundViewSet, prefix="compounds")
 
 
 urlpatterns = [

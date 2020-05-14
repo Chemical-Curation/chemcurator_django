@@ -24,14 +24,18 @@ A definition file is a representation of an OpenAPI schema. It includes some fea
             description: "A description of what passing this parameter does."
         }
     ]
+    readOnly: false,
+    writeOnly: false,
     attributes: {
         attributeName: {
             // all of https://swagger.io/docs/specification/data-models/keywords/
             oneOfGroup: "Optional. If this attribute should not be combined in a POST with another attribute, assign both attributes the same oneOfGroup.,
-            required: "Defaults to true unless a `default` is provided. Set to `false` if the attribute isn't required."
+            required: "Defaults to `true` unless a `default` is provided. Set to `false` if the attribute isn't required."
             detailRead: "Optional. Defaults to `false`. A field that is only included in the detail view and not the list view.",
+            filter: "Defaults to `false`. Set to `true` if the attribute can be filtered against."
         }
     },
+    polymorphicObjects: "A list of polymorphic objects this endpoint represents. You should either use this OR the attributes field above.",
     relationships: [
         {
             object: "The definition of the related model. You'll need to `import` it above the definition.",

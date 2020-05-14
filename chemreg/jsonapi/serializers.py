@@ -1,3 +1,4 @@
+import copy
 import inspect
 
 from rest_framework_json_api import serializers
@@ -17,7 +18,7 @@ class SelfLinkMixin:
     """Adds a link to "self" for a serializer."""
 
     def __new__(cls, *args, **kwargs):
-        if "url" not in cls.Meta.fields:
+        if hasattr(cls.Meta, "fields") and "url" not in cls.Meta.fields:
             cls.Meta.fields += type(cls.Meta.fields)(("url",))
         return super().__new__(cls, *args, **kwargs)
 
@@ -25,19 +26,25 @@ class SelfLinkMixin:
 class AutoRelatedMixin:
     """Pulls in related fields from serializer."""
 
-    def __new__(cls, *args, **kwargs):
-        included_serializers = {
+    @staticmethod
+    def _gen_included_serializers(serializer):
+        return {
             key: val
-            for key, val in cls.__dict__.items()
-            if key in cls.Meta.fields
+            for key, val in serializer.__dict__.items()
+            if key in serializer.Meta.fields
             and inspect.isclass(val)
             and (
                 issubclass(val, serializers.ModelSerializer)
                 or issubclass(val, serializers.HyperlinkedModelSerializer)
             )
         }
+
+    def __new__(cls, *args, **kwargs):
+        included_serializers = cls._gen_included_serializers(cls)
         for key in included_serializers:
             delattr(cls, key)
+        for serializer in getattr(cls, "polymorphic_serializers", []):
+            included_serializers.update(cls._gen_included_serializers(serializer))
         if included_serializers:
             if not hasattr(cls, "included_serializers"):
                 cls.included_serializers = included_serializers
@@ -74,16 +81,6 @@ class ModelSerializer(
     pass
 
 
-class PolymorphicModelSerializer(
-    ResourceRelatedFieldMixin,
-    AutoRelatedMixin,
-    type(
-        "PolymorphicModelSerializerBase",
-        serializers.PolymorphicModelSerializer.__bases__,
-        dict(vars(serializers.PolymorphicModelSerializer)),
-    ),
-    SelfLinkMixin,
-    RootMetaMixin,
-    metaclass=serializers.PolymorphicSerializerMetaclass,
-):
-    pass
+PolymorphicModelSerializer = copy.deepcopy(serializers.PolymorphicModelSerializer)
+PolymorphicModelSerializer.__bases__ = (ModelSerializer,)
+PolymorphicModelSerializer.get_root_meta = RootMetaMixin.get_root_meta

@@ -2,6 +2,12 @@ import re
 
 import pytest
 
+from chemreg.compound.serializers import (
+    CompoundSerializer,
+    DefinedCompoundSerializer,
+    IllDefinedCompoundSerializer,
+    PolymorphicModelSerializer,
+)
 from chemreg.compound.settings import compound_settings
 
 
@@ -160,3 +166,12 @@ def test_ill_defined_compound_prefix(ill_defined_compound_factory):
     # assert that the prefix of the serialized ill defined compound is equivalent to
     # the prefix generated in compound_settings
     assert instance.cid[0 : instance.cid.find("CID")] == compound_settings.PREFIX
+
+
+@pytest.mark.django_db
+def test_compound_serializer():
+    assert issubclass(CompoundSerializer, PolymorphicModelSerializer)
+    assert CompoundSerializer.polymorphic_serializers == [
+        DefinedCompoundSerializer,
+        IllDefinedCompoundSerializer,
+    ]

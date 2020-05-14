@@ -1,17 +1,19 @@
 from rest_framework.permissions import IsAdminUser
 
 from chemreg.compound.models import (
+    BaseCompound,
     DefinedCompound,
     IllDefinedCompound,
     QueryStructureType,
 )
 from chemreg.compound.serializers import (
+    CompoundSerializer,
     DefinedCompoundDetailSerializer,
     DefinedCompoundSerializer,
     IllDefinedCompoundSerializer,
     QueryStructureTypeSerializer,
 )
-from chemreg.jsonapi.views import ModelViewSet
+from chemreg.jsonapi.views import ModelViewSet, ReadOnlyModelViewSet
 
 
 class DefinedCompoundViewSet(ModelViewSet):
@@ -22,6 +24,7 @@ class DefinedCompoundViewSet(ModelViewSet):
         "retrieve": DefinedCompoundDetailSerializer,
     }
     valid_post_query_params = ["override"]
+    filterset_fields = ["cid"]
 
     def get_serializer_class(self, *args, **kwargs):
         try:
@@ -48,9 +51,17 @@ class IllDefinedCompoundViewSet(ModelViewSet):
 
     queryset = IllDefinedCompound.objects.all()
     serializer_class = IllDefinedCompoundSerializer
+    filterset_fields = ["cid"]
 
 
 class QueryStructureTypeViewSet(ModelViewSet):
 
     queryset = QueryStructureType.objects.all()
     serializer_class = QueryStructureTypeSerializer
+
+
+class CompoundViewSet(ReadOnlyModelViewSet):
+
+    queryset = BaseCompound.objects.all()
+    serializer_class = CompoundSerializer
+    filterset_fields = ["cid"]
