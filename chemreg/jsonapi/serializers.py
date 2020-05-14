@@ -46,7 +46,7 @@ class AutoRelatedMixin:
         for serializer in getattr(cls, "polymorphic_serializers", []):
             included_serializers.update(cls._gen_included_serializers(serializer))
         if included_serializers:
-            if not hasattr(cls, "included_serializers"):
+            if not getattr(cls, "included_serializers", None):
                 cls.included_serializers = included_serializers
             else:
                 cls.included_serializers = cls.included_serializers.update(
