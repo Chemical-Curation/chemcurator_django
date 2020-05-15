@@ -38,6 +38,7 @@ local baseCompound = import 'baseCompound.libsonnet';
       readOnly: true,
       description: 'The [InChIKey](https://en.wikipedia.org/wiki/International_Chemical_Identifier#InChIKey) computed at the time of storage for this compound.',
       example: 'MYMOFIZGZYHOMD-UHFFFAOYSA-N',
+      filter: true,
     },
     molecularWeight: {
       type: 'number',
