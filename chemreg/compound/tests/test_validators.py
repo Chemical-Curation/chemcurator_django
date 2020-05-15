@@ -65,7 +65,10 @@ def test_validate_no_structure(defined_compound_v2000_factory):
     dc = defined_compound_v2000_factory.build()
     dc.initial_data.pop("molfile_v2000")
     assert not dc.is_valid()
-    assert str(dc.errors.get("molfile_v3000")[0]) == "This field is required."
+    assert (
+        str(dc.errors.get("non_field_errors")[0])
+        == "One of ['molfileV2000', 'molfileV3000', 'smiles'] required."
+    )
 
 
 @pytest.mark.django_db
@@ -102,8 +105,8 @@ def test_validate_single_structure(
     # assign the V2000 molfile from the first object
     dcsmiles.initial_data["molfile_v2000"] = dc2k.initial_data.get("molfile_v2000")
     assert not dcsmiles.is_valid()
-    assert "molfile_v3000" in dcsmiles.errors.keys()
+    assert "non_field_errors" in dcsmiles.errors.keys()
     assert (
-        str(dcsmiles.errors.get("molfile_v3000"))
-        == "The data includes too many potential non-V3000 molfile structures in ['molfile_v2000', 'smiles']."
+        str(dcsmiles.errors.get("non_field_errors")[0])
+        == "Only one of ['molfileV2000', 'molfileV3000', 'smiles'] allowed. Recieved ['molfileV2000', 'smiles']."
     )

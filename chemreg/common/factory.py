@@ -36,8 +36,10 @@ class DjangoSerializerFactory(BaseFactory, metaclass=DjangoSerializerFactoryMeta
 
     @classmethod
     def _adjust_kwargs(cls, **kwargs):
-        _is_sub_factory = kwargs.pop("_is_sub_factory", False)
-        return {"data": kwargs, "_is_sub_factory": _is_sub_factory}
+        data = {k: v for k, v in kwargs.items() if k in cls._meta.model.Meta.fields}
+        adjusted_kwargs = {k: v for k, v in kwargs.items() if k not in data}
+        adjusted_kwargs["data"] = data
+        return adjusted_kwargs
 
     @classmethod
     def _create_resource(cls, serializer_class, *args, **kwargs):

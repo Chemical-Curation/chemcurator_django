@@ -7,6 +7,7 @@
       required: false,
       description: 'A unique identifier for this compound. It will be created if not provided.',
       example: std.extVar('COMPOUND_PREFIX') + 'CID702467346',
+      filter: true,
     },
   },
 }

@@ -8,7 +8,7 @@ djangorestframework==3.11.0  # https://github.com/encode/django-rest-framework
 djangorestframework-jsonapi[django-filter,django-polymorphic]==3.1.0  # https://github.com/django-json-api/django-rest-framework-json-api
 epam.indigo==1.4.0b0  # https://github.com/epam/Indigo
 gunicorn[gevent,setproctitle]==20.0.4  # https://github.com/benoitc/gunicorn
-jsonnet==0.15.0  # https://github.com/google/jsonnet
+jsonnet==0.15.0; sys_platform == 'linux' or sys_platform == 'darwin' or sys_platform == 'cygwin' # https://github.com/google/jsonnet
 partialsmiles==1.0 # https://github.com/baoilleach/partialsmiles
 psycogreen==1.0.2  # https://github.com/psycopg/psycogreen/
 psycopg2-binary==2.8.4  # https://github.com/psycopg/psycopg2

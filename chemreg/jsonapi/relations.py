@@ -11,23 +11,43 @@ class FormatRelatedFieldMixin:
         return super().get_url(name, view_name, kwargs, request)
 
 
+class AutoRelatedLinkMixin:
+    """Allows related fields to get their links automatically."""
+
+    @property
+    def self_link_view_name(self):
+        if self.read_only:
+            return None
+        return self.context["view"].basename + "-relationships"
+
+    @property
+    def related_link_view_name(self):
+        return self.context["view"].basename + "-related"
+
+
 class HyperlinkedRelatedField(
-    FormatRelatedFieldMixin, relations.HyperlinkedRelatedField
+    AutoRelatedLinkMixin, FormatRelatedFieldMixin, relations.HyperlinkedRelatedField,
 ):
     pass
 
 
-class ResourceRelatedField(FormatRelatedFieldMixin, relations.ResourceRelatedField):
+class ResourceRelatedField(
+    AutoRelatedLinkMixin, FormatRelatedFieldMixin, relations.ResourceRelatedField,
+):
     pass
 
 
 class PolymorphicResourceRelatedField(
-    FormatRelatedFieldMixin, relations.PolymorphicResourceRelatedField
+    AutoRelatedLinkMixin,
+    FormatRelatedFieldMixin,
+    relations.PolymorphicResourceRelatedField,
 ):
     pass
 
 
 class SerializerMethodResourceRelatedField(
-    FormatRelatedFieldMixin, relations.SerializerMethodResourceRelatedField
+    AutoRelatedLinkMixin,
+    FormatRelatedFieldMixin,
+    relations.SerializerMethodResourceRelatedField,
 ):
     pass

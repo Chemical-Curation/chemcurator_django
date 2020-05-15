@@ -28,6 +28,7 @@ local description = |||
 local definedCompound = import 'compound/definedCompound.libsonnet';
 local illDefinedCompound = import 'compound/illDefinedCompound.libsonnet';
 local queryStructureType = import 'compound/queryStructureType.libsonnet';
+local compound = import 'compound/compound.libsonnet';
 
 ////////////////////////
 // List of all models //
@@ -36,6 +37,7 @@ local objs = [
   definedCompound,
   illDefinedCompound,
   queryStructureType,
+  compound,
 ];
 
 // Build spec

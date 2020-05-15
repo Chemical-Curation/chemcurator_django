@@ -1,7 +1,8 @@
 from django.db import models
+from django.utils.functional import cached_property
 
 from computed_property import ComputedCharField
-from indigo import IndigoException
+from indigo import Indigo, IndigoException
 from polymorphic.models import PolymorphicModel
 
 from chemreg.common.models import CommonInfo
@@ -61,6 +62,12 @@ class DefinedCompound(BaseCompound):
             return get_inchikey(self.molfile_v3000)
         except IndigoException:
             return None
+
+    @cached_property
+    def indigo_structure(self):
+        indigo = Indigo()
+        indigo.setOption("molfile-saving-mode", "3000")
+        return indigo.loadStructure(structureStr=self.molfile_v3000)
 
 
 class QueryStructureType(CommonInfo):

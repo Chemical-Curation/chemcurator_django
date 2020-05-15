@@ -19,7 +19,11 @@
     </style>
   </head>
   <body>
-    <redoc spec-url="/openapi.json" path-in-middle-panel="true" no-auto-auth="true"></redoc>
-    <script src='{% static "openapi/redoc.js" %}'> </script>
+    {% if jsonnet %}
+      <redoc spec-url="/openapi.json" path-in-middle-panel="true" no-auto-auth="true"></redoc>
+      <script src='{% static "openapi/redoc.js" %}'> </script>
+    {% else %}
+      Documentation disabled. Only unix systems can build jsonnet.
+    {% endif %}
   </body>
 </html>

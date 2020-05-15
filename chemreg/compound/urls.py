@@ -1,27 +1,16 @@
-from django.conf.urls import url
 from django.urls import include, path
-from rest_framework.routers import SimpleRouter
 
 from chemreg.compound import views
+from chemreg.jsonapi.routers import SimpleRouter
 
 # Create a router and register our viewsets with it.
-router = SimpleRouter(trailing_slash=False)
-router.register(r"definedCompounds", views.DefinedCompoundViewSet)
-router.register(r"illDefinedCompounds", views.IllDefinedCompoundViewSet)
-router.register(r"queryStructureTypes", views.QueryStructureTypeViewSet)
+router = SimpleRouter()
+router.register(views.DefinedCompoundViewSet)
+router.register(views.IllDefinedCompoundViewSet)
+router.register(views.QueryStructureTypeViewSet)
+router.register(views.CompoundViewSet, prefix="compounds")
 
 
 urlpatterns = [
     path("", include(router.urls)),
-    # illDefinedCompound related fields
-    url(
-        regex=r"^illDefinedCompounds/(?P<pk>[^/.]+)/(?P<related_field>[^/.]+)$",
-        view=views.IllDefinedCompoundViewSet.as_view({"get": "retrieve_related"}),
-        name="ill-defined-compounds-related",
-    ),
-    url(
-        regex=r"^illDefinedCompounds/(?P<pk>[^/.]+)/relationships/(?P<related_field>[^/.]+)$",
-        view=views.IllDefinedCompoundRelationshipView.as_view(),
-        name="ill-defined-compounds-relationships",
-    ),
 ]
