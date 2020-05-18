@@ -49,9 +49,7 @@ class AutoRelatedMixin:
             if not getattr(cls, "included_serializers", None):
                 cls.included_serializers = included_serializers
             else:
-                cls.included_serializers = cls.included_serializers.update(
-                    included_serializers
-                )
+                cls.included_serializers.update(included_serializers)
         return super().__new__(cls, *args, **kwargs)
 
 
