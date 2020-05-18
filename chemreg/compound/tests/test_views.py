@@ -72,6 +72,11 @@ def test_definedcompound_detail_attrs(user_factory, defined_compound_factory):
     ]
 
 
+def test_defined_compound_view():
+    """Tests that the Defined Compound View Set includes cid and InChIKey as filterset fields."""
+    assert DefinedCompoundViewSet.filterset_fields == ["cid", "inchikey"]
+
+
 def test_compound_view():
     """Tests that the Compound View Set, is ReadOnly and has the inclusion of cid as a filterset field."""
     assert issubclass(CompoundViewSet, ReadOnlyModelViewSet)

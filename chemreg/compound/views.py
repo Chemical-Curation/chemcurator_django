@@ -27,7 +27,7 @@ class DefinedCompoundViewSet(ModelViewSet):
         "retrieve": DefinedCompoundDetailSerializer,
     }
     valid_post_query_params = ["override"]
-    filterset_fields = ["cid"]
+    filterset_fields = ["cid", "inchikey"]
 
     def get_serializer_class(self, *args, **kwargs):
         try:
