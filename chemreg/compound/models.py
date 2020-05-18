@@ -3,7 +3,7 @@ from django.utils.functional import cached_property
 
 from computed_property import ComputedCharField
 from indigo import Indigo, IndigoException
-from polymorphic.models import PolymorphicModel
+from polymorphic.models import PolymorphicModel, PolymorphicManager
 
 from chemreg.common.models import CommonInfo
 from chemreg.compound.fields import StructureAliasField
@@ -15,6 +15,22 @@ from chemreg.compound.validators import (
     validate_molfile_v3000,
 )
 from chemreg.indigo.inchi import get_inchikey
+from rest_framework.permissions import IsAdminUser
+
+
+class SoftDeleteCompoundManager(PolymorphicManager):
+    def __init__(self, *args, **kwargs):
+        self.with_deleted = kwargs.pop("deleted", False)
+        super(SoftDeleteCompoundManager, self).__init__(*args, **kwargs)
+
+    def _base_queryset(self):
+        return super().get_queryset()
+
+    def get_queryset(self):
+        qs = self._base_queryset()
+        if self.with_deleted and IsAdminUser():
+            return qs
+        return qs.filter(is_deleted=False)
 
 
 class BaseCompound(CommonInfo, PolymorphicModel):
@@ -29,6 +45,8 @@ class BaseCompound(CommonInfo, PolymorphicModel):
     Attributes:
         cid (str): The compound CID.
         structure (str): Definitive structure string
+        is_deleted (bool): The compound was deleted by an admin user
+        replaced_by (foreign key): Upon deletion, the user specified this CID as the replacement
 
     """
 
@@ -39,6 +57,22 @@ class BaseCompound(CommonInfo, PolymorphicModel):
         validators=[validate_cid_regex, validate_cid_checksum],
     )
     structure = models.TextField()
+    # soft delete functionality
+    is_deleted = models.BooleanField(null=False, default=False)
+    replaced_by = models.ForeignKey(
+        "self",
+        related_name="replaces",
+        on_delete=models.PROTECT,
+        null=True,
+        default=None,
+    )
+    qc_note = models.TextField(blank=True, default="")
+    objects = SoftDeleteCompoundManager()
+    objects_with_deleted = SoftDeleteCompoundManager(deleted=True)
+
+    def delete(self):
+        self.is_deleted = True
+        self.save()
 
 
 class DefinedCompound(BaseCompound):

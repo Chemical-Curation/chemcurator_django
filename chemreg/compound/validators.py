@@ -156,3 +156,18 @@ def validate_molfile_v3000_computable(structure: str) -> None:
         get_molfile_v3000(structure)
     except IndigoException:
         raise ValidationError("Cannot be converted into a molfile.")
+
+
+def validate_replacement_cid(replaced_by: str) -> None:
+    """Validates that the replacement CID provided in a DELETE request matches a non-deleted CID
+
+    Args:
+        replaced_by: the CID string
+
+    Raises:
+        ValidationError: If the replacement CID does not exist or has ben deleted.
+    """
+    try:
+        chemreg.models("BaseCompound").objects.filter(cid=replaced_by).exists()
+    except IndigoException:
+        raise ValidationError("Cannot be converted into a molfile.")

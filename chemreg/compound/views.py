@@ -1,4 +1,7 @@
 from rest_framework.permissions import IsAdminUser
+from rest_framework.exceptions import APIException
+from rest_framework.viewsets import GenericViewSet
+from rest_framework import mixins
 
 from chemreg.compound.models import (
     BaseCompound,
@@ -13,7 +16,7 @@ from chemreg.compound.serializers import (
     IllDefinedCompoundSerializer,
     QueryStructureTypeSerializer,
 )
-from chemreg.jsonapi.views import ModelViewSet, ReadOnlyModelViewSet
+from chemreg.jsonapi.views import ModelViewSet
 
 
 class DefinedCompoundViewSet(ModelViewSet):
@@ -60,8 +63,60 @@ class QueryStructureTypeViewSet(ModelViewSet):
     serializer_class = QueryStructureTypeSerializer
 
 
-class CompoundViewSet(ReadOnlyModelViewSet):
+class CompoundViewSet(
+    mixins.ListModelMixin,  # allow list view
+    mixins.RetrieveModelMixin,  # allow detail view
+    mixins.DestroyModelMixin,  # allow DELETE requests
+    GenericViewSet,
+):
+    """
+    A Compound cannot be deleted until an admin user provides another compound's
+    CID and a qc_note explaining why the compound was deleted in favor of the
+    replacement. 
+    """
 
     queryset = BaseCompound.objects.all()
     serializer_class = CompoundSerializer
     filterset_fields = ["cid"]
+
+    def delete(self, request, *args, **kwargs):
+        print("---deleting a compound---")
+        print(request.__dict__)
+        print(kwargs)
+
+        # user must be an Admin
+        if not IsAdminUser():
+            raise APIException("You are not authorized to delete a compound")
+
+        if self.request.data.get("replaced_by"):
+            replacement_cid = self.request.data.get("replaced_by")
+        else:
+            raise APIException(
+                "The request data must include a CID in the replaced_by attribute"
+            )
+        qc_note = self.request.data.get("qc_note")
+
+        # the CID that was provided must match a non-deleted Compound
+        if (
+            BaseCompound.objects.filter(is_deleted=False)
+            .filter(cid=replacement_cid)
+            .exists()
+        ):
+            self.replacement_cid = (
+                BaseCompound.objects.filter(is_deleted=False)
+                .filter(cid=replacement_cid)
+                .first()
+            )
+        else:
+            raise APIException(
+                f"The CID provided, {replacement_cid} does not match an existing compound"
+            )
+        # make sure there is a qc_note
+        if qc_note.strip():
+            self.qc_note = qc_note
+        else:
+            raise APIException(
+                "No QC note was provided to explain the compound replacement"
+            )
+
+        return self.destroy(request, *args, **kwargs)

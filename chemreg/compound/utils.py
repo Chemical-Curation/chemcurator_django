@@ -49,7 +49,7 @@ def build_cid(i=None) -> str:
                 incr_start = compound_settings.INCREMENT_START
                 try:
                     BaseCompound = apps.get_model("compound", "BaseCompound")
-                    last_id = BaseCompound.objects.filter(
+                    last_id = BaseCompound.objects_with_deleted.filter(
                         cid__regex=fr"^{prefix}CID\d0([2-9]\d{{6}}|[1-9]\d{{7,}})$"
                     ).aggregate(
                         max_cid=Max(
