@@ -1,5 +1,6 @@
 from rest_framework.permissions import IsAdminUser
 
+from chemreg.compound.filters import DefinedCompoundFilter
 from chemreg.compound.models import (
     BaseCompound,
     DefinedCompound,
@@ -24,7 +25,7 @@ class DefinedCompoundViewSet(ModelViewSet):
         "retrieve": DefinedCompoundDetailSerializer,
     }
     valid_post_query_params = ["override"]
-    filterset_fields = ["cid", "inchikey"]
+    filterset_class = DefinedCompoundFilter
 
     def get_serializer_class(self, *args, **kwargs):
         try:
