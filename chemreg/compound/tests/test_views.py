@@ -53,7 +53,13 @@ def test_definedcompound_detail_attrs(user_factory, defined_compound_factory):
     force_authenticate(request, user=user)
     response = view(request)
     attrs = response.data["results"].pop()
-    assert list(attrs.keys()) == ["cid", "inchikey", "molfile_v3000", "url"]
+    assert list(attrs.keys()) == [
+        "cid",
+        "inchikey",
+        "molfile_v3000",
+        "replaced_by",
+        "url",
+    ]
 
     view = DefinedCompoundViewSet.as_view({"get": "retrieve"})
     request = factory.get("/definedCompounds/")
@@ -65,6 +71,7 @@ def test_definedcompound_detail_attrs(user_factory, defined_compound_factory):
         "inchikey",
         "molfile_v3000",
         "smiles",
+        "replaced_by",
         "molecular_weight",
         "molecular_formula",
         "calculated_inchikey",
