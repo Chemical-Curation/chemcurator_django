@@ -17,6 +17,7 @@ from chemreg.compound.serializers import (
     QueryStructureTypeSerializer,
 )
 from chemreg.jsonapi.views import ModelViewSet
+from rest_framework_json_api.views import RelationshipView
 
 
 class DefinedCompoundViewSet(ModelViewSet):
@@ -120,3 +121,7 @@ class CompoundViewSet(
             )
 
         return self.destroy(request, *args, **kwargs)
+
+
+class CompoundRelationshipView(RelationshipView):
+    queryset = BaseCompound.objects

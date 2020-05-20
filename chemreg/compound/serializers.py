@@ -21,6 +21,7 @@ from chemreg.jsonapi.serializers import (
     HyperlinkedModelSerializer,
     PolymorphicModelSerializer,
 )
+from rest_framework_json_api.relations import PolymorphicResourceRelatedField
 
 
 class BaseCompoundSerializer(HyperlinkedModelSerializer):
@@ -28,6 +29,9 @@ class BaseCompoundSerializer(HyperlinkedModelSerializer):
 
     serializer_field_mapping = HyperlinkedModelSerializer.serializer_field_mapping
     serializer_field_mapping.update({StructureAliasField: serializers.CharField})
+    related_serializers = {
+        "replaced_by": "compound.serializers.CompoundSerializer",
+    }
 
 
 class DefinedCompoundSerializer(BaseCompoundSerializer):
@@ -127,10 +131,24 @@ class IllDefinedCompoundSerializer(BaseCompoundSerializer):
         fields = ("cid", "mrvfile", "query_structure_type")
 
 
+class ReplacementCompoundSerializer(PolymorphicModelSerializer):
+    """The serializer for the replaced_by field in a compound, either defined or ill-defined."""
+
+    polymorphic_serializers = [DefinedCompoundSerializer, IllDefinedCompoundSerializer]
+
+    class Meta:
+        model = BaseCompound
+        fields = ["cid"]
+
+
 class CompoundSerializer(PolymorphicModelSerializer):
     """The serializer for both ill-defined and defined compounds."""
 
     polymorphic_serializers = [DefinedCompoundSerializer, IllDefinedCompoundSerializer]
+    replaced_by = PolymorphicResourceRelatedField(
+        polymorphic_serializer=ReplacementCompoundSerializer,
+        queryset=BaseCompound.objects.all(),
+    )
 
     class Meta:
         model = BaseCompound
