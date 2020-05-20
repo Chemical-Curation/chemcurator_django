@@ -1,5 +1,6 @@
 import copy
-import inspect
+
+from django.utils.module_loading import import_string
 
 from rest_framework_json_api import serializers
 
@@ -28,21 +29,32 @@ class AutoRelatedMixin:
 
     @staticmethod
     def _gen_included_serializers(serializer):
-        return {
-            key: val
-            for key, val in serializer.__dict__.items()
-            if key in serializer.Meta.fields
-            and inspect.isclass(val)
-            and (
-                issubclass(val, serializers.ModelSerializer)
-                or issubclass(val, serializers.HyperlinkedModelSerializer)
-            )
-        }
+        included_serializers = {}
+        for fieldname in serializer.Meta.fields:
+            field = getattr(serializer, fieldname, None)
+            if isinstance(field, str):
+                related_serializer = import_string(field)
+            else:
+                related_serializer = field
+            if related_serializer and issubclass(
+                related_serializer,
+                (
+                    serializers.ModelSerializer,
+                    serializers.HyperlinkedModelSerializer,
+                    serializers.PolymorphicModelSerializer,
+                ),
+            ):
+                included_serializers[fieldname] = related_serializer
+
+        return included_serializers
 
     def __new__(cls, *args, **kwargs):
         included_serializers = cls._gen_included_serializers(cls)
         for key in included_serializers:
-            delattr(cls, key)
+            try:
+                delattr(cls, key)
+            except AttributeError:
+                pass
         for serializer in getattr(cls, "polymorphic_serializers", []):
             included_serializers.update(cls._gen_included_serializers(serializer))
         if included_serializers:
@@ -79,6 +91,7 @@ class ModelSerializer(
     pass
 
 
+PolymorphicSerializerMetaclass = serializers.PolymorphicSerializerMetaclass
 PolymorphicModelSerializer = copy.deepcopy(serializers.PolymorphicModelSerializer)
 PolymorphicModelSerializer.__bases__ = (ModelSerializer,)
 PolymorphicModelSerializer.get_root_meta = RootMetaMixin.get_root_meta

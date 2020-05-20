@@ -29,9 +29,7 @@ class BaseCompoundSerializer(HyperlinkedModelSerializer):
 
     serializer_field_mapping = HyperlinkedModelSerializer.serializer_field_mapping
     serializer_field_mapping.update({StructureAliasField: serializers.CharField})
-    related_serializers = {
-        "replaced_by": "compound.serializers.CompoundSerializer",
-    }
+    replaced_by = "chemreg.compound.serializers.CompoundSerializer"
 
 
 class DefinedCompoundSerializer(BaseCompoundSerializer):
@@ -66,6 +64,7 @@ class DefinedCompoundSerializer(BaseCompoundSerializer):
             "molfile_v2000",
             "molfile_v3000",
             "smiles",
+            "replaced_by",
         )
         extra_kwargs = {"molfile_v3000": {"required": False, "trim_whitespace": False}}
         validators = [
@@ -128,7 +127,7 @@ class IllDefinedCompoundSerializer(BaseCompoundSerializer):
 
     class Meta:
         model = IllDefinedCompound
-        fields = ("cid", "mrvfile", "query_structure_type")
+        fields = ["cid", "mrvfile", "query_structure_type", "replaced_by"]
 
 
 class ReplacementCompoundSerializer(PolymorphicModelSerializer):
