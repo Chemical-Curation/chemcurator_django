@@ -1,7 +1,5 @@
-from rest_framework.permissions import IsAdminUser
 from rest_framework.exceptions import APIException
-from rest_framework.viewsets import GenericViewSet
-from rest_framework import mixins
+from rest_framework.permissions import IsAdminUser
 
 from chemreg.compound.models import (
     BaseCompound,
@@ -16,71 +14,17 @@ from chemreg.compound.serializers import (
     IllDefinedCompoundSerializer,
     QueryStructureTypeSerializer,
 )
-from chemreg.jsonapi.views import ModelViewSet
-from rest_framework_json_api.views import RelationshipView
+from chemreg.jsonapi.views import ModelViewSet, ReadOnlyModelViewSet
 
 
-class DefinedCompoundViewSet(ModelViewSet):
-
-    queryset = DefinedCompound.objects.all()
-    serializer_class = DefinedCompoundSerializer
-    serializer_action_classes = {
-        "retrieve": DefinedCompoundDetailSerializer,
-    }
-    valid_post_query_params = ["override"]
-    filterset_fields = ["cid", "inchikey"]
-
-    def get_serializer_class(self, *args, **kwargs):
-        try:
-            return self.serializer_action_classes[self.action]
-        except (KeyError, AttributeError):
-            return self.serializer_class
-
-    @property
-    def override(self):
-        return "override" in self.request.query_params
-
-    def get_permissions(self):
-        if self.override:
-            return [IsAdminUser()]
-        return super().get_permissions()
-
-    def get_serializer(self, *args, **kwargs):
-        if self.override:
-            kwargs["admin_override"] = True
-        return super().get_serializer(*args, **kwargs)
-
-
-class IllDefinedCompoundViewSet(ModelViewSet):
-
-    queryset = IllDefinedCompound.objects.all()
-    serializer_class = IllDefinedCompoundSerializer
-    filterset_fields = ["cid"]
-
-
-class QueryStructureTypeViewSet(ModelViewSet):
-
-    queryset = QueryStructureType.objects.all()
-    serializer_class = QueryStructureTypeSerializer
-
-
-class CompoundViewSet(
-    mixins.ListModelMixin,  # allow list view
-    mixins.RetrieveModelMixin,  # allow detail view
-    mixins.DestroyModelMixin,  # allow DELETE requests
-    GenericViewSet,
-):
+class SoftDeleteCompoundMixin:
     """
     A Compound cannot be deleted until an admin user provides another compound's
     CID and a qc_note explaining why the compound was deleted in favor of the
-    replacement. 
+    replacement.
     """
 
-    queryset = BaseCompound.objects.all()
-    serializer_class = CompoundSerializer
-    filterset_fields = ["cid"]
-
-    def delete(self, request, *args, **kwargs):
+    def destroy(self, request, *args, **kwargs):
         print("---deleting a compound---")
         print(request.__dict__)
         print(kwargs)
@@ -120,8 +64,55 @@ class CompoundViewSet(
                 "No QC note was provided to explain the compound replacement"
             )
 
-        return self.destroy(request, *args, **kwargs)
+        return super().destroy(request, *args, **kwargs)
 
 
-class CompoundRelationshipView(RelationshipView):
-    queryset = BaseCompound.objects
+class DefinedCompoundViewSet(SoftDeleteCompoundMixin, ModelViewSet):
+
+    queryset = DefinedCompound.objects.all()
+    serializer_class = DefinedCompoundSerializer
+    serializer_action_classes = {
+        "retrieve": DefinedCompoundDetailSerializer,
+    }
+    valid_post_query_params = ["override"]
+    filterset_fields = ["cid", "inchikey"]
+
+    def get_serializer_class(self, *args, **kwargs):
+        try:
+            return self.serializer_action_classes[self.action]
+        except (KeyError, AttributeError):
+            return self.serializer_class
+
+    @property
+    def override(self):
+        return "override" in self.request.query_params
+
+    def get_permissions(self):
+        if self.override:
+            return [IsAdminUser()]
+        return super().get_permissions()
+
+    def get_serializer(self, *args, **kwargs):
+        if self.override:
+            kwargs["admin_override"] = True
+        return super().get_serializer(*args, **kwargs)
+
+
+class IllDefinedCompoundViewSet(SoftDeleteCompoundMixin, ModelViewSet):
+
+    queryset = IllDefinedCompound.objects.all()
+    serializer_class = IllDefinedCompoundSerializer
+    filterset_fields = ["cid"]
+
+
+class QueryStructureTypeViewSet(ModelViewSet):
+
+    queryset = QueryStructureType.objects.all()
+    serializer_class = QueryStructureTypeSerializer
+
+
+class CompoundViewSet(ReadOnlyModelViewSet):
+
+    queryset = BaseCompound.objects.all()
+    serializer_class = CompoundSerializer
+    filterset_fields = ["cid"]
