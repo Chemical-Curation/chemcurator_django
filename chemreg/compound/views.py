@@ -81,7 +81,7 @@ class DefinedCompoundViewSet(SoftDeleteCompoundMixin, ModelViewSet):
         try:
             return self.serializer_action_classes[self.action]
         except (KeyError, AttributeError):
-            return self.serializer_class
+            return super().get_serializer_class(*args, **kwargs)
 
     @property
     def override(self):
