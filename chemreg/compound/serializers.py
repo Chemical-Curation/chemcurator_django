@@ -30,6 +30,9 @@ class BaseCompoundSerializer(HyperlinkedModelSerializer):
     serializer_field_mapping.update({StructureAliasField: serializers.CharField})
     replaced_by = "chemreg.compound.serializers.CompoundSerializer"
 
+    class Meta:
+        fields = ["replaced_by"]
+
 
 class DefinedCompoundSerializer(BaseCompoundSerializer):
     """The serializer for defined compounds."""
