@@ -1,9 +1,10 @@
 from django.db import models
 from django.utils.functional import cached_property
+from rest_framework.permissions import IsAdminUser
 
 from computed_property import ComputedCharField
 from indigo import Indigo, IndigoException
-from polymorphic.models import PolymorphicModel, PolymorphicManager
+from polymorphic.models import PolymorphicManager, PolymorphicModel
 
 from chemreg.common.models import CommonInfo
 from chemreg.compound.fields import StructureAliasField
@@ -15,7 +16,6 @@ from chemreg.compound.validators import (
     validate_molfile_v3000,
 )
 from chemreg.indigo.inchi import get_inchikey
-from rest_framework.permissions import IsAdminUser
 
 
 class SoftDeleteCompoundManager(PolymorphicManager):

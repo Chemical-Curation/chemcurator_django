@@ -1,13 +1,13 @@
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAdminUser
-from rest_framework.test import APIRequestFactory, force_authenticate, APIClient
+from rest_framework.test import APIClient, APIRequestFactory, force_authenticate
 
 import pytest
 
+from chemreg.compound.models import DefinedCompound
 from chemreg.compound.validators import validate_inchikey_unique
 from chemreg.compound.views import CompoundViewSet, DefinedCompoundViewSet
 from chemreg.jsonapi.views import ReadOnlyModelViewSet
-from chemreg.compound.models import DefinedCompound
 
 
 def test_definedcompound_override():
