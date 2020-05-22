@@ -43,12 +43,12 @@ class SoftDeleteCompoundMixin:
 
         # the CID that was provided must match a non-deleted Compound
         if (
-            BaseCompound.objects.filter(is_deleted=False)
+            BaseCompound.objects.filter(replaced_by__isnull=True)
             .filter(cid=replacement_cid)
             .exists()
         ):
             self.replacement_cid = (
-                BaseCompound.objects.filter(is_deleted=False)
+                BaseCompound.objects.filter(replaced_by__isnull=True)
                 .filter(cid=replacement_cid)
                 .first()
             )

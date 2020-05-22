@@ -13,11 +13,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name="basecompound",
-            name="is_deleted",
-            field=models.BooleanField(default=False),
-        ),
-        migrations.AddField(
-            model_name="basecompound",
             name="qc_note",
             field=models.TextField(blank=True, default=""),
         ),

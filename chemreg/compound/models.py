@@ -30,7 +30,11 @@ class SoftDeleteCompoundManager(PolymorphicManager):
         qs = self._base_queryset()
         if self.with_deleted and IsAdminUser():
             return qs
-        return qs.filter(is_deleted=False)
+        return qs.filter(replaced_by__isnull=True)
+
+    @property
+    def is_deleted(self):
+        return not self.replaced_by__isnull
 
 
 class BaseCompound(CommonInfo, PolymorphicModel):
@@ -45,9 +49,8 @@ class BaseCompound(CommonInfo, PolymorphicModel):
     Attributes:
         cid (str): The compound CID.
         structure (str): Definitive structure string
-        is_deleted (bool): The compound was deleted by an admin user
-        replaced_by (foreign key): Upon deletion, the user specified this CID as the replacement
-
+        replaced_by (foreign key): A user deleted the compound and specified this CID as the replacement
+        qc_note (str): An explanation of why the compound was deleted and replaced
     """
 
     cid = models.CharField(
@@ -58,7 +61,6 @@ class BaseCompound(CommonInfo, PolymorphicModel):
     )
     structure = models.TextField()
     # soft delete functionality
-    is_deleted = models.BooleanField(null=False, default=False)
     replaced_by = models.ForeignKey(
         "self",
         related_name="replaces",
@@ -71,8 +73,8 @@ class BaseCompound(CommonInfo, PolymorphicModel):
     objects_with_deleted = SoftDeleteCompoundManager(deleted=True)
 
     def delete(self):
-        self.is_deleted = True
-        self.save()
+        # the record may not actually be deleted
+        pass
 
 
 class DefinedCompound(BaseCompound):

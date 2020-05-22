@@ -138,5 +138,5 @@ def test_compound_soft_delete(user_factory, defined_compound_factory):
 
     resp = client.delete(f"/compounds/{compound_1.id}", data=destroy_data)
 
-    assert DefinedCompound.objects.filter(pk=compound_1.id, is_deleted=True).exists()
+    assert DefinedCompound.objects_with_deleted.filter(pk=compound_1.id).exists()
     client.logout()
