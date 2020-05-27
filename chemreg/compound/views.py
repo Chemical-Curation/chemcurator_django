@@ -1,5 +1,6 @@
-from rest_framework.exceptions import APIException
+from rest_framework import status
 from rest_framework.permissions import IsAdminUser
+from rest_framework.response import Response
 
 from chemreg.compound.models import (
     BaseCompound,
@@ -8,6 +9,7 @@ from chemreg.compound.models import (
     QueryStructureType,
 )
 from chemreg.compound.serializers import (
+    CompoundDeleteSerializer,
     CompoundSerializer,
     DefinedCompoundDetailSerializer,
     DefinedCompoundSerializer,
@@ -24,64 +26,47 @@ class SoftDeleteCompoundMixin:
     replacement.
     """
 
+    @property
+    def _is_admin(self):
+        return IsAdminUser().has_permission(self.request, self)
+
     def destroy(self, request, *args, **kwargs):
-        print("---deleting a compound---")
-        print(request.__dict__)
-        print(kwargs)
+        """Perform a soft delete."""
 
-        # user must be an Admin
-        if not IsAdminUser():
-            raise APIException("You are not authorized to delete a compound")
+        instance = self.get_object()
+        serializer = CompoundDeleteSerializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
-        if self.request.data.get("replaced_by"):
-            replacement_cid = self.request.data.get("replaced_by")
-        else:
-            raise APIException(
-                "The request data must include a CID in the replaced_by attribute"
-            )
-        qc_note = self.request.data.get("qc_note")
+    def get_permissions(self):
+        if self.action == "destroy":
+            return [IsAdminUser()]
+        return super().get_permissions()
 
-        # the CID that was provided must match a non-deleted Compound
-        if (
-            BaseCompound.objects.filter(replaced_by__isnull=True)
-            .filter(cid=replacement_cid)
-            .exists()
-        ):
-            self.replacement_cid = (
-                BaseCompound.objects.filter(replaced_by__isnull=True)
-                .filter(cid=replacement_cid)
-                .first()
-            )
-        else:
-            raise APIException(
-                f"The CID provided, {replacement_cid} does not match an existing compound"
-            )
-        # make sure there is a qc_note
-        if qc_note.strip():
-            self.qc_note = qc_note
-        else:
-            raise APIException(
-                "No QC note was provided to explain the compound replacement"
-            )
+    def get_serializer(self, *args, **kwargs):
+        if self._is_admin:
+            kwargs["is_admin"] = True
+        return super().get_serializer(*args, **kwargs)
 
-        return super().destroy(request, *args, **kwargs)
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self._is_admin:
+            return qs
+        return qs.filter(replaced_by__isnull=True)
 
 
 class DefinedCompoundViewSet(SoftDeleteCompoundMixin, ModelViewSet):
 
     queryset = DefinedCompound.objects.all()
     serializer_class = DefinedCompoundSerializer
-    serializer_action_classes = {
-        "retrieve": DefinedCompoundDetailSerializer,
-    }
     valid_post_query_params = ["override"]
     filterset_fields = ["cid", "inchikey"]
 
     def get_serializer_class(self, *args, **kwargs):
-        try:
-            return self.serializer_action_classes[self.action]
-        except (KeyError, AttributeError):
-            return super().get_serializer_class(*args, **kwargs)
+        if self.action == "retrieve":
+            return DefinedCompoundDetailSerializer
+        return super().get_serializer_class(*args, **kwargs)
 
     @property
     def override(self):
@@ -111,7 +96,7 @@ class QueryStructureTypeViewSet(ModelViewSet):
     serializer_class = QueryStructureTypeSerializer
 
 
-class CompoundViewSet(ReadOnlyModelViewSet):
+class CompoundViewSet(SoftDeleteCompoundMixin, ReadOnlyModelViewSet):
 
     queryset = BaseCompound.objects.all()
     serializer_class = CompoundSerializer
