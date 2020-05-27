@@ -18,25 +18,6 @@ from chemreg.compound.validators import (
 from chemreg.indigo.inchi import get_inchikey
 
 
-class SoftDeleteCompoundManager(PolymorphicManager):
-    def __init__(self, *args, **kwargs):
-        self.with_deleted = kwargs.pop("deleted", False)
-        super(SoftDeleteCompoundManager, self).__init__(*args, **kwargs)
-
-    def _base_queryset(self):
-        return super().get_queryset()
-
-    def get_queryset(self):
-        qs = self._base_queryset()
-        if self.with_deleted and IsAdminUser():
-            return qs
-        return qs.filter(replaced_by__isnull=True)
-
-    @property
-    def is_deleted(self):
-        return not self.replaced_by__isnull
-
-
 class BaseCompound(CommonInfo, PolymorphicModel):
     """The base class for compounds.
 
@@ -69,8 +50,10 @@ class BaseCompound(CommonInfo, PolymorphicModel):
         default=None,
     )
     qc_note = models.TextField(blank=True, default="")
-    objects = SoftDeleteCompoundManager()
-    objects_with_deleted = SoftDeleteCompoundManager(deleted=True)
+
+    @property
+    def is_deleted(self):
+        return self.replaced_by_id is not None
 
     def delete(self):
         # the record may not actually be deleted
