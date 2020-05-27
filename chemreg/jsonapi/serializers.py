@@ -1,6 +1,9 @@
-import copy
 import inspect
+from collections import ChainMap
 
+from django.core.exceptions import FieldDoesNotExist
+from django.db.models.fields.related import RelatedField
+from django.db.models.query import QuerySet
 from django.utils.module_loading import import_string
 from rest_framework.utils.field_mapping import get_relation_kwargs
 
@@ -29,56 +32,100 @@ class SelfLinkMixin:
         return super().__new__(cls, *args, **kwargs)
 
 
-class AutoRelatedMetaclass(serializers.SerializerMetaclass):
-    """Pulls in related fields from serializer."""
+class AutoIncludeMetaclass(serializers.SerializerMetaclass):
+    """
+    This metaclass sets a dictionary named `included_serializers` on the class if not explicitly declared.
+
+    Any instances of `ModelSerializer`, `HyperlinkedModelSerializer`,  `PolymorphicModelSerializer`,
+    or a string pointing to a subclass of these included as attributes on either the class or on any
+    of its superclasses will be included in the `included_serializers` dictionary.
+    """
+
+    @classmethod
+    def _get_included_serializers(cls, bases, attrs):
+        """Find serializers included on the serializer"""
+
+        included_serializers = {}
+        meta = attrs.get("Meta", None)
+        model = getattr(meta, "model", None)
+        for field_name, field_obj in list(attrs.items()):
+            try:
+                model_field = model._meta.get_field(field_name)
+            except (AttributeError, FieldDoesNotExist):
+                model_field = None
+            # Does this field point to a RelatedField on the model?
+            is_related_field = isinstance(model_field, RelatedField)
+            # Is this possibly an import string?
+            is_string = isinstance(field_obj, str)
+            # Is this an accepted serializer?
+            is_serializer = inspect.isclass(field_obj) and issubclass(
+                field_obj,
+                (
+                    serializers.ModelSerializer,
+                    serializers.HyperlinkedModelSerializer,
+                    serializers.PolymorphicModelSerializer,
+                ),
+            )
+            if is_related_field and (is_string or is_serializer):
+                included_serializer = attrs.pop(field_name)
+                included_serializers[field_name] = included_serializer
+        # Gather the included serializers from all bases
+        base_included_serializer_dicts = [
+            serializer.included_serializers
+            for serializer in bases
+            if hasattr(serializer, "included_serializers")
+            and serializer.included_serializers
+        ]
+        if included_serializers:
+            return ChainMap(included_serializers, *base_included_serializer_dicts)
+        return ChainMap(*base_included_serializer_dicts)
 
     def __new__(cls, name, bases, attrs):
-        # Automatically include serializer
-        included_serializers = attrs.get("included_serializers", {})
-        # Inspect bases for their included serializers
-        for base in bases:
-            base_included_serializer = getattr(base, "included_serializers", {})
-            for key, value in base_included_serializer.items():
-                # Only include if not overwritten
-                if key not in included_serializers:
-                    included_serializers[key] = value
-        for fieldname in getattr(attrs.get("Meta"), "fields", []):
-            if fieldname not in included_serializers:
-                field = attrs.get(fieldname)
-                if (
-                    isinstance(field, str)
-                    or inspect.isclass(field)
-                    and issubclass(
-                        field,
-                        (
-                            serializers.ModelSerializer,
-                            serializers.HyperlinkedModelSerializer,
-                            serializers.PolymorphicModelSerializer,
-                        ),
-                    )
-                ):
-                    included_serializers[fieldname] = field
-        attrs["included_serializers"] = included_serializers
-        # Let DRF handle generating the fields
-        for fieldname in included_serializers:
-            if fieldname in attrs:
-                attrs.pop(fieldname)
-        return super(AutoRelatedMetaclass, cls).__new__(cls, name, bases, attrs)
+        if "included_serializers" not in attrs:
+            attrs["included_serializers"] = cls._get_included_serializers(bases, attrs)
+        return super().__new__(cls, name, bases, attrs)
 
 
-class AutoIncludePolymorphicMixin:
-    """Pulls in included fields from polymorphic serializers."""
+class PolymorphicAutoIncludeMetaclass(
+    AutoIncludeMetaclass, serializers.PolymorphicSerializerMetaclass
+):
+    """
+    This metaclass sets a dictionary named `included_serializers` on the class if not explicitly declared.
 
-    def __new__(cls, *args, **kwargs):
-        included_serializers = getattr(cls, "included_serializers", None) or {}
-        polymorphic_serializers = getattr(cls, "polymorphic_serializers", None) or []
-        for serializer in polymorphic_serializers:
-            serializer_included_serializers = (
-                getattr(serializer, "included_serializers", None) or {}
+    The `included_serializers` will be a combination of every `included_serializers` included
+    in the list of each `polymorphic_serializers`.
+    """
+
+    @classmethod
+    def _get_included_serializers(cls, bases, attrs):
+        """Find serializers included on the polymorphic serializer."""
+
+        polymorphic_serializers = attrs.get("polymorphic_serializers", [])
+        polymorphic_included_serializer_dicts = [
+            serializer.included_serializers
+            for serializer in polymorphic_serializers
+            if hasattr(serializer, "included_serializers")
+            and serializer.included_serializers
+        ]
+        base_included_serializer_dicts = [
+            serializer.included_serializers
+            for serializer in bases
+            if hasattr(serializer, "included_serializers")
+            and serializer.included_serializers
+        ]
+        return ChainMap(
+            *polymorphic_included_serializer_dicts, *base_included_serializer_dicts
+        )
+
+    def __new__(cls, name, bases, attrs):
+
+        # There's a bug in the base serializers.PolymorphicSerializerMetaclass that prevents
+        # subclassing it.
+        if name == "PolymorphicModelSerializer":
+            return super(serializers.PolymorphicSerializerMetaclass, cls).__new__(
+                cls, name, bases, attrs
             )
-            included_serializers.update(serializer_included_serializers)
-        cls.included_serializers = included_serializers
-        return super().__new__(cls, *args, **kwargs)
+        return super().__new__(cls, name, bases, attrs)
 
 
 class ResourceRelatedFieldMixin:
@@ -112,29 +159,78 @@ class PolymorphicSelfLinkMixin:
         return super().build_url_field(field_name, model_class)
 
 
+class PolymorphicInitKwargMixin:
+    """Fixes a bug where init kwargs are not passed to child serializers."""
+
+    serializer_kwargs = {}
+
+    def __init__(self, *args, **kwargs):
+        self._init_kwarg_values = {}
+        for kwarg_list in self.serializer_kwargs.values():
+            for kwarg in kwarg_list:
+                if kwarg in kwargs:
+                    self._init_kwarg_values[kwarg] = kwargs.pop(kwarg)
+        super().__init__(*args, **kwargs)
+
+    def get_serializer_kwargs(self, instance):
+        serializer_class = self.get_polymorphic_serializer_for_instance(instance)
+        serializer_kwarg_list = self.serializer_kwargs.get(serializer_class, [])
+        serializer_kwargs = {}
+        for kwarg in serializer_kwarg_list:
+            if kwarg in self._init_kwarg_values:
+                serializer_kwargs[kwarg] = self._init_kwarg_values[kwarg]
+        return serializer_kwargs
+
+    def to_representation(self, instance):
+        serializer_class = self.get_polymorphic_serializer_for_instance(instance)
+        serializer_kwargs = self.get_serializer_kwargs(instance)
+        return serializer_class(
+            instance, context=self.context, **serializer_kwargs
+        ).to_representation(instance)
+
+    def get_fields(self):
+        if self.instance not in (None, []):
+            if not isinstance(self.instance, QuerySet):
+                serializer_class = self.get_polymorphic_serializer_for_instance(
+                    self.instance
+                )
+                serializer_kwargs = self.get_serializer_kwargs(self.instance)
+                return serializer_class(
+                    self.instance, context=self.context, **serializer_kwargs
+                ).get_fields()
+            else:
+                raise Exception(
+                    "Cannot get fields from a polymorphic serializer given a queryset"
+                )
+        return super().get_fields()
+
+
 class HyperlinkedModelSerializer(
     ResourceRelatedFieldMixin,
     PolymorphicSelfLinkMixin,
     serializers.HyperlinkedModelSerializer,
     SelfLinkMixin,
     RootMetaMixin,
-    metaclass=AutoRelatedMetaclass,
+    metaclass=AutoIncludeMetaclass,
 ):
     pass
 
 
 class ModelSerializer(
-    AutoIncludePolymorphicMixin,
-    PolymorphicSelfLinkMixin,
     ResourceRelatedFieldMixin,
+    PolymorphicSelfLinkMixin,
     serializers.ModelSerializer,
     SelfLinkMixin,
     RootMetaMixin,
-    metaclass=AutoRelatedMetaclass,
+    metaclass=AutoIncludeMetaclass,
 ):
     pass
 
 
-PolymorphicModelSerializer = copy.deepcopy(serializers.PolymorphicModelSerializer)
-PolymorphicModelSerializer.__bases__ = (ModelSerializer,)
-PolymorphicModelSerializer.get_root_meta = RootMetaMixin.get_root_meta
+class PolymorphicModelSerializer(
+    PolymorphicInitKwargMixin,
+    ModelSerializer,
+    serializers.PolymorphicModelSerializer,
+    metaclass=PolymorphicAutoIncludeMetaclass,
+):
+    pass
