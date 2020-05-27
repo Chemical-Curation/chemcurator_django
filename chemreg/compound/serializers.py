@@ -140,3 +140,17 @@ class CompoundSerializer(PolymorphicModelSerializer):
     class Meta:
         model = BaseCompound
         fields = ["cid"]
+
+class CompoundDeleteSerializer(serializers.Serializer):
+    """Serializes data required for the soft delete of compounds."""
+
+    replacement_cid = serializers.SlugRelatedField(
+        slug_field="cid", queryset=BaseCompound.objects.all()
+    )
+    qc_note = serializers.CharField()
+
+    def update(self, instance, validated_data):
+        instance.replaced_by = validated_data["replacement_cid"]
+        instance.qc_note = validated_data["qc_note"]
+        instance.save()
+        return instance
