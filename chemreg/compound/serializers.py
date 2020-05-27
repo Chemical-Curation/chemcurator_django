@@ -32,6 +32,13 @@ class BaseCompoundSerializer(HyperlinkedModelSerializer):
 
     class Meta:
         fields = ["replaced_by"]
+        model = BaseCompound
+
+    def __init__(self, *args, is_admin=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Remove admin-only fields
+        if not is_admin:
+            self.fields.pop("replaced_by")
 
 
 class DefinedCompoundSerializer(BaseCompoundSerializer):
@@ -60,14 +67,14 @@ class DefinedCompoundSerializer(BaseCompoundSerializer):
 
     class Meta:
         model = DefinedCompound
-        fields = (
+        fields = [
             "cid",
             "inchikey",
             "molfile_v2000",
             "molfile_v3000",
             "smiles",
             "replaced_by",
-        )
+        ]
         extra_kwargs = {"molfile_v3000": {"required": False, "trim_whitespace": False}}
         validators = [
             OneOfValidator("molfile_v2000", "molfile_v3000", "smiles", required=True)
@@ -94,12 +101,12 @@ class DefinedCompoundDetailSerializer(DefinedCompoundSerializer):
     calculated_inchikey = serializers.SerializerMethodField()
 
     class Meta(DefinedCompoundSerializer.Meta):
-        fields = DefinedCompoundSerializer.Meta.fields + (
+        fields = DefinedCompoundSerializer.Meta.fields + [
             "molecular_weight",
             "molecular_formula",
             "smiles",
             "calculated_inchikey",
-        )
+        ]
 
     def get_molecular_weight(self, obj):
         return obj.indigo_structure.molecularWeight()
@@ -119,7 +126,7 @@ class QueryStructureTypeSerializer(HyperlinkedModelSerializer):
 
     class Meta:
         model = QueryStructureType
-        fields = ("name", "label", "short_description", "long_description")
+        fields = ["name", "label", "short_description", "long_description"]
 
 
 class IllDefinedCompoundSerializer(BaseCompoundSerializer):
@@ -136,10 +143,14 @@ class CompoundSerializer(PolymorphicModelSerializer):
     """The serializer for both ill-defined and defined compounds."""
 
     polymorphic_serializers = [DefinedCompoundSerializer, IllDefinedCompoundSerializer]
+    serializer_kwargs = {
+        DefinedCompoundSerializer: ["override", "is_admin"],
+        IllDefinedCompoundSerializer: ["is_admin"],
+    }
 
     class Meta:
         model = BaseCompound
-        fields = ["cid"]
+
 
 class CompoundDeleteSerializer(serializers.Serializer):
     """Serializes data required for the soft delete of compounds."""
