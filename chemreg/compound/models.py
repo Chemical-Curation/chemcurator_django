@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.functional import cached_property
-from rest_framework.permissions import IsAdminUser
 
 from computed_property import ComputedCharField
 from indigo import Indigo, IndigoException
@@ -16,6 +15,14 @@ from chemreg.compound.validators import (
     validate_molfile_v3000,
 )
 from chemreg.indigo.inchi import get_inchikey
+
+
+class SoftDeleteCompoundManager(PolymorphicManager):
+    """Filters out the soft deleted compounds."""
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.filter(replaced_by__isnull=True)
 
 
 class BaseCompound(CommonInfo, PolymorphicModel):
@@ -50,14 +57,20 @@ class BaseCompound(CommonInfo, PolymorphicModel):
         default=None,
     )
     qc_note = models.TextField(blank=True, default="")
+    objects = SoftDeleteCompoundManager()
+    objects_with_deleted = PolymorphicManager()
 
     @property
     def is_deleted(self):
         return self.replaced_by_id is not None
 
-    def delete(self):
-        # the record may not actually be deleted
-        pass
+    def delete(self, force=False):
+        if not force:
+            raise Exception(
+                "Attempted to delete a soft-delete model. "
+                "Pass in `force=True` if you need to perfrom an actual deletion."
+            )
+        return super().delete()
 
 
 class DefinedCompound(BaseCompound):
