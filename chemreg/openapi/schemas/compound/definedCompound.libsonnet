@@ -36,8 +36,9 @@ local baseCompound = import 'baseCompound.libsonnet';
     inchikey: {
       type: 'string',
       maxLength: 29,
-      readOnly: true,
-      description: 'The [InChIKey](https://en.wikipedia.org/wiki/International_Chemical_Identifier#InChIKey) computed at the time of storage for this compound.',
+      required: false,
+      description: 'The [InChIKey](https://en.wikipedia.org/wiki/International_Chemical_Identifier#InChIKey) for this compound. 
+        \n ** Can only be defined when "cid" is present. Otherwise, will be computed at the time of storage.',
       example: 'MYMOFIZGZYHOMD-UHFFFAOYSA-N',
       filter: true,
     },

@@ -1,38 +1,5 @@
 import pytest
 
-from chemreg.compound.settings import compound_settings
-
-
-@pytest.mark.django_db
-@pytest.mark.parametrize(
-    "cid",
-    [
-        f"FOO{compound_settings.PREFIX}CID000",  # invalid prefix
-        f"{compound_settings.PREFIX}CID00",  # does not have ID
-        f"{compound_settings.PREFIX}CDI000",  # malformed meta text
-        f"{compound_settings.PREFIX}CID090",  # incorrect checksum separator
-        f"{compound_settings.PREFIX}CIDA00",  # non-integer checksum
-        f"{compound_settings.PREFIX}CID00A",  # non-integer ID
-    ],
-)
-def test_validate_cid_regex(defined_compound_factory, cid):
-    serializer = defined_compound_factory.build(cid=cid)
-    assert not serializer.is_valid()
-    assert f"Invalid format. Expected {compound_settings.PREFIX}CID$0######." in (
-        str(err) for err in serializer.errors["cid"]
-    )
-
-
-@pytest.mark.django_db
-def test_validate_cid_checksum(defined_compound_factory):
-    serializer = defined_compound_factory.build(
-        cid=f"{compound_settings.PREFIX}CID00123"
-    )
-    assert not serializer.is_valid()
-    assert "Invalid checksum. Expected 4." in (
-        str(err) for err in serializer.errors["cid"]
-    )
-
 
 @pytest.mark.django_db
 def test_validate_inchikey_computable(defined_compound_factory):
@@ -66,7 +33,7 @@ def test_validate_no_structure(defined_compound_v2000_factory):
     dc.initial_data.pop("molfile_v2000")
     assert not dc.is_valid()
     assert (
-        str(dc.errors.get("non_field_errors")[0])
+        str(dc.errors.get("non_field_errors"))
         == "One of ['molfileV2000', 'molfileV3000', 'smiles'] required."
     )
 
@@ -107,6 +74,6 @@ def test_validate_single_structure(
     assert not dcsmiles.is_valid()
     assert "non_field_errors" in dcsmiles.errors.keys()
     assert (
-        str(dcsmiles.errors.get("non_field_errors")[0])
+        str(dcsmiles.errors.get("non_field_errors"))
         == "Only one of ['molfileV2000', 'molfileV3000', 'smiles'] allowed. Recieved ['molfileV2000', 'smiles']."
     )

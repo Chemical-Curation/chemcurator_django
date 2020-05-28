@@ -17,7 +17,19 @@ from chemreg.compound.serializers import (
 from chemreg.jsonapi.views import ModelViewSet, ReadOnlyModelViewSet
 
 
-class DefinedCompoundViewSet(ModelViewSet):
+class CIDPermissionsMixin:
+    def get_permissions(self):
+        # return permission_classes depending on `action`
+        if "cid" in self.request.data:
+            return [
+                permission()
+                for permission in self.permission_classes_by_action[self.action]
+            ]
+        else:
+            return [permission() for permission in self.permission_classes]
+
+
+class DefinedCompoundViewSet(CIDPermissionsMixin, ModelViewSet):
 
     queryset = DefinedCompound.objects.all()
     serializer_class = DefinedCompoundSerializer
@@ -26,6 +38,9 @@ class DefinedCompoundViewSet(ModelViewSet):
     }
     valid_post_query_params = ["override"]
     filterset_class = DefinedCompoundFilter
+    permission_classes_by_action = {
+        "create": [IsAdminUser],
+    }
 
     def get_serializer_class(self, *args, **kwargs):
         try:
@@ -48,11 +63,14 @@ class DefinedCompoundViewSet(ModelViewSet):
         return super().get_serializer(*args, **kwargs)
 
 
-class IllDefinedCompoundViewSet(ModelViewSet):
+class IllDefinedCompoundViewSet(CIDPermissionsMixin, ModelViewSet):
 
     queryset = IllDefinedCompound.objects.all()
     serializer_class = IllDefinedCompoundSerializer
     filterset_fields = ["cid"]
+    permission_classes_by_action = {
+        "create": [IsAdminUser],
+    }
 
 
 class QueryStructureTypeViewSet(ModelViewSet):

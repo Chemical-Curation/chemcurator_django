@@ -11,11 +11,7 @@ from chemreg.compound.models import (
     get_illdefined_qst,
 )
 from chemreg.compound.utils import build_cid
-from chemreg.compound.validators import (
-    validate_cid_checksum,
-    validate_cid_regex,
-    validate_inchikey_computable,
-)
+from chemreg.compound.validators import validate_inchikey_computable
 
 
 def test_basecompound():
@@ -26,8 +22,6 @@ def test_basecompound():
     assert cid.default == build_cid
     assert cid.max_length == 50
     assert cid.unique
-    assert validate_cid_checksum in cid.validators
-    assert validate_cid_regex in cid.validators
     # structure
     structure = BaseCompound._meta.get_field("structure")
     assert isinstance(structure, models.TextField)
