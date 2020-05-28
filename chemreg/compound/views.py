@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
+from chemreg.compound.filters import DefinedCompoundFilter
 from chemreg.compound.models import (
     BaseCompound,
     DefinedCompound,
@@ -17,6 +18,18 @@ from chemreg.compound.serializers import (
     QueryStructureTypeSerializer,
 )
 from chemreg.jsonapi.views import ModelViewSet, ReadOnlyModelViewSet
+
+
+class CIDPermissionsMixin:
+    def get_permissions(self):
+        # return permission_classes depending on `action`
+        if "cid" in self.request.data:
+            return [
+                permission()
+                for permission in self.permission_classes_by_action[self.action]
+            ]
+        else:
+            return [permission() for permission in self.permission_classes]
 
 
 class SoftDeleteCompoundMixin:
@@ -56,12 +69,17 @@ class SoftDeleteCompoundMixin:
         return qs.filter(replaced_by__isnull=True)
 
 
-class DefinedCompoundViewSet(SoftDeleteCompoundMixin, ModelViewSet):
+class DefinedCompoundViewSet(
+    SoftDeleteCompoundMixin, CIDPermissionsMixin, ModelViewSet
+):
 
     queryset = DefinedCompound.objects.all()
     serializer_class = DefinedCompoundSerializer
     valid_post_query_params = ["override"]
-    filterset_fields = ["cid", "inchikey"]
+    filterset_class = DefinedCompoundFilter
+    permission_classes_by_action = {
+        "create": [IsAdminUser],
+    }
 
     def get_serializer_class(self, *args, **kwargs):
         if self.action == "retrieve":
@@ -83,11 +101,16 @@ class DefinedCompoundViewSet(SoftDeleteCompoundMixin, ModelViewSet):
         return super().get_serializer(*args, **kwargs)
 
 
-class IllDefinedCompoundViewSet(SoftDeleteCompoundMixin, ModelViewSet):
+class IllDefinedCompoundViewSet(
+    SoftDeleteCompoundMixin, CIDPermissionsMixin, ModelViewSet
+):
 
     queryset = IllDefinedCompound.objects.all()
     serializer_class = IllDefinedCompoundSerializer
     filterset_fields = ["cid"]
+    permission_classes_by_action = {
+        "create": [IsAdminUser],
+    }
 
 
 class QueryStructureTypeViewSet(ModelViewSet):

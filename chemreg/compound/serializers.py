@@ -1,6 +1,8 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
-from chemreg.common.validators import OneOfValidator
+from rest_framework_json_api.utils import format_value
+
 from chemreg.compound.fields import StructureAliasField
 from chemreg.compound.models import (
     BaseCompound,
@@ -64,6 +66,7 @@ class DefinedCompoundSerializer(BaseCompoundSerializer):
         ],
         trim_whitespace=False,
     )
+    alt_structures = ("molfile_v2000", "molfile_v3000", "smiles")
 
     class Meta:
         model = DefinedCompound
@@ -76,21 +79,46 @@ class DefinedCompoundSerializer(BaseCompoundSerializer):
             "replaced_by",
         ]
         extra_kwargs = {"molfile_v3000": {"required": False, "trim_whitespace": False}}
-        validators = [
-            OneOfValidator("molfile_v2000", "molfile_v3000", "smiles", required=True)
-        ]
 
     def __init__(self, *args, admin_override=False, **kwargs):
         if not admin_override:
-            for structrue in ("molfile_v2000", "molfile_v3000", "smiles"):
-                field = self.fields[structrue]
+            for structure in self.alt_structures:
+                field = self.fields[structure]
                 field.validators.append(validate_inchikey_unique)
         super().__init__(*args, **kwargs)
 
-    def validate(self, data):
-        alt_structures = ("molfile_v2000", "molfile_v3000", "smiles")
-        alt_structure = next(k for k in alt_structures if k in data)
-        data["molfile_v3000"] = get_molfile_v3000(data.pop(alt_structure))
+    def validate_cid(self, value):
+        if "inchikey" not in self.initial_data:
+            raise ValidationError("InchIKey must be included when CID is defined.")
+        return value
+
+    def validate_inchikey(self, value):
+        if "cid" not in self.initial_data:
+            raise ValidationError("CID must be included when InchIKey is defined.")
+        return value
+
+    def to_internal_value(self, data):
+        matched_fields = set(self.alt_structures) & set(self.initial_data.keys())
+        formatted_fields = [format_value(f) for f in sorted(self.alt_structures)]
+        formatted_matched_fields = [format_value(f) for f in sorted(matched_fields)]
+        if not matched_fields:
+            raise ValidationError(
+                {"non_field_errors": f"One of {sorted(formatted_fields)} required."}
+            )
+        if len(matched_fields) > 1:
+            raise ValidationError(
+                {
+                    "non_field_errors": (
+                        f"Only one of {formatted_fields} allowed. "
+                        f"Recieved {formatted_matched_fields}."
+                    )
+                }
+            )
+        data = super().to_internal_value(data)  # calls field validators
+        structure = next(k for k in self.alt_structures if k in data)
+        data["molfile_v3000"] = get_molfile_v3000(data.pop(structure))
+        if "inchikey" not in data:
+            data["inchikey"] = get_inchikey(data["molfile_v3000"])
         return data
 
 

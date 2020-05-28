@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils.functional import cached_property
 
-from computed_property import ComputedCharField
 from indigo import Indigo, IndigoException
 from polymorphic.models import PolymorphicManager, PolymorphicModel
 
@@ -9,8 +8,6 @@ from chemreg.common.models import CommonInfo
 from chemreg.compound.fields import StructureAliasField
 from chemreg.compound.utils import build_cid
 from chemreg.compound.validators import (
-    validate_cid_checksum,
-    validate_cid_regex,
     validate_inchikey_computable,
     validate_molfile_v3000,
 )
@@ -41,12 +38,7 @@ class BaseCompound(CommonInfo, PolymorphicModel):
         qc_note (str): An explanation of why the compound was deleted and replaced
     """
 
-    cid = models.CharField(
-        default=build_cid,
-        max_length=50,
-        unique=True,
-        validators=[validate_cid_regex, validate_cid_checksum],
-    )
+    cid = models.CharField(default=build_cid, max_length=50, unique=True)
     structure = models.TextField()
     # soft delete functionality
     replaced_by = models.ForeignKey(
@@ -85,7 +77,7 @@ class DefinedCompound(BaseCompound):
     molfile_v3000 = StructureAliasField(
         validators=[validate_molfile_v3000, validate_inchikey_computable]
     )
-    inchikey = ComputedCharField(compute_from="_inchikey", max_length=29)
+    inchikey = models.CharField(null=True, max_length=29)
 
     @property
     def _inchikey(self):

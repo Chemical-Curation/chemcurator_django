@@ -18,7 +18,6 @@ def test_definedcompound_override():
     )
 
     view.request = view.initialize_request(factory.post("/definedCompounds"))
-    assert not any(isinstance(p, IsAdminUser) for p in view.get_permissions())
     for field in ("molfile_v2000", "molfile_v3000", "smiles"):
         assert (
             validate_inchikey_unique in view.get_serializer().fields[field].validators
@@ -77,15 +76,102 @@ def test_definedcompound_detail_attrs(user_factory, defined_compound_factory):
     ]
 
 
+@pytest.mark.django_db
+def test_ill_defined_compound_admin_user(user_factory, ill_defined_compound_factory):
+    """Tests and Validates the outcomes of multiple POST requests performed by an
+    User both with and without ADMIN permissions"""
+    client = APIClient()
+    user = user_factory.build()
+    user.is_staff = True
+    client.force_authenticate(user=user)
+    idc = ill_defined_compound_factory.build()
+    idc.initial_data.update(cid="CID")
+    response = client.post(
+        "/illDefinedCompounds",
+        {"data": {"type": "illDefinedCompound", "attributes": idc.initial_data}},
+    )
+    assert response.status_code == 201
+    client = APIClient()
+    user = user_factory.build()
+    assert user.is_staff is False
+    client.force_authenticate(user=user)
+    idc = ill_defined_compound_factory.build()
+    idc.initial_data.update(cid="XXX")
+    response = client.post(
+        "/illDefinedCompounds",
+        {"data": {"type": "illDefinedCompound", "attributes": idc.initial_data}},
+    )
+    assert response.status_code == 403
+
+
 def test_defined_compound_view():
     """Tests that the Defined Compound View Set includes cid and InChIKey as filterset fields."""
-    assert DefinedCompoundViewSet.filterset_fields == ["cid", "inchikey"]
+    assert DefinedCompoundViewSet.filterset_class.Meta.fields == [
+        "cid",
+        "inchikey",
+        "molfile_v3000",
+    ]
 
 
 def test_compound_view():
     """Tests that the Compound View Set, is ReadOnly and has the inclusion of cid as a filterset field."""
     assert issubclass(CompoundViewSet, ReadOnlyModelViewSet)
     assert CompoundViewSet.filterset_fields == ["cid"]
+
+
+@pytest.mark.django_db
+def test_definedcompound_admin_user(user_factory, defined_compound_factory):
+    """Tests and Validates the outcomes of multiple POST requests performed by an
+    User both with and without ADMIN permissions"""
+    client = APIClient()
+    user = user_factory.build()
+    user.is_staff = True
+    client.force_authenticate(user=user)
+    dc = defined_compound_factory.build()
+    dc.initial_data.update(cid="CID")
+    response = client.post(
+        "/definedCompounds",
+        {"data": {"type": "definedCompound", "attributes": dc.initial_data}},
+    )
+    assert response.status_code == 400
+    assert response.exception is True
+    assert (
+        str(response.data[0]["detail"])
+        == "InchIKey must be included when CID is defined."
+    )
+    dc.initial_data.update(inchikey="INCHI")
+    response = client.post(
+        "/definedCompounds",
+        {"data": {"type": "definedCompound", "attributes": dc.initial_data}},
+    )
+    assert response.status_code == 201
+    dc.initial_data.pop("cid")
+    response = client.post(
+        "/definedCompounds",
+        {"data": {"type": "definedCompound", "attributes": dc.initial_data}},
+    )
+    assert response.status_code == 400
+    assert response.exception is True
+    assert (
+        str(response.data[0]["detail"])
+        == "CID must be included when InchIKey is defined."
+    )
+    client = APIClient()
+    user = user_factory.build()
+    assert user.is_staff is False
+    client.force_authenticate(user=user)
+    dc = defined_compound_factory.build()
+    dc.initial_data.update(cid="XXX", inchikey="XXX")
+    response = client.post(
+        "/definedCompounds",
+        {"data": {"type": "definedCompound", "attributes": dc.initial_data}},
+    )
+    assert response.status_code == 403
+    assert response.exception is True
+    assert (
+        str(response.data[0]["detail"])
+        == "You do not have permission to perform this action."
+    )
 
 
 @pytest.mark.django_db
