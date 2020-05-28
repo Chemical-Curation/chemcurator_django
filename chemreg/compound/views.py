@@ -21,15 +21,14 @@ from chemreg.jsonapi.views import ModelViewSet, ReadOnlyModelViewSet
 
 
 class CIDPermissionsMixin:
+    """
+    You must be an admin if POSTing a CID.
+    """
+
     def get_permissions(self):
-        # return permission_classes depending on `action`
-        if "cid" in self.request.data:
-            return [
-                permission()
-                for permission in self.permission_classes_by_action[self.action]
-            ]
-        else:
-            return [permission() for permission in self.permission_classes]
+        if self.action == "create" and "cid" in self.request.data:
+            return [IsAdminUser()]
+        return super().get_permissions()
 
 
 class SoftDeleteCompoundMixin:
@@ -77,9 +76,6 @@ class DefinedCompoundViewSet(
     serializer_class = DefinedCompoundSerializer
     valid_post_query_params = ["override"]
     filterset_class = DefinedCompoundFilter
-    permission_classes_by_action = {
-        "create": [IsAdminUser],
-    }
 
     def get_serializer_class(self, *args, **kwargs):
         if self.action == "retrieve":
@@ -108,9 +104,6 @@ class IllDefinedCompoundViewSet(
     queryset = IllDefinedCompound.objects.all()
     serializer_class = IllDefinedCompoundSerializer
     filterset_fields = ["cid"]
-    permission_classes_by_action = {
-        "create": [IsAdminUser],
-    }
 
 
 class QueryStructureTypeViewSet(ModelViewSet):
