@@ -21,3 +21,7 @@ def test_defined_compound_filters(defined_compound_factory, user):
     response = client.get(f"/definedCompounds?filter[molfileV3000]={molfile}")
     assert len(response.data["results"]) == 1
     assert response.data["results"][0]["cid"] == compounds[0].instance.cid
+
+    # Test with invalid molfile
+    response = client.get(f"/definedCompounds?filter[molfileV3000]=foo")
+    assert "Structure is not in V3000 format." in response.data[0]["detail"]
