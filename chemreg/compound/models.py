@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.functional import cached_property
-from rest_framework.permissions import IsAdminUser
 
 from computed_property import ComputedCharField
 from indigo import Indigo, IndigoException
@@ -55,9 +54,13 @@ class BaseCompound(CommonInfo, PolymorphicModel):
     def is_deleted(self):
         return self.replaced_by_id is not None
 
-    def delete(self):
-        # the record may not actually be deleted
-        pass
+    def delete(self, force=False):
+        if not force:
+            raise Exception(
+                "Attempted to delete a soft-delete model. "
+                "Pass in `force=True` if you need to perfrom an actual deletion."
+            )
+        return super().delete()
 
 
 class DefinedCompound(BaseCompound):
