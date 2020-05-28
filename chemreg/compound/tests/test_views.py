@@ -73,7 +73,11 @@ def test_definedcompound_detail_attrs(user_factory, defined_compound_factory):
 
 def test_defined_compound_view():
     """Tests that the Defined Compound View Set includes cid and InChIKey as filterset fields."""
-    assert DefinedCompoundViewSet.filterset_class.Meta.fields == ["cid", "inchikey"]
+    assert DefinedCompoundViewSet.filterset_class.Meta.fields == [
+        "cid",
+        "inchikey",
+        "molfile_v3000",
+    ]
 
 
 def test_compound_view():

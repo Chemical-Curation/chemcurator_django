@@ -17,6 +17,7 @@ local baseCompound = import 'baseCompound.libsonnet';
       description: 'A [v3000 MDL Molfile](https://en.wikipedia.org/wiki/Chemical_table_file#The_Extended_Connection_Table_(V3000)) representing this compound. Newlines must be escaped (e.g. `\\n`) and spaces preserved.',
       example: '\n  -INDIGO-04212015202D\n\n  0  0  0  0  0  0  0  0  0  0  0 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 2 1 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 O 0.0 0.0 0.0 0\nM  V30 2 O 0.0 0.0 0.0 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 1 2 1 2\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n',
       oneOfGroup: 'structure',
+      filter: true,
     },
     smiles: {
       type: 'string',
