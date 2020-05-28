@@ -57,7 +57,6 @@ def test_definedcompound_detail_attrs(user_factory, defined_compound_factory):
         "cid",
         "inchikey",
         "molfile_v3000",
-        "replaced_by",
         "url",
     ]
 
@@ -71,7 +70,6 @@ def test_definedcompound_detail_attrs(user_factory, defined_compound_factory):
         "inchikey",
         "molfile_v3000",
         "smiles",
-        "replaced_by",
         "molecular_weight",
         "molecular_formula",
         "calculated_inchikey",
@@ -136,7 +134,7 @@ def test_compound_soft_delete(user_factory, defined_compound_factory):
     #
     destroy_data = {"qc_note": "replacing with another", "replaced_by": compound_2.cid}
 
-    resp = client.delete(f"/compounds/{compound_1.id}", data=destroy_data)
+    resp = client.delete(f"/definedCompounds/{compound_1.id}", data=destroy_data)
     assert resp.status_code == 204
 
     # it should be visible to an admin user calling objects_with_deleted
@@ -179,7 +177,7 @@ def test_compound_forbidden_soft_delete(user_factory, defined_compound_factory):
     client.force_authenticate(user=standard_user)
     resp = client.get(f"/compounds/{compound_1.id}")
 
-    client.force_authenticate(user=admin_user)
+    client.force_authenticate(user=standard_user)
     destroy_data = {"qc_note": "replacing with another", "replaced_by": compound_2.cid}
     # The standard user should not be allowed to delete the compound
     resp = client.delete(f"/compounds/{compound_1.id}", data=destroy_data)
