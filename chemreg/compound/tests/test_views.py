@@ -129,9 +129,10 @@ def test_compound_soft_delete(user_factory, defined_compound_factory):
     resp = client.get(f"/compounds/{compound_2.id}")
     assert compound_2.inchikey == resp.data.get("inchikey")
 
-    # One can be soft-deleted.
+    resp = client.get(f"/compounds")
+    assert len(resp.data["results"]) == 2
 
-    #
+    # One can be soft-deleted.
     destroy_data = {
         "data": {
             "type": "definedCompound",
@@ -150,6 +151,11 @@ def test_compound_soft_delete(user_factory, defined_compound_factory):
     assert DefinedCompound.objects_with_deleted.filter(pk=compound_1.id).exists()
     # it should NOT be visible to an admin user calling the default objects manager
     assert not DefinedCompound.objects.filter(pk=compound_1.id).exists()
+
+    # The admin user now sees only one resource in the list.
+    # Is this the intended behavior?
+    resp = client.get(f"/compounds")
+    assert len(resp.data["results"]) == 1
     client.logout()
 
     # it should not be visible to a non-admin user
@@ -157,6 +163,10 @@ def test_compound_soft_delete(user_factory, defined_compound_factory):
     client.force_authenticate(user=standard_user)
     resp = client.get(f"/compounds/{compound_1.id}")
     assert resp.status_code == 404
+    assert resp.data[0]["detail"].code == "not_found"
+
+    resp = client.get(f"/compounds")
+    assert len(resp.data["results"]) == 1
 
 
 @pytest.mark.django_db
@@ -186,8 +196,18 @@ def test_compound_forbidden_soft_delete(user_factory, defined_compound_factory):
     client.force_authenticate(user=standard_user)
     resp = client.get(f"/compounds/{compound_1.id}")
 
-    client.force_authenticate(user=standard_user)
-    destroy_data = {"qc_note": "replacing with another", "replaced_by": compound_2.cid}
     # The standard user should not be allowed to delete the compound
+    destroy_data = {
+        "data": {
+            "type": "definedCompound",
+            "id": compound_1.id,
+            "attributes": {
+                "replacement_cid": compound_2.cid,
+                "qc_note": "replacing with another",
+            },
+        }
+    }
+
     resp = client.delete(f"/compounds/{compound_1.id}", data=destroy_data)
     assert resp.status_code == 403
+    assert resp.data[0]["detail"].code == "permission_denied"
