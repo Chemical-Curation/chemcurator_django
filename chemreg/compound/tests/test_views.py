@@ -132,7 +132,16 @@ def test_compound_soft_delete(user_factory, defined_compound_factory):
     # One can be soft-deleted.
 
     #
-    destroy_data = {"qc_note": "replacing with another", "replaced_by": compound_2.cid}
+    destroy_data = {
+        "data": {
+            "type": "definedCompound",
+            "id": compound_1.id,
+            "attributes": {
+                "replacement_cid": compound_2.cid,
+                "qc_note": "replacing with another",
+            },
+        }
+    }
 
     resp = client.delete(f"/definedCompounds/{compound_1.id}", data=destroy_data)
     assert resp.status_code == 204
