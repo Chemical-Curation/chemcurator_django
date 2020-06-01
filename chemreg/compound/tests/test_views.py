@@ -273,7 +273,7 @@ def test_compound_forbidden_soft_delete(user_factory, defined_compound_factory):
     compound_2 = serializers[1].instance
 
     # There should now be two defined compounds with the same structure.
-    standard_user = user_factory.build(username="lauryn", is_staff=False)
+    standard_user = user_factory.build(is_staff=False)
     client.force_authenticate(user=standard_user)
     resp = client.get(f"/compounds/{compound_1.id}")
 
@@ -292,3 +292,41 @@ def test_compound_forbidden_soft_delete(user_factory, defined_compound_factory):
     resp = client.delete(f"/compounds/{compound_1.id}", data=destroy_data)
     assert resp.status_code == 403
     assert resp.data[0]["detail"].code == "permission_denied"
+
+
+@pytest.mark.django_db
+def test_compound_redirect(user_factory, defined_compound_factory):
+    """Tests that soft-deleted compounds will redirect when non-admin."""
+
+    client = APIClient()
+    admin_user = user_factory.build(is_staff=True)
+    standard_user = user_factory.build(is_staff=False)
+
+    serializers = defined_compound_factory.create_batch(2)
+    compound_1 = serializers[0].instance
+    compound_2 = serializers[1].instance
+
+    destroy_data = {
+        "data": {
+            "type": "definedCompound",
+            "id": compound_1.id,
+            "attributes": {
+                "replacement_cid": compound_2.cid,
+                "qc_note": "replacing with another",
+            },
+        }
+    }
+    client.force_authenticate(user=admin_user)
+    resp = client.delete(f"/definedCompounds/{compound_1.id}", data=destroy_data)
+    assert resp.status_code == 204
+
+    # Non-admin should be redirected
+    client.force_authenticate(user=standard_user)
+    resp = client.get(f"/compounds/{compound_1.id}")
+    assert resp.status_code == 301
+    assert compound_2.id == int(resp.url.split("/")[-1])
+
+    # Admin should be able to retrieve it
+    client.force_authenticate(user=admin_user)
+    resp = client.get(f"/compounds/{compound_1.id}")
+    assert resp.status_code == 200

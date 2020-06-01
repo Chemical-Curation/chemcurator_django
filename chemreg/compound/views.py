@@ -1,3 +1,4 @@
+from django.http import HttpResponsePermanentRedirect
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -51,6 +52,16 @@ class SoftDeleteCompoundMixin:
         serializer.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    def retrieve(self, request, *args, **kwargs):
+        """Redirect if a non-admin user is accessing a soft-deleted object."""
+
+        instance = self.get_object()
+        if instance.is_deleted and not self._is_admin:
+            redirect_url = self.reverse_action("detail", [instance.replaced_by_id])
+            return HttpResponsePermanentRedirect(redirect_url)
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
     def get_permissions(self):
         if self.action == "destroy":
             return [IsAdminUser()]
@@ -62,8 +73,15 @@ class SoftDeleteCompoundMixin:
         return super().get_serializer(*args, **kwargs)
 
     def get_queryset(self):
+        """Filter the queryset to remove soft-deleted compounds.
+
+        Provide all compounds if an admin is making the request. Also, provide
+        all compounds if retrieving a single object. This allows us to give a
+        redirect if warranted in `self.retrieve()`.
+        """
+
         qs = super().get_queryset()
-        if self._is_admin:
+        if self._is_admin or self.action == "retrieve":
             return qs
         return qs.filter_deleted()
 
