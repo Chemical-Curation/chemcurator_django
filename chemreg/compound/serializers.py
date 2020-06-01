@@ -1,3 +1,4 @@
+from django.db.models import Case, F, Q, Value, When
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -189,7 +190,47 @@ class CompoundDeleteSerializer(serializers.Serializer):
     qc_note = serializers.CharField()
 
     def update(self, instance, validated_data):
+        """
+        This method is called when "deleting" the instance.
+
+        Any compounds replaced by this one will also be updated to the
+        new compound. For example, say a compound "B" replaces
+        compounds "C" and "D".
+        1. B replaces C
+        2. B replaces D
+
+             C
+          ↙
+        B
+          ↖
+             D
+
+        Then, when "A" replaces "B", both "C" and "D" are also updated to
+        be replaced by "A".
+        1. A replaces B
+        2. A replaces C
+        3. A replaces D
+
+             B
+          ↙
+        A ← C
+          ↖
+             D
+
+        This allows us to know that there is never more than one self
+        join required to find which compound replaces which.
+        """
+        BaseCompound.objects.with_deleted().filter(
+            Q(replaced_by=instance) | Q(pk=instance.pk)
+        ).update(
+            replaced_by=validated_data["replacement_cid"],
+            qc_note=Case(
+                When(pk=instance.pk, then=Value(validated_data["qc_note"])),
+                default=F("qc_note"),
+            ),
+        )
+        # Django REST Framework wants this function to return an
+        # updated instance, so let's give it one.
         instance.replaced_by = validated_data["replacement_cid"]
         instance.qc_note = validated_data["qc_note"]
-        instance.save()
         return instance
