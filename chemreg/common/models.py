@@ -38,7 +38,7 @@ class CommonInfo(models.Model):
         ordering = ["pk"]
 
 
-class SourceModel(models.Model):
+class SourceModel(CommonInfo):
     """Controlled vocabulary for Sources
 
     Attributes:
