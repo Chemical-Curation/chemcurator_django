@@ -3,6 +3,7 @@ from django.utils.functional import cached_property
 
 from indigo import Indigo, IndigoException
 from polymorphic.models import PolymorphicManager, PolymorphicModel
+from polymorphic.query import PolymorphicQuerySet
 
 from chemreg.common.models import CommonInfo
 from chemreg.compound.fields import StructureAliasField
@@ -14,12 +15,32 @@ from chemreg.compound.validators import (
 from chemreg.indigo.inchi import get_inchikey
 
 
+class SoftDeleteCompoundQuerySet(PolymorphicQuerySet):
+    """Filters out the soft deleted compounds."""
+
+    def filter_deleted(self):
+        return self.filter(replaced_by__isnull=True)
+
+    def delete(self, force=False):
+        if not force:
+            raise Exception(
+                "Attempted to delete a soft-delete model. "
+                "Pass in `force=True` if you need to perfrom an actual deletion."
+            )
+        return super().delete()
+
+
 class SoftDeleteCompoundManager(PolymorphicManager):
     """Filters out the soft deleted compounds."""
 
     def get_queryset(self):
+        """The default queryset filters out deleted."""
         qs = super().get_queryset()
-        return qs.filter(replaced_by__isnull=True)
+        return qs.filter_deleted()
+
+    def with_deleted(self):
+        """Include deleted with this call."""
+        return super().get_queryset()
 
 
 class BaseCompound(CommonInfo, PolymorphicModel):
@@ -49,8 +70,7 @@ class BaseCompound(CommonInfo, PolymorphicModel):
         default=None,
     )
     qc_note = models.TextField(blank=True, default="")
-    objects = SoftDeleteCompoundManager()
-    objects_with_deleted = PolymorphicManager()
+    objects = SoftDeleteCompoundManager.from_queryset(SoftDeleteCompoundQuerySet)()
 
     @property
     def is_deleted(self):

@@ -65,14 +65,14 @@ class SoftDeleteCompoundMixin:
         qs = super().get_queryset()
         if self._is_admin:
             return qs
-        return qs.filter(replaced_by__isnull=True)
+        return qs.filter_deleted()
 
 
 class DefinedCompoundViewSet(
     SoftDeleteCompoundMixin, CIDPermissionsMixin, ModelViewSet
 ):
 
-    queryset = DefinedCompound.objects.all()
+    queryset = DefinedCompound.objects.with_deleted().all()
     serializer_class = DefinedCompoundSerializer
     valid_post_query_params = ["override"]
     filterset_class = DefinedCompoundFilter
@@ -101,7 +101,7 @@ class IllDefinedCompoundViewSet(
     SoftDeleteCompoundMixin, CIDPermissionsMixin, ModelViewSet
 ):
 
-    queryset = IllDefinedCompound.objects.all()
+    queryset = IllDefinedCompound.objects.with_deleted().all()
     serializer_class = IllDefinedCompoundSerializer
     filterset_fields = ["cid"]
 
@@ -114,6 +114,6 @@ class QueryStructureTypeViewSet(ModelViewSet):
 
 class CompoundViewSet(SoftDeleteCompoundMixin, ReadOnlyModelViewSet):
 
-    queryset = BaseCompound.objects.all()
+    queryset = BaseCompound.objects.with_deleted().all()
     serializer_class = CompoundSerializer
     filterset_fields = ["cid"]
