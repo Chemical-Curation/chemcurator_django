@@ -183,76 +183,81 @@ def test_compound_soft_delete(user_factory, defined_compound_factory):
     is also providing a valid replacement CID and a QC note
     """
     client = APIClient()
-    # Create a pair of tautomers
-    # acetone | 67-64-1 | DTXSID8021482 | CC(C)=O
-    mol1 = "\n  Mrv1533009301517212D          \n\n  0  0  0     0  0            999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 4 3 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 2.3093 0 0 0\nM  V30 2 C 1.5386 -1.3333 0 0\nM  V30 3 C 2.3093 -2.6667 0 0\nM  V30 4 O 0 -1.3333 0 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 1 1 1 2\nM  V30 2 1 2 3\nM  V30 3 2 2 4\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n"
+    standard_user = user_factory.build(is_staff=False)
+    admin_user = user_factory.build(is_staff=True)
+    compounds = [
+        serializer.instance for serializer in defined_compound_factory.create_batch(4)
+    ]
 
-    # Propen-2-ol | 29456-04-0 | DTXSID20183662
-    mol2 = "\n  Mrv1533009301517412D          \n\n  0  0  0     0  0            999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 4 3 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 O 5.7475 1.1551 0 0\nM  V30 2 C 3.08 1.1551 0 0\nM  V30 3 C 4.4137 0.3851 0 0\nM  V30 4 C 4.4137 -1.1551 0 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 1 1 1 3\nM  V30 2 1 2 3\nM  V30 3 2 3 4\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n"
-
-    assert DefinedCompound.objects.count() == 0
-
-    serializer_1 = defined_compound_factory.build(molfile_v3000=mol1)
-
-    assert serializer_1.is_valid()
-    compound_1 = serializer_1.save()
-
-    serializer_2 = defined_compound_factory.build(molfile_v3000=mol2)
-    serializer_2.is_valid()
-    compound_2 = serializer_2.save()
-
-    # There should now be two defined compounds with the same structure.
-    admin_user = user_factory.build(username="karyn", is_staff=True)
+    # Compound 1 will replace 2 and 3
     client.force_authenticate(user=admin_user)
-    resp = client.get(f"/compounds/{compound_1.id}")
+    for compound in compounds[2:]:
+        destroy_data = {
+            "data": {
+                "type": "definedCompound",
+                "id": compound.id,
+                "attributes": {
+                    "replacementCid": compounds[1].cid,
+                    "qcNote": f"replacing compound {compound.id} with compound {compounds[1].id}",
+                },
+            }
+        }
+        resp = client.delete(f"/definedCompounds/{compound.id}", data=destroy_data)
+        assert resp.status_code == 204
+        deleted_compound = DefinedCompound.objects.with_deleted().get(pk=compound.pk)
+        assert deleted_compound.replaced_by == compounds[1]
+        assert (
+            deleted_compound.qc_note
+            == f"replacing compound {compound.id} with compound {compounds[1].id}"
+        )
 
+    # the deleted compounds should be visible to an admin user
     client.force_authenticate(user=admin_user)
-    # Both should have different inchikeys
-    assert not compound_1.inchikey == compound_2.inchikey
-    resp = client.get(f"/compounds/{compound_1.id}")
-    assert compound_1.inchikey == resp.data.get("inchikey")
+    resp = client.get(f"/definedCompounds")
+    cid_set = set(c["cid"] for c in resp.data["results"])
+    assert len(cid_set) == 4
+    # it should NOT be visible to non-admin user
+    client.force_authenticate(user=standard_user)
+    resp = client.get(f"/definedCompounds")
+    cid_set = set(c["cid"] for c in resp.data["results"])
+    assert len(cid_set) == 2
+    assert compounds[2].cid not in cid_set
+    assert compounds[3].cid not in cid_set
 
-    resp = client.get(f"/compounds/{compound_2.id}")
-    assert compound_2.inchikey == resp.data.get("inchikey")
-
-    resp = client.get(f"/compounds")
-    assert len(resp.data["results"]) == 2
-
-    # One can be soft-deleted.
+    # Compound 0 will replace compound 1
+    client.force_authenticate(user=admin_user)
     destroy_data = {
         "data": {
             "type": "definedCompound",
-            "id": compound_1.id,
+            "id": compounds[1].id,
             "attributes": {
-                "replacement_cid": compound_2.cid,
-                "qc_note": "replacing with another",
+                "replacementCid": compounds[0].cid,
+                "qcNote": f"replacing compound {compounds[1].id} with compound {compounds[0].id}",
             },
         }
     }
-
-    resp = client.delete(f"/definedCompounds/{compound_1.id}", data=destroy_data)
+    resp = client.delete(f"/definedCompounds/{compounds[1].id}", data=destroy_data)
     assert resp.status_code == 204
-
-    # it should be visible to an admin user calling objects_with_deleted
-    assert DefinedCompound.objects_with_deleted.filter(pk=compound_1.id).exists()
-    # it should NOT be visible to an admin user calling the default objects manager
-    assert not DefinedCompound.objects.filter(pk=compound_1.id).exists()
-
-    # The admin user now sees only one resource in the list.
-    # Is this the intended behavior?
-    resp = client.get(f"/compounds")
-    assert len(resp.data["results"]) == 1
-    client.logout()
-
-    # it should not be visible to a non-admin user
-    standard_user = user_factory.build(username="lauryn", is_staff=False)
-    client.force_authenticate(user=standard_user)
-    resp = client.get(f"/compounds/{compound_1.id}")
-    assert resp.status_code == 404
-    assert resp.data[0]["detail"].code == "not_found"
-
-    resp = client.get(f"/compounds")
-    assert len(resp.data["results"]) == 1
+    deleted_compounds = [
+        DefinedCompound.objects.with_deleted().get(pk=compound.pk)
+        for compound in compounds
+    ]
+    # Compounds 1, 2, and 3 should be replaced by compound 0
+    for deleted_compound in deleted_compounds[1:]:
+        assert deleted_compound.replaced_by == compounds[0]
+    assert (
+        deleted_compounds[1].qc_note
+        == f"replacing compound {compounds[1].id} with compound {compounds[0].id}"
+    )
+    # Make sure the qc_note for compounds 2 and 3 are unchanged
+    assert (
+        deleted_compounds[2].qc_note
+        == f"replacing compound {compounds[2].id} with compound {compounds[1].id}"
+    )
+    assert (
+        deleted_compounds[3].qc_note
+        == f"replacing compound {compounds[3].id} with compound {compounds[1].id}"
+    )
 
 
 @pytest.mark.django_db
@@ -262,20 +267,10 @@ def test_compound_forbidden_soft_delete(user_factory, defined_compound_factory):
     A non-admin user cannot perform the soft-deleted done in the test above
     """
     client = APIClient()
-    # Create a pair of tautomers
-    # acetone | 67-64-1 | DTXSID8021482 | CC(C)=O
-    mol1 = "\n  Mrv1533009301517212D          \n\n  0  0  0     0  0            999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 4 3 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 C 2.3093 0 0 0\nM  V30 2 C 1.5386 -1.3333 0 0\nM  V30 3 C 2.3093 -2.6667 0 0\nM  V30 4 O 0 -1.3333 0 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 1 1 1 2\nM  V30 2 1 2 3\nM  V30 3 2 2 4\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n"
 
-    # Propen-2-ol | 29456-04-0 | DTXSID20183662
-    mol2 = "\n  Mrv1533009301517412D          \n\n  0  0  0     0  0            999 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 4 3 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 O 5.7475 1.1551 0 0\nM  V30 2 C 3.08 1.1551 0 0\nM  V30 3 C 4.4137 0.3851 0 0\nM  V30 4 C 4.4137 -1.1551 0 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 1 1 1 3\nM  V30 2 1 2 3\nM  V30 3 2 3 4\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n"
-
-    serializer_1 = defined_compound_factory.build(molfile_v3000=mol1)
-    serializer_1.is_valid()
-    compound_1 = serializer_1.save()
-
-    serializer_2 = defined_compound_factory.build(molfile_v3000=mol2)
-    serializer_2.is_valid()
-    compound_2 = serializer_2.save()
+    serializers = defined_compound_factory.create_batch(2)
+    compound_1 = serializers[0].instance
+    compound_2 = serializers[1].instance
 
     # There should now be two defined compounds with the same structure.
     standard_user = user_factory.build(username="lauryn", is_staff=False)
