@@ -38,7 +38,7 @@ class CommonInfo(models.Model):
         ordering = ["pk"]
 
 
-class SourceModel(CommonInfo):
+class Source(CommonInfo):
     """Controlled vocabulary for Sources
 
     Attributes:
@@ -49,19 +49,16 @@ class SourceModel(CommonInfo):
     """
 
     name = models.SlugField(
-        max_length=49, verbose_name="name", help_text="Source Model name", unique=True,
+        max_length=49, verbose_name="name", help_text="Source name", unique=True,
     )
     label = models.CharField(
-        max_length=99,
-        verbose_name="label",
-        help_text="Source Model label",
-        unique=True,
+        max_length=99, verbose_name="label", help_text="Source label", unique=True,
     )
     short_description = models.CharField(
         max_length=499,
         verbose_name="short description",
-        help_text="Source Model short description",
+        help_text="Source short description",
     )
     long_description = models.TextField(
-        verbose_name="long description", help_text="Source Model long description",
+        verbose_name="long description", help_text="Source long description",
     )

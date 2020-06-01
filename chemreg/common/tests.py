@@ -3,7 +3,7 @@ from django.db import models
 import pytest
 from crum import impersonate
 
-from chemreg.common.models import CommonInfo, SourceModel
+from chemreg.common.models import CommonInfo, Source
 
 
 def test_commoninfo_attr():
@@ -44,16 +44,16 @@ def test_user_link(user_factory):
 
 def test_source_model():
     """Tests the validity of the Source Model's attributes"""
-    name = SourceModel._meta.get_field("name")
+    name = Source._meta.get_field("name")
     assert isinstance(name, models.SlugField)
     assert name.max_length == 49
     assert name.unique
-    label = SourceModel._meta.get_field("label")
+    label = Source._meta.get_field("label")
     assert isinstance(label, models.CharField)
     assert label.max_length == 99
     assert label.unique
-    short_description = SourceModel._meta.get_field("short_description")
+    short_description = Source._meta.get_field("short_description")
     assert isinstance(short_description, models.CharField)
     assert short_description.max_length == 499
-    long_description = SourceModel._meta.get_field("long_description")
+    long_description = Source._meta.get_field("long_description")
     assert isinstance(long_description, models.TextField)
