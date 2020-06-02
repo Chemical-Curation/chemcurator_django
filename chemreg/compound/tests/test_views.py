@@ -347,3 +347,26 @@ def test_compound_redirect(user, admin_user, compound_factory):
         client.force_authenticate(user=admin_user)
         resp = client.get(f"/{endpoint}/{compound_1.id}")
         assert resp.status_code == 200
+
+
+@pytest.mark.django_db
+def test_compound_field_exclusion(
+    user, admin_user, defined_compound_factory, ill_defined_compound_factory, client
+):
+    """Tests that `replaced_by` and `qc_note` are only visible to admins."""
+    defined_compound_factory.create()
+    ill_defined_compound_factory.create()
+    for compound_endpoint in ["definedCompounds", "illDefinedCompounds"]:
+        for endpoint in ["compounds", compound_endpoint]:
+            # Admins should see replaced_by and qc_note
+            client.force_authenticate(admin_user)
+            resp = client.get(f"/{endpoint}")
+            for result in resp.data["results"]:
+                assert "replaced_by" in result
+                assert "qc_note" in result
+            # Non-admins shouldn't see replaced_by and qc_note
+            client.force_authenticate(user)
+            resp = client.get(f"/{endpoint}")
+            for result in resp.data["results"]:
+                assert "replaced_by" not in result
+                assert "qc_note" not in result
