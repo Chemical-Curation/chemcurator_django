@@ -4,7 +4,11 @@ from rest_framework.test import APIClient, APIRequestFactory, force_authenticate
 
 import pytest
 
-from chemreg.compound.models import DefinedCompound
+from chemreg.compound.models import DefinedCompound, IllDefinedCompound
+from chemreg.compound.tests.factories import (
+    DefinedCompoundFactory,
+    IllDefinedCompoundFactory,
+)
 from chemreg.compound.validators import validate_inchikey_unique
 from chemreg.compound.views import CompoundViewSet, DefinedCompoundViewSet
 from chemreg.jsonapi.views import ReadOnlyModelViewSet
@@ -174,27 +178,34 @@ def test_definedcompound_admin_user(user_factory, defined_compound_factory):
     )
 
 
+@pytest.mark.parametrize(
+    "compound_factory", [DefinedCompoundFactory, IllDefinedCompoundFactory]
+)
 @pytest.mark.django_db
-def test_compound_soft_delete(user_factory, defined_compound_factory):
+def test_compound_soft_delete(user_factory, compound_factory):
     """
     Tests:
     Compound records cannot be hard-deleted
     Soft delete of Compounds can only be done by an Admin user who
     is also providing a valid replacement CID and a QC note
     """
+    if compound_factory == DefinedCompoundFactory:
+        compound_json_type = "definedCompound"
+        model = DefinedCompound
+    elif compound_factory == IllDefinedCompoundFactory:
+        compound_json_type = "illDefinedCompound"
+        model = IllDefinedCompound
     client = APIClient()
     standard_user = user_factory.build(is_staff=False)
     admin_user = user_factory.build(is_staff=True)
-    compounds = [
-        serializer.instance for serializer in defined_compound_factory.create_batch(4)
-    ]
+    compounds = [serializer.instance for serializer in compound_factory.create_batch(4)]
 
     # Compound 1 will replace 2 and 3
     client.force_authenticate(user=admin_user)
     for compound in compounds[2:]:
         destroy_data = {
             "data": {
-                "type": "definedCompound",
+                "type": compound_json_type,
                 "id": compound.id,
                 "attributes": {
                     "replacementCid": compounds[1].cid,
@@ -202,9 +213,9 @@ def test_compound_soft_delete(user_factory, defined_compound_factory):
                 },
             }
         }
-        resp = client.delete(f"/definedCompounds/{compound.id}", data=destroy_data)
+        resp = client.delete(f"/{compound_json_type}s/{compound.id}", data=destroy_data)
         assert resp.status_code == 204
-        deleted_compound = DefinedCompound.objects.with_deleted().get(pk=compound.pk)
+        deleted_compound = model.objects.with_deleted().get(pk=compound.pk)
         assert deleted_compound.replaced_by == compounds[1]
         assert (
             deleted_compound.qc_note
@@ -212,23 +223,24 @@ def test_compound_soft_delete(user_factory, defined_compound_factory):
         )
 
     # the deleted compounds should be visible to an admin user
-    client.force_authenticate(user=admin_user)
-    resp = client.get(f"/definedCompounds")
-    cid_set = set(c["cid"] for c in resp.data["results"])
-    assert len(cid_set) == 4
-    # it should NOT be visible to non-admin user
-    client.force_authenticate(user=standard_user)
-    resp = client.get(f"/definedCompounds")
-    cid_set = set(c["cid"] for c in resp.data["results"])
-    assert len(cid_set) == 2
-    assert compounds[2].cid not in cid_set
-    assert compounds[3].cid not in cid_set
+    for endpoint in [f"{compound_json_type}s", "compounds"]:
+        client.force_authenticate(user=admin_user)
+        resp = client.get(f"/{endpoint}")
+        cid_set = set(c["cid"] for c in resp.data["results"])
+        assert len(cid_set) == 4
+        # it should NOT be visible to non-admin user
+        client.force_authenticate(user=standard_user)
+        resp = client.get(f"/{endpoint}")
+        cid_set = set(c["cid"] for c in resp.data["results"])
+        assert len(cid_set) == 2
+        assert compounds[2].cid not in cid_set
+        assert compounds[3].cid not in cid_set
 
     # Compound 0 will replace compound 1
     client.force_authenticate(user=admin_user)
     destroy_data = {
         "data": {
-            "type": "definedCompound",
+            "type": compound_json_type,
             "id": compounds[1].id,
             "attributes": {
                 "replacementCid": compounds[0].cid,
@@ -236,11 +248,10 @@ def test_compound_soft_delete(user_factory, defined_compound_factory):
             },
         }
     }
-    resp = client.delete(f"/definedCompounds/{compounds[1].id}", data=destroy_data)
+    resp = client.delete(f"/{compound_json_type}s/{compounds[1].id}", data=destroy_data)
     assert resp.status_code == 204
     deleted_compounds = [
-        DefinedCompound.objects.with_deleted().get(pk=compound.pk)
-        for compound in compounds
+        model.objects.with_deleted().get(pk=compound.pk) for compound in compounds
     ]
     # Compounds 1, 2, and 3 should be replaced by compound 0
     for deleted_compound in deleted_compounds[1:]:
@@ -260,55 +271,63 @@ def test_compound_soft_delete(user_factory, defined_compound_factory):
     )
 
 
+@pytest.mark.parametrize(
+    "compound_factory", [DefinedCompoundFactory, IllDefinedCompoundFactory]
+)
 @pytest.mark.django_db
-def test_compound_forbidden_soft_delete(user_factory, defined_compound_factory):
+def test_compound_forbidden_soft_delete(user_factory, compound_factory):
     """
     Tests:
     A non-admin user cannot perform the soft-deleted done in the test above
     """
+    if compound_factory == DefinedCompoundFactory:
+        compound_json_type = "definedCompound"
+    elif compound_factory == IllDefinedCompoundFactory:
+        compound_json_type = "illDefinedCompound"
     client = APIClient()
 
-    serializers = defined_compound_factory.create_batch(2)
+    serializers = compound_factory.create_batch(2)
     compound_1 = serializers[0].instance
     compound_2 = serializers[1].instance
-
-    # There should now be two defined compounds with the same structure.
-    standard_user = user_factory.build(is_staff=False)
-    client.force_authenticate(user=standard_user)
-    resp = client.get(f"/compounds/{compound_1.id}")
 
     # The standard user should not be allowed to delete the compound
     destroy_data = {
         "data": {
-            "type": "definedCompound",
+            "type": compound_json_type,
             "id": compound_1.id,
             "attributes": {
-                "replacement_cid": compound_2.cid,
-                "qc_note": "replacing with another",
+                "replacementCid": compound_2.cid,
+                "qcNote": "replacing with another",
             },
         }
     }
 
-    resp = client.delete(f"/compounds/{compound_1.id}", data=destroy_data)
+    resp = client.delete(f"/{compound_json_type}s/{compound_1.id}", data=destroy_data)
     assert resp.status_code == 403
-    assert resp.data[0]["detail"].code == "permission_denied"
+    assert resp.data[0]["detail"].code == "not_authenticated"
 
 
+@pytest.mark.parametrize(
+    "compound_factory", [DefinedCompoundFactory, IllDefinedCompoundFactory]
+)
 @pytest.mark.django_db
-def test_compound_redirect(user_factory, defined_compound_factory):
+def test_compound_redirect(user_factory, compound_factory):
     """Tests that soft-deleted compounds will redirect when non-admin."""
-
+    if compound_factory == DefinedCompoundFactory:
+        compound_json_type = "definedCompound"
+    elif compound_factory == IllDefinedCompoundFactory:
+        compound_json_type = "illDefinedCompound"
     client = APIClient()
     admin_user = user_factory.build(is_staff=True)
     standard_user = user_factory.build(is_staff=False)
 
-    serializers = defined_compound_factory.create_batch(2)
+    serializers = compound_factory.create_batch(2)
     compound_1 = serializers[0].instance
     compound_2 = serializers[1].instance
 
     destroy_data = {
         "data": {
-            "type": "definedCompound",
+            "type": compound_json_type,
             "id": compound_1.id,
             "attributes": {
                 "replacement_cid": compound_2.cid,
@@ -317,16 +336,17 @@ def test_compound_redirect(user_factory, defined_compound_factory):
         }
     }
     client.force_authenticate(user=admin_user)
-    resp = client.delete(f"/definedCompounds/{compound_1.id}", data=destroy_data)
+    resp = client.delete(f"/{compound_json_type}s/{compound_1.id}", data=destroy_data)
     assert resp.status_code == 204
 
-    # Non-admin should be redirected
-    client.force_authenticate(user=standard_user)
-    resp = client.get(f"/compounds/{compound_1.id}")
-    assert resp.status_code == 301
-    assert compound_2.id == int(resp.url.split("/")[-1])
+    for endpoint in [f"{compound_json_type}s", "compounds"]:
+        # Non-admin should be redirected
+        client.force_authenticate(user=standard_user)
+        resp = client.get(f"/{endpoint}/{compound_1.id}")
+        assert resp.status_code == 301
+        assert compound_2.id == int(resp.url.split("/")[-1])
 
-    # Admin should be able to retrieve it
-    client.force_authenticate(user=admin_user)
-    resp = client.get(f"/compounds/{compound_1.id}")
-    assert resp.status_code == 200
+        # Admin should be able to retrieve it
+        client.force_authenticate(user=admin_user)
+        resp = client.get(f"/{endpoint}/{compound_1.id}")
+        assert resp.status_code == 200
