@@ -182,7 +182,7 @@ def test_definedcompound_admin_user(user_factory, defined_compound_factory):
     "compound_factory", [DefinedCompoundFactory, IllDefinedCompoundFactory]
 )
 @pytest.mark.django_db
-def test_compound_soft_delete(user_factory, compound_factory):
+def test_compound_soft_delete(user, admin_user, compound_factory):
     """
     Tests:
     Compound records cannot be hard-deleted
@@ -196,8 +196,6 @@ def test_compound_soft_delete(user_factory, compound_factory):
         compound_json_type = "illDefinedCompound"
         model = IllDefinedCompound
     client = APIClient()
-    standard_user = user_factory.build(is_staff=False)
-    admin_user = user_factory.build(is_staff=True)
     compounds = [serializer.instance for serializer in compound_factory.create_batch(4)]
 
     # Compound 1 will replace 2 and 3
@@ -229,7 +227,7 @@ def test_compound_soft_delete(user_factory, compound_factory):
         cid_set = set(c["cid"] for c in resp.data["results"])
         assert len(cid_set) == 4
         # it should NOT be visible to non-admin user
-        client.force_authenticate(user=standard_user)
+        client.force_authenticate(user=user)
         resp = client.get(f"/{endpoint}")
         cid_set = set(c["cid"] for c in resp.data["results"])
         assert len(cid_set) == 2
@@ -275,7 +273,7 @@ def test_compound_soft_delete(user_factory, compound_factory):
     "compound_factory", [DefinedCompoundFactory, IllDefinedCompoundFactory]
 )
 @pytest.mark.django_db
-def test_compound_forbidden_soft_delete(user_factory, compound_factory):
+def test_compound_forbidden_soft_delete(user, compound_factory):
     """
     Tests:
     A non-admin user cannot perform the soft-deleted done in the test above
@@ -303,6 +301,7 @@ def test_compound_forbidden_soft_delete(user_factory, compound_factory):
     }
 
     resp = client.delete(f"/{compound_json_type}s/{compound_1.id}", data=destroy_data)
+    client.force_authenticate(user)
     assert resp.status_code == 403
     assert resp.data[0]["detail"].code == "not_authenticated"
 
@@ -311,15 +310,13 @@ def test_compound_forbidden_soft_delete(user_factory, compound_factory):
     "compound_factory", [DefinedCompoundFactory, IllDefinedCompoundFactory]
 )
 @pytest.mark.django_db
-def test_compound_redirect(user_factory, compound_factory):
+def test_compound_redirect(user, admin_user, compound_factory):
     """Tests that soft-deleted compounds will redirect when non-admin."""
     if compound_factory == DefinedCompoundFactory:
         compound_json_type = "definedCompound"
     elif compound_factory == IllDefinedCompoundFactory:
         compound_json_type = "illDefinedCompound"
     client = APIClient()
-    admin_user = user_factory.build(is_staff=True)
-    standard_user = user_factory.build(is_staff=False)
 
     serializers = compound_factory.create_batch(2)
     compound_1 = serializers[0].instance
@@ -341,7 +338,7 @@ def test_compound_redirect(user_factory, compound_factory):
 
     for endpoint in [f"{compound_json_type}s", "compounds"]:
         # Non-admin should be redirected
-        client.force_authenticate(user=standard_user)
+        client.force_authenticate(user=user)
         resp = client.get(f"/{endpoint}/{compound_1.id}")
         assert resp.status_code == 301
         assert compound_2.id == int(resp.url.split("/")[-1])

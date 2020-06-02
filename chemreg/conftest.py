@@ -41,6 +41,11 @@ def user() -> settings.AUTH_USER_MODEL:
 
 
 @pytest.fixture
+def admin_user() -> settings.AUTH_USER_MODEL:
+    return UserFactory(is_staff=True)
+
+
+@pytest.fixture
 def user_factory() -> UserFactory:
     return UserFactory
 
