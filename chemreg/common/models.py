@@ -62,3 +62,29 @@ class Source(CommonInfo):
     long_description = models.TextField(
         verbose_name="long description", help_text="Source long description",
     )
+
+
+class SubstanceType(CommonInfo):
+    """Controlled vocabulary for Substances
+
+    Attributes:
+        Name = String (Less than 50 character, url safe, unique, required field)
+        Label = String (Less than 100 characters, unique, required field)
+        Short Description = String (Less than 500 characters, required field)
+        Long Description = TEXT (required field)
+    """
+
+    name = models.SlugField(
+        max_length=49, verbose_name="name", help_text="Substance name", unique=True,
+    )
+    label = models.CharField(
+        max_length=99, verbose_name="label", help_text="Substance label", unique=True,
+    )
+    short_description = models.CharField(
+        max_length=499,
+        verbose_name="short description",
+        help_text="Substance short description",
+    )
+    long_description = models.TextField(
+        verbose_name="long description", help_text="Substance long description",
+    )

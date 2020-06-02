@@ -3,7 +3,7 @@ from django.db import models
 import pytest
 from crum import impersonate
 
-from chemreg.common.models import CommonInfo, Source
+from chemreg.common.models import CommonInfo, Source, SubstanceType
 
 
 def test_commoninfo_attr():
@@ -56,4 +56,21 @@ def test_source_model():
     assert isinstance(short_description, models.CharField)
     assert short_description.max_length == 499
     long_description = Source._meta.get_field("long_description")
+    assert isinstance(long_description, models.TextField)
+
+
+def test_substance_type():
+    """Tests the validity of the Substance Type Model's attributes"""
+    name = SubstanceType._meta.get_field("name")
+    assert isinstance(name, models.SlugField)
+    assert name.max_length == 49
+    assert name.unique
+    label = SubstanceType._meta.get_field("label")
+    assert isinstance(label, models.CharField)
+    assert label.max_length == 99
+    assert label.unique
+    short_description = SubstanceType._meta.get_field("short_description")
+    assert isinstance(short_description, models.CharField)
+    assert short_description.max_length == 499
+    long_description = SubstanceType._meta.get_field("long_description")
     assert isinstance(long_description, models.TextField)
