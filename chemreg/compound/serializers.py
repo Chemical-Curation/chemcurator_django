@@ -34,13 +34,14 @@ class BaseCompoundSerializer(HyperlinkedModelSerializer):
     replaced_by = "chemreg.compound.serializers.CompoundSerializer"
 
     class Meta:
-        fields = ["replaced_by"]
+        fields = ["qc_note", "replaced_by"]
         model = BaseCompound
 
     def __init__(self, *args, is_admin=False, **kwargs):
         super().__init__(*args, **kwargs)
         # Remove admin-only fields
         if not is_admin:
+            self.fields.pop("qc_note")
             self.fields.pop("replaced_by")
 
 
@@ -77,6 +78,7 @@ class DefinedCompoundSerializer(BaseCompoundSerializer):
             "molfile_v2000",
             "molfile_v3000",
             "smiles",
+            "qc_note",
             "replaced_by",
         ]
         extra_kwargs = {"molfile_v3000": {"required": False, "trim_whitespace": False}}
@@ -165,7 +167,7 @@ class IllDefinedCompoundSerializer(BaseCompoundSerializer):
 
     class Meta:
         model = IllDefinedCompound
-        fields = ["cid", "mrvfile", "query_structure_type", "replaced_by"]
+        fields = ["cid", "mrvfile", "query_structure_type", "qc_note", "replaced_by"]
 
 
 class CompoundSerializer(PolymorphicModelSerializer):
