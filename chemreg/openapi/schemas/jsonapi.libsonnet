@@ -94,7 +94,6 @@ local ModelTemplate = {
         ]
       )
     ),
-
 };
 
 local AttributeTemplate(attributeObj) = {
