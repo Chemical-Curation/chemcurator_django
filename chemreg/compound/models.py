@@ -4,7 +4,7 @@ from django.utils.functional import cached_property
 from indigo import Indigo, IndigoException
 from polymorphic.models import PolymorphicModel
 
-from chemreg.common.models import CommonInfo
+from chemreg.common.models import CommonInfo, ControlledVocabulary
 from chemreg.compound.fields import StructureAliasField
 from chemreg.compound.utils import build_cid
 from chemreg.compound.validators import (
@@ -62,7 +62,7 @@ class DefinedCompound(BaseCompound):
         return indigo.loadStructure(structureStr=self.molfile_v3000)
 
 
-class QueryStructureType(CommonInfo):
+class QueryStructureType(ControlledVocabulary):
     """A controlled vocabulary
 
     Attributes:
@@ -72,30 +72,7 @@ class QueryStructureType(CommonInfo):
     Long Description = TEXT (required field)
     """
 
-    name = models.SlugField(
-        max_length=49,
-        verbose_name="name",
-        help_text="Query structure type name",
-        unique=True,
-    )
-    label = models.CharField(
-        max_length=99,
-        verbose_name="label",
-        help_text="Query structure type label",
-        unique=True,
-    )
-    short_description = models.CharField(
-        max_length=499,
-        verbose_name="short description",
-        help_text="Query structure type short description",
-    )
-    long_description = models.TextField(
-        verbose_name="long description",
-        help_text="Query structure type long description",
-    )
-
-    def __str__(self):
-        return self.label
+    pass
 
 
 def get_illdefined_qst():
