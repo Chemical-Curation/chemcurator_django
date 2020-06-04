@@ -44,6 +44,7 @@ class ControlledVocabulary(CommonInfo):
     label = models.CharField(max_length=99, unique=True)
     short_description = models.CharField(max_length=499)
     long_description = models.TextField()
+    deprecated = models.BooleanField(default=False)
 
     class Meta:
         abstract = True
