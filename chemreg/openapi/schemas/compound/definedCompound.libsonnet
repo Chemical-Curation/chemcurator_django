@@ -12,6 +12,8 @@ local baseCompound = import 'baseCompound.libsonnet';
   ],
   attributes: {
     cid: baseCompound.attributes.cid,
+    qcNote: baseCompound.attributes.qcNote,
+    replacementCid: baseCompound.attributes.replacementCid,
     molfileV3000: {
       type: 'string',
       description: 'A [v3000 MDL Molfile](https://en.wikipedia.org/wiki/Chemical_table_file#The_Extended_Connection_Table_(V3000)) representing this compound. Newlines must be escaped (e.g. `\\n`) and spaces preserved.',

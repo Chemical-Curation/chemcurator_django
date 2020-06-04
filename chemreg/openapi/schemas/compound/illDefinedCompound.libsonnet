@@ -7,6 +7,8 @@ local queryStructureType = import 'queryStructureType.libsonnet';
   description: 'Everything about ill defined compounds.',
   attributes: {
     cid: baseCompound.attributes.cid,
+    qcNote: baseCompound.attributes.qcNote,
+    replacementCid: baseCompound.attributes.replacementCid,
     mrvfile: {
       type: 'string',
       description: 'The [ChemAxon MRV format](https://docs.chemaxon.com/display/docs/Marvin_Documents_-_MRV.html) representation for this compound.',
