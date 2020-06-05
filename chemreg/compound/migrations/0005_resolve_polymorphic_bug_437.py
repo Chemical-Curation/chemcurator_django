@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("compound", "0003_soft_delete_attributes"),
+        ("compound", "0004_soft_delete_attributes"),
     ]
 
     operations = [

@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("compound", "0002_alter_cid_inchikey"),
+        ("compound", "0003_inherit_controlled_vocabulary"),
     ]
 
     operations = [
