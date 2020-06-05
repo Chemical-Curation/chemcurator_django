@@ -156,7 +156,13 @@ class QueryStructureTypeSerializer(HyperlinkedModelSerializer):
 
     class Meta:
         model = QueryStructureType
-        fields = ["name", "label", "short_description", "long_description"]
+        fields = [
+            "name",
+            "label",
+            "short_description",
+            "long_description",
+            "deprecated",
+        ]
 
 
 class IllDefinedCompoundSerializer(BaseCompoundSerializer):
@@ -167,6 +173,13 @@ class IllDefinedCompoundSerializer(BaseCompoundSerializer):
     class Meta:
         model = IllDefinedCompound
         fields = ["cid", "mrvfile", "query_structure_type", "qc_note", "replaced_by"]
+
+    def validate_query_structure_type(self, data):
+        if data.deprecated:
+            raise ValidationError(
+                "The Query Structure Type submitted for this compound is no longer supported."
+            )
+        return data
 
 
 class CompoundSerializer(PolymorphicModelSerializer):

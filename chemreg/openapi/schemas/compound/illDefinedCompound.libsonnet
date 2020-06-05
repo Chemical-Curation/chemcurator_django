@@ -22,4 +22,12 @@ local queryStructureType = import 'queryStructureType.libsonnet';
       default: '1',
     },
   ],
+  errors: [
+    {
+      status: 400,
+      detail: 'The Query Structure Type submitted for this compound is no longer supported.',
+      pointer: '/data/attributes/queryStructureType',
+      code: 'invalid',
+    },
+  ],
 }

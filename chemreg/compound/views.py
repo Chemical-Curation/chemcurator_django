@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 
+from chemreg.common.mixins import DeprecateDeleteMixin
 from chemreg.compound.filters import DefinedCompoundFilter
 from chemreg.compound.models import (
     BaseCompound,
@@ -135,7 +136,7 @@ class IllDefinedCompoundViewSet(
     }
 
 
-class QueryStructureTypeViewSet(ModelViewSet):
+class QueryStructureTypeViewSet(DeprecateDeleteMixin, ModelViewSet):
 
     queryset = QueryStructureType.objects.all()
     serializer_class = QueryStructureTypeSerializer
