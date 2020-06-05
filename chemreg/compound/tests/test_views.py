@@ -1,6 +1,6 @@
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAdminUser
-from rest_framework.test import APIClient, APIRequestFactory, force_authenticate
+from rest_framework.test import force_authenticate
 
 import pytest
 
@@ -9,20 +9,23 @@ from chemreg.compound.views import CompoundViewSet, DefinedCompoundViewSet
 from chemreg.jsonapi.views import ReadOnlyModelViewSet
 
 
-def test_definedcompound_override():
+def test_definedcompound_override(api_request_factory):
     """Test that passing an override query parameter works in DefinedCompoundViewSet."""
-    factory = APIRequestFactory()
     view = DefinedCompoundViewSet(
         action_map={"post": "create"}, kwargs={}, format_kwarg={}
     )
 
-    view.request = view.initialize_request(factory.post("/definedCompounds"))
+    view.request = view.initialize_request(
+        api_request_factory.post("/definedCompounds")
+    )
     for field in ("molfile_v2000", "molfile_v3000", "smiles"):
         assert (
             validate_inchikey_unique in view.get_serializer().fields[field].validators
         )
 
-    view.request = view.initialize_request(factory.post("/definedCompounds?override"))
+    view.request = view.initialize_request(
+        api_request_factory.post("/definedCompounds?override")
+    )
     assert any(isinstance(p, IsAdminUser) for p in view.get_permissions())
     for field in ("molfile_v2000", "molfile_v3000", "smiles"):
         assert (
@@ -30,7 +33,9 @@ def test_definedcompound_override():
             not in view.get_serializer().fields[field].validators
         )
 
-    view.request = view.initialize_request(factory.post("/definedCompounds?overRide"))
+    view.request = view.initialize_request(
+        api_request_factory.post("/definedCompounds?overRide")
+    )
     with pytest.raises(ValidationError) as err:
         view.create(view.request)
     assert err.value.status_code == 400
@@ -39,14 +44,15 @@ def test_definedcompound_override():
 
 
 @pytest.mark.django_db
-def test_definedcompound_detail_attrs(user_factory, defined_compound_factory):
+def test_definedcompound_detail_attrs(
+    user_factory, defined_compound_factory, api_request_factory
+):
     """Test that detail view includes extra SerializerMethodField attributes."""
-    factory = APIRequestFactory()
     view = DefinedCompoundViewSet.as_view({"get": "list"})
     serializer = defined_compound_factory.build()
     assert serializer.is_valid()
     compound = serializer.save()
-    request = factory.get("/definedCompounds")
+    request = api_request_factory.get("/definedCompounds")
     user = user_factory.build()
     force_authenticate(request, user=user)
     response = view(request)
@@ -54,7 +60,7 @@ def test_definedcompound_detail_attrs(user_factory, defined_compound_factory):
     assert list(attrs.keys()) == ["cid", "inchikey", "molfile_v3000", "url"]
 
     view = DefinedCompoundViewSet.as_view({"get": "retrieve"})
-    request = factory.get("/definedCompounds/")
+    request = api_request_factory.get("/definedCompounds")
     force_authenticate(request, user=user)
     response = view(request, pk=compound.pk)
     attrs = response.data
@@ -71,10 +77,11 @@ def test_definedcompound_detail_attrs(user_factory, defined_compound_factory):
 
 
 @pytest.mark.django_db
-def test_ill_defined_compound_admin_user(user_factory, ill_defined_compound_factory):
+def test_ill_defined_compound_admin_user(
+    user_factory, ill_defined_compound_factory, client
+):
     """Tests and Validates the outcomes of multiple POST requests performed by an
     User both with and without ADMIN permissions"""
-    client = APIClient()
     user = user_factory.build()
     user.is_staff = True
     client.force_authenticate(user=user)
@@ -85,7 +92,6 @@ def test_ill_defined_compound_admin_user(user_factory, ill_defined_compound_fact
         {"data": {"type": "illDefinedCompound", "attributes": idc.initial_data}},
     )
     assert response.status_code == 201
-    client = APIClient()
     user = user_factory.build()
     assert user.is_staff is False
     client.force_authenticate(user=user)
@@ -114,10 +120,9 @@ def test_compound_view():
 
 
 @pytest.mark.django_db
-def test_definedcompound_admin_user(user_factory, defined_compound_factory):
+def test_definedcompound_admin_user(user_factory, defined_compound_factory, client):
     """Tests and Validates the outcomes of multiple POST requests performed by an
     User both with and without ADMIN permissions"""
-    client = APIClient()
     user = user_factory.build()
     user.is_staff = True
     client.force_authenticate(user=user)
@@ -150,7 +155,6 @@ def test_definedcompound_admin_user(user_factory, defined_compound_factory):
         str(response.data[0]["detail"])
         == "CID must be included when InchIKey is defined."
     )
-    client = APIClient()
     user = user_factory.build()
     assert user.is_staff is False
     client.force_authenticate(user=user)
@@ -165,4 +169,55 @@ def test_definedcompound_admin_user(user_factory, defined_compound_factory):
     assert (
         str(response.data[0]["detail"])
         == "You do not have permission to perform this action."
+    )
+
+
+@pytest.mark.django_db
+def test_query_structure_type_delete(
+    user_factory, query_structure_type_factory, client
+):
+    """DELETE will deprecate the structure but not remove from DB"""
+    qst = query_structure_type_factory.build()
+    assert qst.is_valid()
+    instance = qst.save()
+    assert instance.deprecated is False
+    user = user_factory.build()
+    client.force_authenticate(user=user)
+    resp = client.delete(f"/queryStructureTypes/{instance.pk}")
+    assert resp.status_code == 204
+    instance.refresh_from_db()
+    assert instance.deprecated is True
+    QueryStructureType = instance._meta.model  # should we just import this?
+    assert QueryStructureType.objects.filter(pk=f"{instance.pk}").exists()
+
+
+@pytest.mark.django_db
+def test_deprecated_qst_in_illdefined(
+    user_factory, query_structure_type_factory, ill_defined_compound_factory, client
+):
+    user = user_factory.build()
+    client.force_authenticate(user=user)
+    qst = query_structure_type_factory.build(deprecated=True)
+    assert qst.is_valid()
+    deprecated_structure = qst.save()
+    idc = ill_defined_compound_factory.build()
+    post_data = {
+        "data": {
+            "type": "illDefinedCompound",
+            "attributes": idc.initial_data,  # mrvfile
+            "relationships": {
+                "query_structure_type": {
+                    "data": {
+                        "type": "queryStructureType",
+                        "id": deprecated_structure.pk,
+                    }
+                },
+            },
+        }
+    }
+    response = client.post("/illDefinedCompounds", post_data)
+    assert response.status_code == 400
+    assert (
+        str(response.data[0]["detail"])
+        == "The Query Structure Type submitted for this compound is no longer supported."
     )

@@ -1,5 +1,6 @@
 from rest_framework.permissions import IsAdminUser
 
+from chemreg.common.mixins import DeprecateDeleteMixin
 from chemreg.compound.filters import DefinedCompoundFilter
 from chemreg.compound.models import (
     BaseCompound,
@@ -73,7 +74,7 @@ class IllDefinedCompoundViewSet(CIDPermissionsMixin, ModelViewSet):
     }
 
 
-class QueryStructureTypeViewSet(ModelViewSet):
+class QueryStructureTypeViewSet(DeprecateDeleteMixin, ModelViewSet):
 
     queryset = QueryStructureType.objects.all()
     serializer_class = QueryStructureTypeSerializer

@@ -1,7 +1,7 @@
 {
   app: 'Compound',
   type: 'queryStructureType',
-  description: 'Everything about query structure types.',
+  description: 'Query structure types will persist on DELETE and will be flagged as `"deprecated"` disabling them from being related to an illDefinedCompound.',
   attributes: {
     name: {
       type: 'string',
@@ -18,6 +18,10 @@
     },
     longDescription: {
       type: 'string',
+    },
+    deprecated: {
+      type: 'boolean',
+      readOnly: true,
     },
   },
 }

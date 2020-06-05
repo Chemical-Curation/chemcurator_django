@@ -1,11 +1,8 @@
-from rest_framework.test import APIClient
-
 import pytest
 
 
 @pytest.mark.django_db
-def test_defined_compound_filters(defined_compound_factory, user):
-    client = APIClient()
+def test_defined_compound_filters(defined_compound_factory, user, client):
     client.force_authenticate(user=user)
     compounds = defined_compound_factory.create_batch(2)
     # Alter the molfile so that we can ensure the lookup is done on the inchikey
