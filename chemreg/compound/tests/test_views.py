@@ -196,28 +196,28 @@ def test_compound_soft_delete(user, admin_user, compound_factory):
         compound_json_type = "illDefinedCompound"
         model = IllDefinedCompound
     client = APIClient()
-    compounds = [serializer.instance for serializer in compound_factory.create_batch(4)]
+    compounds = [serializer.instance for serializer in compound_factory.create_batch(3)]
 
     # Compound 1 will replace 2 and 3
     client.force_authenticate(user=admin_user)
-    for compound in compounds[2:]:
+    for compound in compounds[1:]:
         destroy_data = {
             "data": {
                 "type": compound_json_type,
                 "id": compound.id,
                 "attributes": {
-                    "replacementCid": compounds[1].cid,
-                    "qcNote": f"replacing compound {compound.id} with compound {compounds[1].id}",
+                    "replacementCid": compounds[0].cid,
+                    "qcNote": f"replacing compound {compound.id} with compound {compounds[0].id}",
                 },
             }
         }
         resp = client.delete(f"/{compound_json_type}s/{compound.id}", data=destroy_data)
         assert resp.status_code == 204
         deleted_compound = model.objects.with_deleted().get(pk=compound.pk)
-        assert deleted_compound.replaced_by == compounds[1]
+        assert deleted_compound.replaced_by == compounds[0]
         assert (
             deleted_compound.qc_note
-            == f"replacing compound {compound.id} with compound {compounds[1].id}"
+            == f"replacing compound {compound.id} with compound {compounds[0].id}"
         )
 
     # the deleted compounds should be visible to an admin user
@@ -225,48 +225,14 @@ def test_compound_soft_delete(user, admin_user, compound_factory):
         client.force_authenticate(user=admin_user)
         resp = client.get(f"/{endpoint}")
         cid_set = set(c["cid"] for c in resp.data["results"])
-        assert len(cid_set) == 4
+        assert len(cid_set) == 3
         # it should NOT be visible to non-admin user
         client.force_authenticate(user=user)
         resp = client.get(f"/{endpoint}")
         cid_set = set(c["cid"] for c in resp.data["results"])
-        assert len(cid_set) == 2
+        assert len(cid_set) == 1
+        assert compounds[1].cid not in cid_set
         assert compounds[2].cid not in cid_set
-        assert compounds[3].cid not in cid_set
-
-    # Compound 0 will replace compound 1
-    client.force_authenticate(user=admin_user)
-    destroy_data = {
-        "data": {
-            "type": compound_json_type,
-            "id": compounds[1].id,
-            "attributes": {
-                "replacementCid": compounds[0].cid,
-                "qcNote": f"replacing compound {compounds[1].id} with compound {compounds[0].id}",
-            },
-        }
-    }
-    resp = client.delete(f"/{compound_json_type}s/{compounds[1].id}", data=destroy_data)
-    assert resp.status_code == 204
-    deleted_compounds = [
-        model.objects.with_deleted().get(pk=compound.pk) for compound in compounds
-    ]
-    # Compounds 1, 2, and 3 should be replaced by compound 0
-    for deleted_compound in deleted_compounds[1:]:
-        assert deleted_compound.replaced_by == compounds[0]
-    assert (
-        deleted_compounds[1].qc_note
-        == f"replacing compound {compounds[1].id} with compound {compounds[0].id}"
-    )
-    # Make sure the qc_note for compounds 2 and 3 are unchanged
-    assert (
-        deleted_compounds[2].qc_note
-        == f"replacing compound {compounds[2].id} with compound {compounds[1].id}"
-    )
-    assert (
-        deleted_compounds[3].qc_note
-        == f"replacing compound {compounds[3].id} with compound {compounds[1].id}"
-    )
 
 
 @pytest.mark.parametrize(
@@ -318,34 +284,54 @@ def test_compound_redirect(user, admin_user, compound_factory):
         compound_json_type = "illDefinedCompound"
     client = APIClient()
 
-    serializers = compound_factory.create_batch(2)
+    serializers = compound_factory.create_batch(3)
     compound_1 = serializers[0].instance
     compound_2 = serializers[1].instance
+    compound_3 = serializers[2].instance
 
+    # compound_2 will replace compound_3
+    client.force_authenticate(user=admin_user)
     destroy_data = {
         "data": {
             "type": compound_json_type,
-            "id": compound_1.id,
+            "id": compound_3.id,
             "attributes": {
                 "replacement_cid": compound_2.cid,
                 "qc_note": "replacing with another",
             },
         }
     }
-    client.force_authenticate(user=admin_user)
-    resp = client.delete(f"/{compound_json_type}s/{compound_1.id}", data=destroy_data)
+    resp = client.delete(f"/{compound_json_type}s/{compound_3.id}", data=destroy_data)
+    assert resp.status_code == 204
+    # compound_1 will replace compound_2
+    destroy_data = {
+        "data": {
+            "type": compound_json_type,
+            "id": compound_2.id,
+            "attributes": {
+                "replacement_cid": compound_1.cid,
+                "qc_note": "replacing with another",
+            },
+        }
+    }
+    resp = client.delete(f"/{compound_json_type}s/{compound_2.id}", data=destroy_data)
     assert resp.status_code == 204
 
     for endpoint in [f"{compound_json_type}s", "compounds"]:
         # Non-admin should be redirected
         client.force_authenticate(user=user)
-        resp = client.get(f"/{endpoint}/{compound_1.id}")
+        resp = client.get(f"/{endpoint}/{compound_3.id}")
         assert resp.status_code == 301
         assert compound_2.id == int(resp.url.split("/")[-1])
+        resp = client.get(f"/{endpoint}/{compound_2.id}")
+        assert resp.status_code == 301
+        assert compound_1.id == int(resp.url.split("/")[-1])
 
         # Admin should be able to retrieve it
         client.force_authenticate(user=admin_user)
-        resp = client.get(f"/{endpoint}/{compound_1.id}")
+        resp = client.get(f"/{endpoint}/{compound_3.id}")
+        assert resp.status_code == 200
+        resp = client.get(f"/{endpoint}/{compound_2.id}")
         assert resp.status_code == 200
 
 
