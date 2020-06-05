@@ -237,7 +237,7 @@ def test_deprecated_qst_in_illdefined(
     "compound_factory", [DefinedCompoundFactory, IllDefinedCompoundFactory]
 )
 @pytest.mark.django_db
-def test_compound_soft_delete(user, admin_user, compound_factory):
+def test_compound_soft_delete(user, admin_user, compound_factory, client):
     """
     Tests:
     Compound records cannot be hard-deleted
@@ -250,7 +250,6 @@ def test_compound_soft_delete(user, admin_user, compound_factory):
     elif compound_factory == IllDefinedCompoundFactory:
         compound_json_type = "illDefinedCompound"
         model = IllDefinedCompound
-    client = APIClient()
     compounds = [serializer.instance for serializer in compound_factory.create_batch(3)]
 
     # Compound 1 will replace 2 and 3
@@ -294,7 +293,7 @@ def test_compound_soft_delete(user, admin_user, compound_factory):
     "compound_factory", [DefinedCompoundFactory, IllDefinedCompoundFactory]
 )
 @pytest.mark.django_db
-def test_compound_forbidden_soft_delete(user, compound_factory):
+def test_compound_forbidden_soft_delete(user, compound_factory, client):
     """
     Tests:
     A non-admin user cannot perform the soft-deleted done in the test above
@@ -303,7 +302,6 @@ def test_compound_forbidden_soft_delete(user, compound_factory):
         compound_json_type = "definedCompound"
     elif compound_factory == IllDefinedCompoundFactory:
         compound_json_type = "illDefinedCompound"
-    client = APIClient()
 
     serializers = compound_factory.create_batch(2)
     compound_1 = serializers[0].instance
@@ -331,13 +329,12 @@ def test_compound_forbidden_soft_delete(user, compound_factory):
     "compound_factory", [DefinedCompoundFactory, IllDefinedCompoundFactory]
 )
 @pytest.mark.django_db
-def test_compound_redirect(user, admin_user, compound_factory):
+def test_compound_redirect(user, admin_user, compound_factory, client):
     """Tests that soft-deleted compounds will redirect when non-admin."""
     if compound_factory == DefinedCompoundFactory:
         compound_json_type = "definedCompound"
     elif compound_factory == IllDefinedCompoundFactory:
         compound_json_type = "illDefinedCompound"
-    client = APIClient()
 
     serializers = compound_factory.create_batch(3)
     compound_1 = serializers[0].instance
