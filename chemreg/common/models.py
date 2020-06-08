@@ -47,36 +47,8 @@ class ControlledVocabulary(CommonInfo):
     long_description = models.TextField()
     deprecated = models.BooleanField(default=False)
 
-    class Meta:
-        abstract = True
-        ordering = ["pk"]
-        base_manager_name = "objects"
-
     def __str__(self):
         return self.label
 
-
-class Source(ControlledVocabulary):
-    """Controlled vocabulary for Sources
-
-    Attributes:
-        Name = String (Less than 50 character, url safe, unique, required field)
-        Label = String (Less than 100 characters, unique, required field)
-        Short Description = String (Less than 500 characters, required field)
-        Long Description = TEXT (required field)
-    """
-
-    pass
-
-
-class SubstanceType(ControlledVocabulary):
-    """Controlled vocabulary for Substances
-
-    Attributes:
-        Name = String (Less than 50 character, url safe, unique, required field)
-        Label = String (Less than 100 characters, unique, required field)
-        Short Description = String (Less than 500 characters, required field)
-        Long Description = TEXT (required field)
-    """
-
-    pass
+    class Meta(CommonInfo.Meta):
+        abstract = True
