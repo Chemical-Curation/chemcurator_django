@@ -43,7 +43,7 @@ class SoftDeleteCompoundManager(PolymorphicManager):
         return super().get_queryset()
 
 
-class BaseCompound(PolymorphicModel, CommonInfo):
+class BaseCompound(CommonInfo, PolymorphicModel):
     """The base class for compounds.
 
     This model shouldn't exist on it's own. It will always be subclassed
@@ -71,9 +71,6 @@ class BaseCompound(PolymorphicModel, CommonInfo):
     )
     qc_note = models.TextField(blank=True, default="")
     objects = SoftDeleteCompoundManager.from_queryset(SoftDeleteCompoundQuerySet)()
-
-    class Meta:
-        ordering = ["pk"]
 
     @property
     def is_deleted(self):

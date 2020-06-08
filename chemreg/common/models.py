@@ -36,6 +36,7 @@ class CommonInfo(models.Model):
     class Meta:
         abstract = True
         ordering = ["pk"]
+        base_manager_name = "objects"
 
 
 class ControlledVocabulary(CommonInfo):
@@ -48,6 +49,8 @@ class ControlledVocabulary(CommonInfo):
 
     class Meta:
         abstract = True
+        ordering = ["pk"]
+        base_manager_name = "objects"
 
     def __str__(self):
         return self.label
