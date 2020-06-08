@@ -152,5 +152,5 @@ class IllDefinedCompound(BaseCompound):
         "QueryStructureType", on_delete=models.PROTECT, default=get_illdefined_qst
     )
 
-    class Meta:
+    class Meta(BaseCompound.Meta):
         verbose_name = "ill-defined compound"
