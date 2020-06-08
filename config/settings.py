@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "chemreg.common.apps.CommonConfig",
     "chemreg.compound.apps.CompoundConfig",
     "chemreg.openapi.apps.OpenAPIConfig",
+    "chemreg.substance.apps.SubstanceConfig",
     "chemreg.users.apps.UsersConfig",
     "chemreg.utils.apps.UtilsConfig",
 ]
