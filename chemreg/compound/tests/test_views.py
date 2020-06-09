@@ -14,6 +14,19 @@ from chemreg.compound.views import CompoundViewSet, DefinedCompoundViewSet
 from chemreg.jsonapi.views import ReadOnlyModelViewSet
 
 
+def build_destroy_data(compound_json_type, compound1, compound2):
+    return {
+        "data": {
+            "type": compound_json_type,
+            "id": compound1.id,
+            "attributes": {
+                "replacementCid": compound2.cid,
+                "qcNote": f"replacing compound {compound1.id} with compound {compound2.id}",
+            },
+        }
+    }
+
+
 def test_definedcompound_override(api_request_factory):
     """Test that passing an override query parameter works in DefinedCompoundViewSet."""
     view = DefinedCompoundViewSet(
@@ -255,16 +268,7 @@ def test_compound_soft_delete(user, admin_user, compound_factory, client):
     # Compound 1 will replace 2 and 3
     client.force_authenticate(user=admin_user)
     for compound in compounds[1:]:
-        destroy_data = {
-            "data": {
-                "type": compound_json_type,
-                "id": compound.id,
-                "attributes": {
-                    "replacementCid": compounds[0].cid,
-                    "qcNote": f"replacing compound {compound.id} with compound {compounds[0].id}",
-                },
-            }
-        }
+        destroy_data = build_destroy_data(compound_json_type, compound, compounds[0])
         resp = client.delete(f"/{compound_json_type}s/{compound.id}", data=destroy_data)
         assert resp.status_code == 204
         deleted_compound = model.objects.with_deleted().get(pk=compound.pk)
@@ -308,17 +312,7 @@ def test_compound_forbidden_soft_delete(user, compound_factory, client):
     compound_2 = serializers[1].instance
 
     # The standard user should not be allowed to delete the compound
-    destroy_data = {
-        "data": {
-            "type": compound_json_type,
-            "id": compound_1.id,
-            "attributes": {
-                "replacementCid": compound_2.cid,
-                "qcNote": "replacing with another",
-            },
-        }
-    }
-
+    destroy_data = build_destroy_data(compound_json_type, compound_1, compound_2)
     resp = client.delete(f"/{compound_json_type}s/{compound_1.id}", data=destroy_data)
     client.force_authenticate(user)
     assert resp.status_code == 403
@@ -343,29 +337,11 @@ def test_compound_redirect(user, admin_user, compound_factory, client):
 
     # compound_2 will replace compound_3
     client.force_authenticate(user=admin_user)
-    destroy_data = {
-        "data": {
-            "type": compound_json_type,
-            "id": compound_3.id,
-            "attributes": {
-                "replacement_cid": compound_2.cid,
-                "qc_note": "replacing with another",
-            },
-        }
-    }
+    destroy_data = build_destroy_data(compound_json_type, compound_3, compound_2)
     resp = client.delete(f"/{compound_json_type}s/{compound_3.id}", data=destroy_data)
     assert resp.status_code == 204
     # compound_1 will replace compound_2
-    destroy_data = {
-        "data": {
-            "type": compound_json_type,
-            "id": compound_2.id,
-            "attributes": {
-                "replacement_cid": compound_1.cid,
-                "qc_note": "replacing with another",
-            },
-        }
-    }
+    destroy_data = build_destroy_data(compound_json_type, compound_2, compound_1)
     resp = client.delete(f"/{compound_json_type}s/{compound_2.id}", data=destroy_data)
     assert resp.status_code == 204
 
@@ -408,3 +384,21 @@ def test_compound_field_exclusion(
             for result in resp.data["results"]:
                 assert "replaced_by" not in result
                 assert "qc_note" not in result
+
+
+@pytest.mark.django_db
+def test_compound_delete_type_change(
+    user, admin_user, defined_compound_factory, ill_defined_compound_factory, client
+):
+    """Tests that soft delete can replace compound of another type and maintain a
+    redirect to the user that will provide the `replaced_by` compound """
+    defined = defined_compound_factory.create().instance
+    ill_defined = ill_defined_compound_factory.create().instance
+    client.force_authenticate(user=admin_user)
+    destroy_data = build_destroy_data("illDefinedCompound", ill_defined, defined)
+    resp = client.delete(f"/illDefinedCompounds/{ill_defined.id}", data=destroy_data)
+    assert resp.status_code == 204
+    client.force_authenticate(user)
+    resp = client.get(f"/illDefinedCompounds/{ill_defined.id}")
+    assert resp.status_code == 301
+    assert resp.url == f"/compounds/{defined.id}"

@@ -2,6 +2,7 @@ from django.http import HttpResponsePermanentRedirect
 from rest_framework import status
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 
 from chemreg.common.mixins import DeprecateDeleteMixin
 from chemreg.compound.filters import DefinedCompoundFilter
@@ -63,7 +64,7 @@ class SoftDeleteCompoundMixin:
 
         instance = self.get_object()
         if instance.is_deleted and not self._is_admin:
-            redirect_url = self.reverse_action("detail", [instance.replaced_by_id])
+            redirect_url = reverse("basecompound-detail", [instance.replaced_by_id])
             return HttpResponsePermanentRedirect(redirect_url)
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
