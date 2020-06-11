@@ -185,7 +185,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "chemreg.jsonapi.pagination.JsonApiPageNumberPagination",
     "DEFAULT_PARSER_CLASSES": ["chemreg.jsonapi.parsers.JSONParser"],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticatedOrReadOnly"
+        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
     ],
     "DEFAULT_RENDERER_CLASSES": ["chemreg.jsonapi.renderers.JSONRenderer"],
     "EXCEPTION_HANDLER": "rest_framework_json_api.exceptions.exception_handler",
