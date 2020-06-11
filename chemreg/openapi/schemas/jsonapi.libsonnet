@@ -964,6 +964,7 @@ local buildPaths(obj) =
   {
     ['/' + obj.typePlural + '/{id}']: {
       [if !obj.writeOnly then 'get']: {
+        security: [{ anonAuth: [] }, { basicAuth: [] }, { cookieAuth: [] }],
         tags: [obj.type],
         summary: 'Fetch resource',
         parameters: builtParameters.read,
@@ -1020,6 +1021,7 @@ local buildPaths(obj) =
     },
     ['/' + obj.typePlural]: {
       [if !obj.writeOnly then 'get']: {
+        security: [{ anonAuth: [] }, { basicAuth: [] }, { cookieAuth: [] }],
         tags: [obj.type],
         summary: 'List resources',
         parameters: builtParameters.readList,
@@ -1060,6 +1062,7 @@ local buildPaths(obj) =
   } + {
     ['/' + obj.typePlural + '/{id}/relationships/' + relatedObj.object.typePlural]: {
       [if !obj.writeOnly then 'get']: {
+        security: [{ anonAuth: [] }, { basicAuth: [] }, { cookieAuth: [] }],
         tags: [obj.type],
         summary: 'Fetch related resource identifiers',
         parameters: builtParameters.write,
@@ -1130,6 +1133,7 @@ local buildPaths(obj) =
   } + {
     ['/' + obj.typePlural + '/{id}/' + relatedObj.object.typePlural]: {
       [if !obj.writeOnly then 'get']: {
+        security: [{ anonAuth: [] }, { basicAuth: [] }, { cookieAuth: [] }],
         tags: [obj.type],
         summary: 'Fetch related resources',
         parameters: builtParameters.write,
@@ -1149,6 +1153,7 @@ local buildPaths(obj) =
   } + {
     ['/' + obj.typePlural + '/{id}/relationships/' + relatedObj.object.type]: {
       [if !obj.writeOnly then 'get']: {
+        security: [{ anonAuth: [] }, { basicAuth: [] }, { cookieAuth: [] }],
         tags: [obj.type],
         summary: 'Fetch related resource identifier',
         parameters: builtParameters.write,
@@ -1185,6 +1190,7 @@ local buildPaths(obj) =
   } + {
     ['/' + obj.typePlural + '/{id}/' + relatedObj.object.type]: {
       [if !obj.writeOnly then 'get']: {
+        security: [{ anonAuth: [] }, { basicAuth: [] }, { cookieAuth: [] }],
         tags: [obj.type],
         summary: 'Fetch related resource',
         parameters: builtParameters.write,
@@ -1232,6 +1238,11 @@ local buildSpec(objs, description) = {
   },
   components: {
     securitySchemes: {
+      anonAuth: {
+        type: 'http',
+        scheme: 'anonymous',
+        description: 'An anonymous request does not contain any authentication information. This is equivalent to granting everyone access to the resource.',
+      },
       basicAuth: {
         type: 'http',
         scheme: 'basic',
