@@ -1238,11 +1238,6 @@ local buildSpec(objs, description) = {
   },
   components: {
     securitySchemes: {
-      anonAuth: {
-        type: 'http',
-        scheme: 'anonymous',
-        description: 'An anonymous request does not contain any authentication information. This is equivalent to granting everyone access to the resource.',
-      },
       basicAuth: {
         type: 'http',
         scheme: 'basic',
