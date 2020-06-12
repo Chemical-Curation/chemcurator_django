@@ -964,7 +964,7 @@ local buildPaths(obj) =
   {
     ['/' + obj.typePlural + '/{id}']: {
       [if !obj.writeOnly then 'get']: {
-        security: [{ anonAuth: [] }, { basicAuth: [] }, { cookieAuth: [] }],
+        security: [ {}, ],
         tags: [obj.type],
         summary: 'Fetch resource',
         parameters: builtParameters.read,
@@ -1021,7 +1021,7 @@ local buildPaths(obj) =
     },
     ['/' + obj.typePlural]: {
       [if !obj.writeOnly then 'get']: {
-        security: [{ anonAuth: [] }, { basicAuth: [] }, { cookieAuth: [] }],
+        security: [ {}, ],
         tags: [obj.type],
         summary: 'List resources',
         parameters: builtParameters.readList,
@@ -1062,7 +1062,7 @@ local buildPaths(obj) =
   } + {
     ['/' + obj.typePlural + '/{id}/relationships/' + relatedObj.object.typePlural]: {
       [if !obj.writeOnly then 'get']: {
-        security: [{ anonAuth: [] }, { basicAuth: [] }, { cookieAuth: [] }],
+        security: [ {}, ],
         tags: [obj.type],
         summary: 'Fetch related resource identifiers',
         parameters: builtParameters.write,
@@ -1133,7 +1133,7 @@ local buildPaths(obj) =
   } + {
     ['/' + obj.typePlural + '/{id}/' + relatedObj.object.typePlural]: {
       [if !obj.writeOnly then 'get']: {
-        security: [{ anonAuth: [] }, { basicAuth: [] }, { cookieAuth: [] }],
+        security: [ {}, ],
         tags: [obj.type],
         summary: 'Fetch related resources',
         parameters: builtParameters.write,
@@ -1153,7 +1153,7 @@ local buildPaths(obj) =
   } + {
     ['/' + obj.typePlural + '/{id}/relationships/' + relatedObj.object.type]: {
       [if !obj.writeOnly then 'get']: {
-        security: [{ anonAuth: [] }, { basicAuth: [] }, { cookieAuth: [] }],
+        security: [ {}, ],
         tags: [obj.type],
         summary: 'Fetch related resource identifier',
         parameters: builtParameters.write,
@@ -1190,7 +1190,7 @@ local buildPaths(obj) =
   } + {
     ['/' + obj.typePlural + '/{id}/' + relatedObj.object.type]: {
       [if !obj.writeOnly then 'get']: {
-        security: [{ anonAuth: [] }, { basicAuth: [] }, { cookieAuth: [] }],
+        security: [ {}, ],
         tags: [obj.type],
         summary: 'Fetch related resource',
         parameters: builtParameters.write,

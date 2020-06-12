@@ -15,8 +15,7 @@ local description = |||
 
 
   ### Authentication
-  Three methods of authentication are available:
-  - Anonymous: An anonymous request does not contain any authentication information. An anonymous user has the ability to perform GET requests.
+  Two methods of authentication are available:
   - [HTTP basic authentication](https://en.wikipedia.org/wiki/Basic_access_authentication)
   - Session: A session will be made on the server after the first authenticated response. The response will include a cookie that sets the session ID. To mitigate CSRF attacks, the server uses the [strict SameSite policy](https://web.dev/samesite-cookies-explained/) in combination with the CORS policy detailed above.
 |||;
