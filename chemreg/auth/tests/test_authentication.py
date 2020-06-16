@@ -45,6 +45,6 @@ def test_settings(settings):
     # Unauthorised users will only be permitted if the request
     # method is one of the "safe" methods; GET, HEAD or OPTIONS.
     assert (
-        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnlyDjangoModelPermissionsOrAnonReadOnly"
+        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
         in settings.REST_FRAMEWORK["DEFAULT_PERMISSION_CLASSES"]
     )
