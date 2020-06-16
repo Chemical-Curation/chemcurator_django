@@ -63,7 +63,7 @@ def test_definedcompound_override(api_request_factory):
 
 @pytest.mark.django_db
 def test_definedcompound_detail_attrs(
-    user_factory, defined_compound_factory, api_request_factory
+    user, defined_compound_factory, api_request_factory
 ):
     """Test that detail view includes extra SerializerMethodField attributes."""
     view = DefinedCompoundViewSet.as_view({"get": "list"})
@@ -71,7 +71,6 @@ def test_definedcompound_detail_attrs(
     assert serializer.is_valid()
     compound = serializer.save()
     request = api_request_factory.get("/definedCompounds")
-    user = user_factory.build()
     force_authenticate(request, user=user)
     response = view(request)
     attrs = response.data["results"].pop()
@@ -101,13 +100,11 @@ def test_definedcompound_detail_attrs(
 
 @pytest.mark.django_db
 def test_ill_defined_compound_admin_user(
-    user_factory, ill_defined_compound_factory, client
+    admin_user, client, ill_defined_compound_factory, user
 ):
     """Tests and Validates the outcomes of multiple POST requests performed by an
     User both with and without ADMIN permissions"""
-    user = user_factory.build()
-    user.is_staff = True
-    client.force_authenticate(user=user)
+    client.force_authenticate(user=admin_user)
     idc = ill_defined_compound_factory.build()
     idc.initial_data.update(cid="CID")
     response = client.post(
@@ -115,8 +112,6 @@ def test_ill_defined_compound_admin_user(
         {"data": {"type": "illDefinedCompound", "attributes": idc.initial_data}},
     )
     assert response.status_code == 201
-    user = user_factory.build()
-    assert user.is_staff is False
     client.force_authenticate(user=user)
     idc = ill_defined_compound_factory.build()
     idc.initial_data.update(cid="XXX")
@@ -143,12 +138,10 @@ def test_compound_view():
 
 
 @pytest.mark.django_db
-def test_definedcompound_admin_user(user_factory, defined_compound_factory, client):
+def test_definedcompound_admin_user(admin_user, client, defined_compound_factory, user):
     """Tests and Validates the outcomes of multiple POST requests performed by an
     User both with and without ADMIN permissions"""
-    user = user_factory.build()
-    user.is_staff = True
-    client.force_authenticate(user=user)
+    client.force_authenticate(user=admin_user)
     dc = defined_compound_factory.build()
     dc.initial_data.update(cid="CID")
     response = client.post(
@@ -178,8 +171,6 @@ def test_definedcompound_admin_user(user_factory, defined_compound_factory, clie
         str(response.data[0]["detail"])
         == "CID must be included when InchIKey is defined."
     )
-    user = user_factory.build()
-    assert user.is_staff is False
     client.force_authenticate(user=user)
     dc = defined_compound_factory.build()
     dc.initial_data.update(cid="XXX", inchikey="XXX")
@@ -196,16 +187,13 @@ def test_definedcompound_admin_user(user_factory, defined_compound_factory, clie
 
 
 @pytest.mark.django_db
-def test_query_structure_type_delete(
-    user_factory, query_structure_type_factory, client
-):
+def test_query_structure_type_delete(admin_user, client, query_structure_type_factory):
     """DELETE will deprecate the structure but not remove from DB"""
     qst = query_structure_type_factory.build()
     assert qst.is_valid()
     instance = qst.save()
     assert instance.deprecated is False
-    user = user_factory.build()
-    client.force_authenticate(user=user)
+    client.force_authenticate(user=admin_user)
     resp = client.delete(f"/queryStructureTypes/{instance.pk}")
     assert resp.status_code == 204
     instance.refresh_from_db()
@@ -216,10 +204,9 @@ def test_query_structure_type_delete(
 
 @pytest.mark.django_db
 def test_deprecated_qst_in_illdefined(
-    user_factory, query_structure_type_factory, ill_defined_compound_factory, client
+    admin_user, client, ill_defined_compound_factory, query_structure_type_factory
 ):
-    user = user_factory.build()
-    client.force_authenticate(user=user)
+    client.force_authenticate(user=admin_user)
     qst = query_structure_type_factory.build(deprecated=True)
     assert qst.is_valid()
     deprecated_structure = qst.save()
