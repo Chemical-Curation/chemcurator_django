@@ -1,5 +1,8 @@
 import time
+import xml
+import xml.etree.ElementTree as ET
 from typing import Optional
+from xml.dom.minidom import Node
 
 from django.apps import apps
 from django.core.cache import cache
@@ -106,3 +109,39 @@ def extract_checksum(cid: str) -> Optional[int]:
         return int(cid[len(meta)])
     except ValueError:
         return None
+
+
+def remove_blanks(node):
+    for x in node.childNodes:
+        if x.nodeType == Node.TEXT_NODE:
+            if x.nodeValue:
+                x.nodeValue = x.nodeValue.strip()
+        elif x.nodeType == Node.ELEMENT_NODE:
+            remove_blanks(x)
+
+
+def format_mrvfile(s: str):
+    """Formats an XML string.
+
+    Args:
+        s (str): The compound that is returned from Indigo's cml method.
+
+    Returns:
+        An XML string that can be used as an mrvfile to load into MarvinJS.
+
+    """
+
+    s = s[s.index("<cml>") :]
+    xml_string = xml.dom.minidom.parseString(s)
+    remove_blanks(xml_string)
+    mol = xml_string.getElementsByTagName("molecule")[0]
+    mol_tree = ET.fromstring(mol.toxml())
+    # create wrapping elements
+    m_struct = ET.Element("MChemicalStruct")
+    m_doc = ET.Element("MDocument")
+    cml = ET.Element("cml")
+    # append from inside out
+    m_struct.append(mol_tree)
+    m_doc.append(m_struct)
+    cml.append(m_doc)
+    return ET.tostring(cml, encoding="unicode")
