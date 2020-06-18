@@ -30,9 +30,7 @@ class CompoundFaker(BaseProvider):
         return self.molecule().molfile()
 
     def mrvfile(self):
-        s = format_mrvfile(self.molecule().cml())
-        print(s)
-        return s
+        return format_mrvfile(self.molecule().cml())
 
     def molfile_v2000(self):
         smiles_str = self.random_element(self.compounds)
