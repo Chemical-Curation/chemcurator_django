@@ -1,3 +1,5 @@
+from django.db import models
+
 from chemreg.common.models import ControlledVocabulary
 
 
@@ -25,3 +27,19 @@ class SubstanceType(ControlledVocabulary):
     """
 
     pass
+
+
+class SynonymType(ControlledVocabulary):
+    """Controlled vocabulary for Synonyms
+
+    Attributes:
+        Name = String (Less than 50 character, url safe, unique, required field)
+        Label = String (Less than 100 characters, unique, required field)
+        Short Description = String (Less than 500 characters, required field)
+        Long Description = TEXT (required field)
+        Validation Regular Expression = String (not required)
+        Score modifier = Float (default 0)
+    """
+
+    validation_regular_expression = models.TextField(blank=True)
+    score_modifier = models.FloatField(default=0)
