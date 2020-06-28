@@ -59,6 +59,7 @@ class QueryStructureTypeFactory(DjangoSerializerFactory):
     label = factory.LazyAttribute(lambda o: o.name.replace("-", " "))
     short_description = factory.Faker("text")
     long_description = factory.Faker("text")
+    deprecated = False
 
     class Meta:
         model = QueryStructureTypeSerializer

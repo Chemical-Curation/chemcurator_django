@@ -40,3 +40,11 @@ def test_settings(settings):
         "rest_framework.authentication.BasicAuthentication"
         in settings.REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"]
     )
+
+    # Authenticated users can perform any request.
+    # Unauthorised users will only be permitted if the request
+    # method is one of the "safe" methods; GET, HEAD or OPTIONS.
+    assert (
+        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
+        in settings.REST_FRAMEWORK["DEFAULT_PERMISSION_CLASSES"]
+    )

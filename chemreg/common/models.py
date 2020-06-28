@@ -36,3 +36,19 @@ class CommonInfo(models.Model):
     class Meta:
         abstract = True
         ordering = ["pk"]
+        base_manager_name = "objects"
+
+
+class ControlledVocabulary(CommonInfo):
+
+    name = models.SlugField(max_length=49, unique=True)
+    label = models.CharField(max_length=99, unique=True)
+    short_description = models.CharField(max_length=499)
+    long_description = models.TextField()
+    deprecated = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.label
+
+    class Meta(CommonInfo.Meta):
+        abstract = True

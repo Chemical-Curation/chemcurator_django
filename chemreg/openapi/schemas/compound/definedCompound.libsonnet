@@ -12,11 +12,14 @@ local baseCompound = import 'baseCompound.libsonnet';
   ],
   attributes: {
     cid: baseCompound.attributes.cid,
+    qcNote: baseCompound.attributes.qcNote,
+    replacementCid: baseCompound.attributes.replacementCid,
     molfileV3000: {
       type: 'string',
       description: 'A [v3000 MDL Molfile](https://en.wikipedia.org/wiki/Chemical_table_file#The_Extended_Connection_Table_(V3000)) representing this compound. Newlines must be escaped (e.g. `\\n`) and spaces preserved.',
       example: '\n  -INDIGO-04212015202D\n\n  0  0  0  0  0  0  0  0  0  0  0 V3000\nM  V30 BEGIN CTAB\nM  V30 COUNTS 2 1 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 O 0.0 0.0 0.0 0\nM  V30 2 O 0.0 0.0 0.0 0\nM  V30 END ATOM\nM  V30 BEGIN BOND\nM  V30 1 2 1 2\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n',
       oneOfGroup: 'structure',
+      filter: true,
     },
     smiles: {
       type: 'string',
@@ -35,9 +38,10 @@ local baseCompound = import 'baseCompound.libsonnet';
     inchikey: {
       type: 'string',
       maxLength: 29,
-      readOnly: true,
-      description: 'The [InChIKey](https://en.wikipedia.org/wiki/International_Chemical_Identifier#InChIKey) computed at the time of storage for this compound.',
+      required: false,
+      description: 'The [InChIKey](https://en.wikipedia.org/wiki/International_Chemical_Identifier#InChIKey) for this compound. \n        \n ** Can only be defined when "cid" is present. Otherwise, will be computed at the time of storage.',
       example: 'MYMOFIZGZYHOMD-UHFFFAOYSA-N',
+      filter: true,
     },
     molecularWeight: {
       type: 'number',
@@ -62,7 +66,6 @@ local baseCompound = import 'baseCompound.libsonnet';
       description: 'The [InChIKey](https://en.wikipedia.org/wiki/International_Chemical_Identifier#InChIKey) as calculated at the time of the request.',
       example: 'MYMOFIZGZYHOMD-UHFFFAOYSA-N',
     },
-
   },
   errors: [
     {

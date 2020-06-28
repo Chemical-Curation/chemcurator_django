@@ -18,11 +18,19 @@ class AutoRelatedLinkMixin:
     def self_link_view_name(self):
         if self.read_only:
             return None
-        return self.context["view"].basename + "-relationships"
+        basename = (
+            self.context["view"].basename
+            or self.parent.instance._meta.model_name.lower()
+        )
+        return basename + "-relationships"
 
     @property
     def related_link_view_name(self):
-        return self.context["view"].basename + "-related"
+        basename = (
+            self.context["view"].basename
+            or self.parent.instance._meta.model_name.lower()
+        )
+        return basename + "-related"
 
 
 class HyperlinkedRelatedField(
@@ -42,7 +50,10 @@ class PolymorphicResourceRelatedField(
     FormatRelatedFieldMixin,
     relations.PolymorphicResourceRelatedField,
 ):
-    pass
+    def __init__(self, polymorphic_serializer=None, **kwargs):
+        if polymorphic_serializer:
+            return super().__init__(polymorphic_serializer, **kwargs)
+        return super().__init__(**kwargs)
 
 
 class SerializerMethodResourceRelatedField(

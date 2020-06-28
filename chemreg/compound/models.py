@@ -1,20 +1,46 @@
 from django.db import models
 from django.utils.functional import cached_property
 
-from computed_property import ComputedCharField
 from indigo import Indigo, IndigoException
-from polymorphic.models import PolymorphicModel
+from polymorphic.models import PolymorphicManager, PolymorphicModel
+from polymorphic.query import PolymorphicQuerySet
 
-from chemreg.common.models import CommonInfo
+from chemreg.common.models import CommonInfo, ControlledVocabulary
 from chemreg.compound.fields import StructureAliasField
 from chemreg.compound.utils import build_cid
 from chemreg.compound.validators import (
-    validate_cid_checksum,
-    validate_cid_regex,
     validate_inchikey_computable,
     validate_molfile_v3000,
 )
 from chemreg.indigo.inchi import get_inchikey
+
+
+class SoftDeleteCompoundQuerySet(PolymorphicQuerySet):
+    """Filters out the soft deleted compounds."""
+
+    def filter_deleted(self):
+        return self.filter(replaced_by__isnull=True)
+
+    def delete(self, force=False):
+        if not force:
+            raise Exception(
+                "Attempted to delete a soft-delete model. "
+                "Pass in `force=True` if you need to perfrom an actual deletion."
+            )
+        return super().delete()
+
+
+class SoftDeleteCompoundManager(PolymorphicManager):
+    """Filters out the soft deleted compounds."""
+
+    def get_queryset(self):
+        """The default queryset filters out deleted."""
+        qs = super().get_queryset()
+        return qs.filter_deleted()
+
+    def with_deleted(self):
+        """Include deleted with this call."""
+        return super().get_queryset()
 
 
 class BaseCompound(CommonInfo, PolymorphicModel):
@@ -29,16 +55,34 @@ class BaseCompound(CommonInfo, PolymorphicModel):
     Attributes:
         cid (str): The compound CID.
         structure (str): Definitive structure string
-
+        replaced_by (foreign key): A user deleted the compound and specified this CID as the replacement
+        qc_note (str): An explanation of why the compound was deleted and replaced
     """
 
-    cid = models.CharField(
-        default=build_cid,
-        max_length=50,
-        unique=True,
-        validators=[validate_cid_regex, validate_cid_checksum],
-    )
+    cid = models.CharField(default=build_cid, max_length=50, unique=True)
     structure = models.TextField()
+    # soft delete functionality
+    replaced_by = models.ForeignKey(
+        "self",
+        related_name="replaces",
+        on_delete=models.PROTECT,
+        null=True,
+        default=None,
+    )
+    qc_note = models.TextField(blank=True, default="")
+    objects = SoftDeleteCompoundManager.from_queryset(SoftDeleteCompoundQuerySet)()
+
+    @property
+    def is_deleted(self):
+        return self.replaced_by_id is not None
+
+    def delete(self, force=False):
+        if not force:
+            raise Exception(
+                "Attempted to delete a soft-delete model. "
+                "Pass in `force=True` if you need to perfrom an actual deletion."
+            )
+        return super().delete()
 
 
 class DefinedCompound(BaseCompound):
@@ -53,7 +97,7 @@ class DefinedCompound(BaseCompound):
     molfile_v3000 = StructureAliasField(
         validators=[validate_molfile_v3000, validate_inchikey_computable]
     )
-    inchikey = ComputedCharField(compute_from="_inchikey", max_length=29)
+    inchikey = models.CharField(null=True, max_length=29)
 
     @property
     def _inchikey(self):
@@ -70,7 +114,7 @@ class DefinedCompound(BaseCompound):
         return indigo.loadStructure(structureStr=self.molfile_v3000)
 
 
-class QueryStructureType(CommonInfo):
+class QueryStructureType(ControlledVocabulary):
     """A controlled vocabulary
 
     Attributes:
@@ -80,30 +124,7 @@ class QueryStructureType(CommonInfo):
     Long Description = TEXT (required field)
     """
 
-    name = models.SlugField(
-        max_length=49,
-        verbose_name="name",
-        help_text="Query structure type name",
-        unique=True,
-    )
-    label = models.CharField(
-        max_length=99,
-        verbose_name="label",
-        help_text="Query structure type label",
-        unique=True,
-    )
-    short_description = models.CharField(
-        max_length=499,
-        verbose_name="short description",
-        help_text="Query structure type short description",
-    )
-    long_description = models.TextField(
-        verbose_name="long description",
-        help_text="Query structure type long description",
-    )
-
-    def __str__(self):
-        return self.label
+    pass
 
 
 def get_illdefined_qst():
@@ -131,5 +152,5 @@ class IllDefinedCompound(BaseCompound):
         "QueryStructureType", on_delete=models.PROTECT, default=get_illdefined_qst
     )
 
-    class Meta:
+    class Meta(BaseCompound.Meta):
         verbose_name = "ill-defined compound"

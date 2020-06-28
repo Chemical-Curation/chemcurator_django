@@ -1,5 +1,6 @@
 from django.apps import apps
 from django.conf import settings
+from django.contrib.auth.models import Permission
 from django.db import models
 from django.test import RequestFactory
 from rest_framework.test import APIClient, APIRequestFactory
@@ -38,6 +39,14 @@ def get_chemreg_models():
 @pytest.fixture
 def user() -> settings.AUTH_USER_MODEL:
     return UserFactory()
+
+
+@pytest.fixture
+def admin_user() -> settings.AUTH_USER_MODEL:
+    admin = UserFactory(is_staff=True)
+    for p in Permission.objects.all():
+        admin.user_permissions.add(p.pk)
+    return admin
 
 
 @pytest.fixture
