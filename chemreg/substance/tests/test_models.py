@@ -1,6 +1,6 @@
 from django.db import models
 
-from chemreg.substance.models import Source, SubstanceType, SynonymType
+from chemreg.substance.models import Source, SubstanceType, SynonymQuality, SynonymType
 
 
 def test_source_model():
@@ -59,3 +59,25 @@ def test_synonym_type():
     assert isinstance(validation_regular_expression, models.TextField)
     score_modifier = SynonymType._meta.get_field("score_modifier")
     assert isinstance(score_modifier, models.FloatField)
+
+
+def test_synonym_quality():
+    """Tests the validity of the Synonym Quality Model's attributes"""
+
+    name = SynonymQuality._meta.get_field("name")
+    assert isinstance(name, models.SlugField)
+    assert name.max_length == 49
+    assert name.unique
+    label = SynonymQuality._meta.get_field("label")
+    assert isinstance(label, models.CharField)
+    assert label.max_length == 99
+    assert label.unique
+    short_description = SynonymQuality._meta.get_field("short_description")
+    assert isinstance(short_description, models.CharField)
+    assert short_description.max_length == 499
+    long_description = SynonymQuality._meta.get_field("long_description")
+    assert isinstance(long_description, models.TextField)
+    score_weight = SynonymQuality._meta.get_field("score_weight")
+    assert isinstance(score_weight, models.FloatField)
+    is_restrictive = SynonymQuality._meta.get_field("is_restrictive")
+    assert isinstance(is_restrictive, models.BooleanField)
