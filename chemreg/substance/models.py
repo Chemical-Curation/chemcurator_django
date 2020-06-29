@@ -43,3 +43,17 @@ class SynonymType(ControlledVocabulary):
 
     validation_regular_expression = models.TextField(blank=True)
     score_modifier = models.FloatField(default=0)
+
+
+class QCLevelsType(ControlledVocabulary):
+    """Controlled vocabulary for qc_levels
+
+    Attributes:
+        Name = String (Less than 50 character, url safe, unique, required field)
+        Label = String (Less than 100 characters, unique, required field)
+        Short Description = String (Less than 500 characters, required field)
+        Long Description = TEXT (required field)
+        rank = integer unique
+    """
+
+    rank = models.IntegerField(unique=True)
