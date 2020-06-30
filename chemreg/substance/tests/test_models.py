@@ -77,6 +77,6 @@ def test_qc_levels_type():
     assert short_description.max_length == 499
     long_description = QCLevelsType._meta.get_field("long_description")
     assert isinstance(long_description, models.TextField)
-    rank = QCLevelsType.meta.get_field("rank")
+    rank = QCLevelsType._meta.get_field("rank")
     assert isinstance(rank, models.IntegerField)
     assert rank.unique
