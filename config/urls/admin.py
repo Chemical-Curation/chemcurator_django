@@ -1,7 +1,7 @@
 from django.contrib import admin
-from django.urls import include, path, url
+from django.urls import include, path
 
 urlpatterns = [
     path("", admin.site.urls),
-    url("", include("django_prometheus.urls")),
+    path("", include("django_prometheus.urls")),
 ]
