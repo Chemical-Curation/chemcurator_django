@@ -16,10 +16,11 @@ redis==3.4.1  # https://github.com/antirez/redis
 whitenoise==5.0.1  # https://github.com/evansd/whitenoise
 
 
-# Code quality, testing, and documentation
+# Code quality, testing, monitoring and documentation
 # ------------------------------------------------------------------------------
 black==19.10b0  # https://github.com/ambv/black
 coverage==5.0.3  # https://github.com/nedbat/coveragepy
+django-prometheus==2.0.0  # https://github.com/korfuri/django-prometheus
 factory-boy==2.12.0  # https://github.com/FactoryBoy/factory_boy
 flake8==3.7.9  # https://github.com/PyCQA/flake8
 flake8-black==0.1.1  # https://github.com/peterjc/flake8-black
