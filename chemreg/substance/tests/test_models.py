@@ -4,6 +4,7 @@ from chemreg.substance.models import (
     QCLevelsType,
     Source,
     SubstanceType,
+    Synonym,
     SynonymQuality,
     SynonymType,
 )
@@ -108,3 +109,17 @@ def test_synonym_quality():
     assert isinstance(score_weight, models.FloatField)
     is_restrictive = SynonymQuality._meta.get_field("is_restrictive")
     assert isinstance(is_restrictive, models.BooleanField)
+
+
+def test_synonym():
+    """Tests the validity of the Synonym Model's attributes"""
+
+    identifier = Synonym._meta.get_field("identifier")
+    assert isinstance(identifier, models.TextField)
+    assert identifier.max_length == 1024
+    assert Synonym.synonym_quality.field.related_model is SynonymQuality
+    assert Synonym.source.field.related_model is Source
+    assert Synonym.synonym_type.field.related_model is SynonymType
+    qc_notes = Synonym._meta.get_field("qc_notes")
+    assert isinstance(qc_notes, models.TextField)
+    assert qc_notes.max_length == 1024
