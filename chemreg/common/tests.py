@@ -40,3 +40,8 @@ def test_user_link(user_factory):
         user_2.save()
         assert user_2.created_by_id == user_1.pk
         assert user_2.updated_by_id == user_2.pk
+
+
+def test_prometheus_metrics_endpoint(client):
+    response = client.get("/metrics")
+    assert response.status_code == 200

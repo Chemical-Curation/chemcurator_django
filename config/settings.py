@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Third party apps
     "computed_property",
+    "django_prometheus",
     "polymorphic",
     "rest_framework",
     "partialsmiles",
@@ -66,6 +67,7 @@ INSTALLED_APPS = [
 MEDIA_ROOT = APPS_DIR("media")
 MEDIA_URL = "/media/"
 MIDDLEWARE = [
+    "django_prometheus.middleware.PrometheusBeforeMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -75,6 +77,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "crum.CurrentRequestUserMiddleware",
+    "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
 ROOT_URLCONF = "config.urls." + env("URL_CONF")
 SECRET_KEY = env("SECRET_KEY")
