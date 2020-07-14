@@ -22,7 +22,7 @@ def test_synonym_type_post(client, admin_user, synonym_type_factory):
 @pytest.mark.django_db
 def test_synonym_type_get(client, admin_user, synonym_type_factory):
     client.force_authenticate(user=admin_user)
-    synonym_type_factory.build()
+    synonym_type_factory.create()
     resp = client.get("/synonymTypes")
     assert resp.status_code == 200
     for result in resp.data["results"]:
