@@ -30,6 +30,9 @@ local illDefinedCompound = import 'compound/illDefinedCompound.libsonnet';
 local queryStructureType = import 'compound/queryStructureType.libsonnet';
 local compound = import 'compound/compound.libsonnet';
 
+// Substance
+local synonymType = import 'substance/synonymType.libsonnet';
+
 ////////////////////////
 // List of all models //
 ////////////////////////
@@ -38,6 +41,7 @@ local objs = [
   illDefinedCompound,
   queryStructureType,
   compound,
+  synonymType
 ];
 
 // Build spec
