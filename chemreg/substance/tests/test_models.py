@@ -76,8 +76,10 @@ def test_synonym_type():
         "validation_regular_expression"
     )
     assert isinstance(validation_regular_expression, models.TextField)
+    assert validation_regular_expression.blank is True
     score_modifier = SynonymType._meta.get_field("score_modifier")
     assert isinstance(score_modifier, models.FloatField)
+    assert score_modifier.default == 0.0
 
 
 def test_qc_levels_type():
@@ -103,6 +105,7 @@ def test_qc_levels_type():
     rank = QCLevelsType._meta.get_field("rank")
     assert isinstance(rank, models.IntegerField)
     assert rank.unique
+    assert not rank.blank
 
 
 def test_synonym_quality():
@@ -127,8 +130,12 @@ def test_synonym_quality():
     assert not long_description.blank
     score_weight = SynonymQuality._meta.get_field("score_weight")
     assert isinstance(score_weight, models.FloatField)
+    assert score_weight.default == 1.0
+    assert not score_weight.blank
     is_restrictive = SynonymQuality._meta.get_field("is_restrictive")
     assert isinstance(is_restrictive, models.BooleanField)
+    assert is_restrictive.default is False
+    assert not is_restrictive.blank
 
 
 def test_synonym():
@@ -144,3 +151,4 @@ def test_synonym():
     qc_notes = Synonym._meta.get_field("qc_notes")
     assert isinstance(qc_notes, models.TextField)
     assert qc_notes.max_length == 1024
+    assert not qc_notes.blank

@@ -73,7 +73,7 @@ class SynonymQuality(ControlledVocabulary):
     """
 
     score_weight = models.FloatField(default=1.0)
-    is_restrictive = models.BooleanField()
+    is_restrictive = models.BooleanField(default=False)
 
 
 class Synonym(CommonInfo):
