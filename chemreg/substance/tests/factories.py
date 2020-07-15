@@ -7,20 +7,25 @@ from chemreg.common.factory import (
     ControlledVocabularyFactory,
     DjangoSerializerFactory,
 )
-from chemreg.substance.serializers import SynonymTypeSerializer
+from chemreg.substance.serializers import SourceSerializer, SynonymTypeSerializer
 
 factory.Faker.add_provider(ChemicalProvider)
 
 
-class SourceFactory(ControlledVocabularyFactory):
-    """Manufactures `SourceFactory` models."""
+class SourceFactory(DjangoSerializerFactory):
+    """Manufactures `Source` models."""
+
+    name = factory.Faker("slug").generate()
+    label = factory.LazyAttribute(lambda o: o.name.replace("-", " "))
+    short_description = factory.Faker("text")
+    long_description = factory.Faker("text")
 
     class Meta:
-        model = apps.get_model("substance", "Source")
+        model = SourceSerializer
 
 
 class SubstanceTypeFactory(ControlledVocabularyFactory):
-    """Manufactures `SubstanceTypeFactory` models."""
+    """Manufactures `SubstanceType` models."""
 
     class Meta:
         model = apps.get_model("substance", "SubstanceType")
