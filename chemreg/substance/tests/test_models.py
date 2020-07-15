@@ -16,15 +16,19 @@ def test_source_model():
     assert isinstance(name, models.SlugField)
     assert name.max_length == 49
     assert name.unique
+    assert not name.blank
     label = Source._meta.get_field("label")
     assert isinstance(label, models.CharField)
     assert label.max_length == 99
     assert label.unique
+    assert not label.blank
     short_description = Source._meta.get_field("short_description")
     assert isinstance(short_description, models.CharField)
     assert short_description.max_length == 499
+    assert not short_description.blank
     long_description = Source._meta.get_field("long_description")
     assert isinstance(long_description, models.TextField)
+    assert not long_description.blank
 
 
 def test_substance_type():
@@ -33,15 +37,19 @@ def test_substance_type():
     assert isinstance(name, models.SlugField)
     assert name.max_length == 49
     assert name.unique
+    assert not name.blank
     label = SubstanceType._meta.get_field("label")
     assert isinstance(label, models.CharField)
     assert label.max_length == 99
     assert label.unique
+    assert not label.blank
     short_description = SubstanceType._meta.get_field("short_description")
     assert isinstance(short_description, models.CharField)
     assert short_description.max_length == 499
+    assert not short_description.blank
     long_description = SubstanceType._meta.get_field("long_description")
     assert isinstance(long_description, models.TextField)
+    assert not long_description.blank
 
 
 def test_synonym_type():
@@ -51,15 +59,19 @@ def test_synonym_type():
     assert isinstance(name, models.SlugField)
     assert name.max_length == 49
     assert name.unique
+    assert not name.blank
     label = SynonymType._meta.get_field("label")
     assert isinstance(label, models.CharField)
     assert label.max_length == 99
     assert label.unique
+    assert not label.blank
     short_description = SynonymType._meta.get_field("short_description")
     assert isinstance(short_description, models.CharField)
     assert short_description.max_length == 499
+    assert not short_description.blank
     long_description = SynonymType._meta.get_field("long_description")
     assert isinstance(long_description, models.TextField)
+    assert not long_description.blank
     validation_regular_expression = SynonymType._meta.get_field(
         "validation_regular_expression"
     )
@@ -75,15 +87,19 @@ def test_qc_levels_type():
     assert isinstance(name, models.SlugField)
     assert name.max_length == 49
     assert name.unique
+    assert not name.blank
     label = QCLevelsType._meta.get_field("label")
     assert isinstance(label, models.CharField)
     assert label.max_length == 99
     assert label.unique
+    assert not label.blank
     short_description = QCLevelsType._meta.get_field("short_description")
     assert isinstance(short_description, models.CharField)
     assert short_description.max_length == 499
+    assert not short_description.blank
     long_description = QCLevelsType._meta.get_field("long_description")
     assert isinstance(long_description, models.TextField)
+    assert not long_description.blank
     rank = QCLevelsType._meta.get_field("rank")
     assert isinstance(rank, models.IntegerField)
     assert rank.unique
@@ -96,15 +112,19 @@ def test_synonym_quality():
     assert isinstance(name, models.SlugField)
     assert name.max_length == 49
     assert name.unique
+    assert not name.blank
     label = SynonymQuality._meta.get_field("label")
     assert isinstance(label, models.CharField)
     assert label.max_length == 99
     assert label.unique
+    assert not label.blank
     short_description = SynonymQuality._meta.get_field("short_description")
     assert isinstance(short_description, models.CharField)
     assert short_description.max_length == 499
+    assert not short_description.blank
     long_description = SynonymQuality._meta.get_field("long_description")
     assert isinstance(long_description, models.TextField)
+    assert not long_description.blank
     score_weight = SynonymQuality._meta.get_field("score_weight")
     assert isinstance(score_weight, models.FloatField)
     is_restrictive = SynonymQuality._meta.get_field("is_restrictive")
@@ -117,6 +137,7 @@ def test_synonym():
     identifier = Synonym._meta.get_field("identifier")
     assert isinstance(identifier, models.TextField)
     assert identifier.max_length == 1024
+    assert not identifier.blank
     assert Synonym.synonym_quality.field.related_model is SynonymQuality
     assert Synonym.source.field.related_model is Source
     assert Synonym.synonym_type.field.related_model is SynonymType
