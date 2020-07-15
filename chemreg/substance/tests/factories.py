@@ -7,7 +7,7 @@ from chemreg.substance.serializers import SourceSerializer, SynonymTypeSerialize
 class SynonymTypeFactory(DjangoSerializerFactory):
     """Manufactures `SynonymType` models."""
 
-    name = factory.Faker("slug")
+    name = factory.Faker("slug").generate()
     label = factory.LazyAttribute(lambda o: o.name.replace("-", " "))
     short_description = factory.Faker("text")
     long_description = factory.Faker("text")
@@ -21,7 +21,7 @@ class SynonymTypeFactory(DjangoSerializerFactory):
 class SourceFactory(DjangoSerializerFactory):
     """Manufactures `Source` models."""
 
-    name = factory.Faker("slug")
+    name = factory.Faker("slug").generate()
     label = factory.LazyAttribute(lambda o: o.name.replace("-", " "))
     short_description = factory.Faker("text")
     long_description = factory.Faker("text")
