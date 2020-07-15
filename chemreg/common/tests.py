@@ -1,9 +1,28 @@
+from random import randint
+
 from django.db import models
 
 import pytest
 from crum import impersonate
 
 from chemreg.common.models import CommonInfo
+from chemreg.common.utils import compute_checksum
+
+
+def test_compute_checksum():
+    i = randint(2000000, 9999999)
+    computed = (
+        (1 * int(str(i)[0]))
+        + (2 * int(str(i)[1]))
+        + (3 * int(str(i)[2]))
+        + (4 * int(str(i)[3]))
+        + (5 * int(str(i)[4]))
+        + (6 * int(str(i)[5]))
+        + (7 * int(str(i)[6]))
+    ) % 10
+    checksum = compute_checksum(i)
+    assert computed == checksum
+    assert 0 <= checksum < 10
 
 
 def test_commoninfo_attr():
