@@ -1,7 +1,7 @@
 import factory
 
 from chemreg.common.factory import DjangoSerializerFactory
-from chemreg.substance.serializers import SynonymTypeSerializer
+from chemreg.substance.serializers import SourceSerializer, SynonymTypeSerializer
 
 
 class SynonymTypeFactory(DjangoSerializerFactory):
@@ -16,3 +16,15 @@ class SynonymTypeFactory(DjangoSerializerFactory):
 
     class Meta:
         model = SynonymTypeSerializer
+
+
+class SourceFactory(DjangoSerializerFactory):
+    """Manufactures `Source` models."""
+
+    name = factory.Faker("slug")
+    label = factory.LazyAttribute(lambda o: o.name.replace("-", " "))
+    short_description = factory.Faker("text")
+    long_description = factory.Faker("text")
+
+    class Meta:
+        model = SourceSerializer
