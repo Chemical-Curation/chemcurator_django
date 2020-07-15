@@ -9,25 +9,8 @@ from django.core.cache import cache
 from django.db.models import IntegerField, Max
 from django.db.models.functions import Cast, Substr
 
+from chemreg.common.utils import compute_checksum
 from chemreg.compound.settings import compound_settings
-
-
-def compute_checksum(i: Optional[int]) -> int:
-    """Computes the checksum from the compound integer.
-
-    Args:
-        i: A compound integer.
-
-    Returns:
-        The CID checksum.
-
-    """
-    try:
-        loci = (x for x in range(1, len(str(i)) + 1))
-        vals = (int(x) for x in str(i))
-        return sum(x * y for x, y in zip(loci, vals)) % 10
-    except ValueError:
-        return None
 
 
 def build_cid(i=None) -> str:
@@ -66,9 +49,7 @@ def build_cid(i=None) -> str:
                     ) or (
                         incr_start - 1
                     )
-                    cache.add(
-                        seq_key, last_id, timeout=(365 * 24 * 60 * 60),
-                    )
+                    cache.add(seq_key, last_id, timeout=(365 * 24 * 60 * 60))
                 finally:
                     cache.delete(seq_key + ".lock")
             time.sleep(0.01)
