@@ -1,4 +1,5 @@
 import time
+from typing import Optional
 
 from django.apps import apps
 from django.core.cache import cache
@@ -13,7 +14,7 @@ def build_sid(i=None) -> str:
     """Builds a unique SID.
 
     Args:
-        i (int): The compound integer to use. If set to `None`, the integer will be incremented
+        i (int): The substance integer to use. If set to `None`, the integer will be incremented
             from the cache sequence. Defaults to `None`.
 
     Returns:
@@ -30,8 +31,8 @@ def build_sid(i=None) -> str:
                 prefix = substance_settings.PREFIX
                 incr_start = substance_settings.INCREMENT_START
                 try:
-                    BaseCompound = apps.get_model("compound", "BaseCompound")
-                    last_id = BaseCompound.objects.with_deleted().filter(
+                    Substance = apps.get_model("substance", "Substance")
+                    last_id = Substance.objects.filter(
                         sid__regex=fr"^{prefix}SID\d0([2-9]\d{{6}}|[1-9]\d{{7,}})$"
                     ).aggregate(
                         max_sid=Max(
@@ -52,3 +53,20 @@ def build_sid(i=None) -> str:
 
     checksum = compute_checksum(i)
     return f"{substance_settings.PREFIX}SID{checksum}0{i}"
+
+
+def extract_int(sid: str) -> Optional[int]:
+    """Extracts the compound integer from the SID.
+
+    Args:
+        sid: A SID string.
+
+    Returns:
+        The substance integer.
+
+    """
+    meta = f"{substance_settings.PREFIX}SID$0"
+    try:
+        return int(sid[len(meta) :])
+    except ValueError:
+        return None

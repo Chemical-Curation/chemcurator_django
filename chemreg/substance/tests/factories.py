@@ -1,7 +1,59 @@
+from django.apps import apps
+
 import factory
 
-from chemreg.common.factory import DjangoSerializerFactory
+from chemreg.common.factory import (
+    ChemicalProvider,
+    ControlledVocabularyFactory,
+    DjangoSerializerFactory,
+)
 from chemreg.substance.serializers import SynonymTypeSerializer
+
+factory.Faker.add_provider(ChemicalProvider)
+
+
+class SourceFactory(ControlledVocabularyFactory):
+    """Manufactures `SourceFactory` models."""
+
+    class Meta:
+        model = apps.get_model("substance", "Source")
+
+
+class SubstanceTypeFactory(ControlledVocabularyFactory):
+    """Manufactures `SubstanceTypeFactory` models."""
+
+    class Meta:
+        model = apps.get_model("substance", "SubstanceType")
+
+
+class QCLevelsTypeFactory(ControlledVocabularyFactory):
+    """Manufactures `QCLevelsType` models."""
+
+    rank = factory.Sequence(lambda n: n)
+
+    class Meta:
+        model = apps.get_model("substance", "QCLevelsType")
+
+
+class SubstanceFactory(factory.DjangoModelFactory):
+    """Manufactures `Substance` models."""
+
+    preferred_name = factory.Sequence(
+        lambda n: f"{factory.Faker('slug').generate()}-{n}"
+    )
+    display_name = factory.LazyAttribute(lambda o: o.preferred_name.replace("-", " "))
+    description = factory.Faker("text")
+    public_qc_note = factory.Faker("text")
+    private_qc_note = factory.Faker("text")
+    casrn = factory.Faker("cas_number")
+
+    # Related Factories
+    source = factory.SubFactory(SourceFactory)
+    substance_type = factory.SubFactory(SubstanceTypeFactory)
+    qc_level = factory.SubFactory(QCLevelsTypeFactory)
+
+    class Meta:
+        model = apps.get_model("substance", "Substance")
 
 
 class SynonymTypeFactory(DjangoSerializerFactory):

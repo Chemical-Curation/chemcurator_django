@@ -29,7 +29,7 @@ class SubstanceSettings:
 
     def __getattr__(self, attr):
         if attr not in self.defaults:
-            raise AttributeError(f"Invalid compound setting: '{attr}'")
+            raise AttributeError(f"Invalid substance setting: '{attr}'")
         if (
             hasattr(self.user_settings, "SUBSTANCE")
             and attr in self.user_settings.SUBSTANCE

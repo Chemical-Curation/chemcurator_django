@@ -63,7 +63,7 @@ class Substance(CommonInfo):
     public_qc_note = models.CharField(max_length=1024)
     private_qc_note = models.CharField(max_length=1024)
     associated_compound = models.ForeignKey(
-        "compound.BaseCompound", on_delete=models.PROTECT
+        "compound.BaseCompound", on_delete=models.PROTECT, null=True
     )
     casrn = models.CharField(max_length=50, unique=True)
     # synonyms = models.ManyToManyField(to="Synonym")
@@ -126,7 +126,7 @@ class Synonym(CommonInfo):
         qc_notes = String (1024) (optional)
     """
 
-    # substance = models.ForeignKey("Substance", on_delete=models.PROTECT)
+    substance = models.ForeignKey("Substance", on_delete=models.PROTECT)
     identifier = models.TextField(max_length=1024)
     synonym_quality = models.ForeignKey(SynonymQuality, on_delete=models.PROTECT)
     source = models.ForeignKey(Source, on_delete=models.PROTECT)
