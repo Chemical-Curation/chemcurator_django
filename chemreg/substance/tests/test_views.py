@@ -59,3 +59,17 @@ def test_source_get(client, admin_user, source_factory):
         assert "label" in result
         assert "short_description" in result
         assert "long_description" in result
+
+
+@pytest.mark.django_db
+def test_source_patch(client, admin_user, source_factory):
+    client.force_authenticate(user=admin_user)
+    source = source_factory.create()
+    pk = source.instance.pk
+    new_name = {"name": "a-new-name"}
+    resp = client.patch(
+        f"/sources/{pk}",
+        {"data": {"id": pk, "type": "source", "attributes": new_name}},
+    )
+    assert resp.status_code == 200
+    assert resp.data["name"] == "a-new-name"
