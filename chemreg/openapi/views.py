@@ -36,6 +36,7 @@ class OpenAPIView(View):
                 "baseServer": "__BASE_SERVER__",
                 "COMPOUND_PREFIX": compound_settings.PREFIX,
             },
+            jpathdir=os.path.join(os.path.dirname(__file__), "schemas"),
         )
     except NameError:
         base_spec = ""
