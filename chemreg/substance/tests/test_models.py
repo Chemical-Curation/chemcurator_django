@@ -170,3 +170,5 @@ def test_synonym():
     qc_notes = Synonym._meta.get_field("qc_notes")
     assert isinstance(qc_notes, models.TextField)
     assert qc_notes.max_length == 1024
+    assert type(Synonym.substance.field) is models.ForeignKey
+    assert Synonym.substance.field.related_model is Substance
