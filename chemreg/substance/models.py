@@ -46,7 +46,7 @@ class Substance(CommonInfo):
         private_qc_note (str): unknown
         associated_compound (foreign key): ForeignKey
         casrn (str): CAS registry number. It is an identifier from the CAS Registry
-         (https://www.cas.org/support/documentation/chemical-substances) for a chemical substance.
+            (https://www.cas.org/support/documentation/chemical-substances) for a chemical substance.
         synonyms (QuerySet): One to Many Synonym resources
         substance_histories (QuerySet): Many to Many Substance history resources (not implemented yet)
     """
@@ -66,7 +66,6 @@ class Substance(CommonInfo):
         "compound.BaseCompound", on_delete=models.PROTECT, null=True
     )
     casrn = models.CharField(max_length=50, unique=True)
-    # synonyms = models.ManyToManyField(to="Synonym")
 
 
 class SubstanceType(ControlledVocabulary):
