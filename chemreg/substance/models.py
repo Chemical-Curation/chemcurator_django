@@ -56,7 +56,7 @@ class Substance(CommonInfo):
     display_name = models.CharField(max_length=255, unique=True, blank=False)
     source = models.ForeignKey("Source", on_delete=models.PROTECT, null=False)
     substance_type = models.ForeignKey(
-        "SubstanceType", on_delete=models.CASCADE, null=False
+        "SubstanceType", on_delete=models.PROTECT, null=False
     )
     qc_level = models.ForeignKey("QCLevelsType", on_delete=models.PROTECT, null=False)
     description = models.CharField(max_length=1024)
