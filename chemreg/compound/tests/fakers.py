@@ -5,7 +5,7 @@ import pickle
 from faker.providers import BaseProvider
 from indigo import Indigo
 
-from chemreg.compound.utils import build_cid
+from chemreg.compound.utils import build_cid, format_mrvfile
 
 with bz2.open(os.path.join(os.path.dirname(__file__), "compounds.bz2"), "rb") as f:
     COMPOUNDS = pickle.load(f)
@@ -30,7 +30,7 @@ class CompoundFaker(BaseProvider):
         return self.molecule().molfile()
 
     def mrvfile(self):
-        return self.molecule().cml()
+        return format_mrvfile(self.molecule().cml())
 
     def molfile_v2000(self):
         smiles_str = self.random_element(self.compounds)

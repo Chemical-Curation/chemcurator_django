@@ -8,7 +8,8 @@ djangorestframework==3.11.0  # https://github.com/encode/django-rest-framework
 djangorestframework-jsonapi[django-filter,django-polymorphic]==3.1.0  # https://github.com/django-json-api/django-rest-framework-json-api
 epam.indigo==1.4.0b0  # https://github.com/epam/Indigo
 gunicorn[gevent,setproctitle]==20.0.4  # https://github.com/benoitc/gunicorn
-jsonnet==0.15.0; sys_platform == 'linux' or sys_platform == 'darwin' or sys_platform == 'cygwin' # https://github.com/google/jsonnet
+jsonnet==0.16.0; sys_platform == 'linux' or sys_platform == 'darwin'  # https://github.com/google/jsonnet
+jsonnetbin==0.16.0; sys_platform == 'win32' or sys_platform == 'cygwin' or sys_platform == 'msys'  # https://github.com/mcovalt/jsonnetbin
 partialsmiles==1.0 # https://github.com/baoilleach/partialsmiles
 psycogreen==1.0.2  # https://github.com/psycopg/psycogreen/
 psycopg2-binary==2.8.4  # https://github.com/psycopg/psycopg2
@@ -16,10 +17,11 @@ redis==3.4.1  # https://github.com/antirez/redis
 whitenoise==5.0.1  # https://github.com/evansd/whitenoise
 
 
-# Code quality, testing, and documentation
+# Code quality, testing, monitoring and documentation
 # ------------------------------------------------------------------------------
 black==19.10b0  # https://github.com/ambv/black
 coverage==5.0.3  # https://github.com/nedbat/coveragepy
+django-prometheus==2.0.0  # https://github.com/korfuri/django-prometheus
 factory-boy==2.12.0  # https://github.com/FactoryBoy/factory_boy
 flake8==3.7.9  # https://github.com/PyCQA/flake8
 flake8-black==0.1.1  # https://github.com/peterjc/flake8-black
