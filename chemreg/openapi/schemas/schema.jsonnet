@@ -33,6 +33,7 @@ local compound = import 'compound/compound.libsonnet';
 // Substance
 local synonymType = import 'substance/synonymType.libsonnet';
 local source = import 'substance/source.libsonnet';
+local substanceType = import 'substance/substanceType.libsonnet';
 
 ////////////////////////
 // List of all models //
@@ -43,7 +44,8 @@ local objs = [
   queryStructureType,
   compound,
   synonymType,
-  source
+  source,
+  substanceType
 ];
 
 // Build spec
