@@ -7,7 +7,11 @@ from chemreg.common.factory import (
     ControlledVocabularyFactory,
     DjangoSerializerFactory,
 )
-from chemreg.substance.serializers import SourceSerializer, SynonymTypeSerializer
+from chemreg.substance.serializers import (
+    SourceSerializer,
+    SubstanceTypeSerializer,
+    SynonymTypeSerializer,
+)
 
 factory.Faker.add_provider(ChemicalProvider)
 
@@ -24,11 +28,16 @@ class SourceFactory(DjangoSerializerFactory):
         model = SourceSerializer
 
 
-class SubstanceTypeFactory(ControlledVocabularyFactory):
+class SubstanceTypeFactory(DjangoSerializerFactory):
     """Manufactures `SubstanceType` models."""
 
+    name = factory.Faker("slug")
+    label = factory.LazyAttribute(lambda o: o.name.replace("-", " "))
+    short_description = factory.Faker("text")
+    long_description = factory.Faker("text")
+
     class Meta:
-        model = apps.get_model("substance", "SubstanceType")
+        model = SubstanceTypeSerializer
 
 
 class QCLevelsTypeFactory(ControlledVocabularyFactory):
@@ -57,7 +66,7 @@ class SubstanceFactory(factory.DjangoModelFactory):
     # Related Factories
     # Todo: This is a work around to allow SerializerFactories as SubFactories. Remove when converting
     source = factory.LazyAttribute(lambda _: SourceFactory().instance)
-    substance_type = factory.SubFactory(SubstanceTypeFactory)
+    substance_type = factory.LazyAttribute(lambda _: SubstanceTypeFactory().instance)
     qc_level = factory.SubFactory(QCLevelsTypeFactory)
 
     class Meta:
