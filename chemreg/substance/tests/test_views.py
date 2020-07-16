@@ -90,7 +90,8 @@ def test_substance_type_post(client, admin_user, substance_type_factory):
     client.force_authenticate(user=admin_user)
     stf = substance_type_factory.build()
     resp = client.post(
-        "/substanceTypes", {"data": {"type": "source", "attributes": stf.initial_data}},
+        "/substanceTypes",
+        {"data": {"type": "substanceType", "attributes": stf.initial_data}},
     )
     assert resp.status_code == 201
 
