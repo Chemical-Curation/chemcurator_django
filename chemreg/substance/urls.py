@@ -7,7 +7,7 @@ from chemreg.substance import views
 router = SimpleRouter()
 router.register(views.SynonymTypeViewSet)
 router.register(views.SourceViewSet)
-
+router.register(views.SubstanceTypeViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),
