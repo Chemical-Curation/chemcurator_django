@@ -102,6 +102,7 @@ def test_substance_type_get(client, admin_user, substance_type_factory):
     substance_type_factory.create()
     resp = client.get("/substanceTypes")
     assert resp.status_code == 200
+    assert resp.data["results"]
     for result in resp.data["results"]:
         assert "name" in result
         assert "label" in result
