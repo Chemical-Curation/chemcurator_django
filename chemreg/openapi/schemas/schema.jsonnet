@@ -34,6 +34,7 @@ local compound = import 'compound/compound.libsonnet';
 local qcLevelsType = import 'substance/qcLevelsType.libsonnet';
 local synonymType = import 'substance/synonymType.libsonnet';
 local source = import 'substance/source.libsonnet';
+local substanceType = import 'substance/substanceType.libsonnet';
 
 ////////////////////////
 // List of all models //
@@ -45,7 +46,8 @@ local objs = [
   compound,
   qcLevelsType,
   synonymType,
-  source
+  source,
+  substanceType
 ];
 
 // Build spec
