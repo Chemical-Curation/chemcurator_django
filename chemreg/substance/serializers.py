@@ -1,5 +1,19 @@
 from chemreg.jsonapi.serializers import HyperlinkedModelSerializer
-from chemreg.substance.models import Source, SynonymType
+from chemreg.substance.models import QCLevelsType, Source, SynonymType
+
+
+class QCLevelsTypeSerializer(HyperlinkedModelSerializer):
+    """The serializer for QCLevelsType Types."""
+
+    class Meta:
+        model = QCLevelsType
+        fields = [
+            "name",
+            "label",
+            "short_description",
+            "long_description",
+            "rank",
+        ]
 
 
 class SynonymTypeSerializer(HyperlinkedModelSerializer):

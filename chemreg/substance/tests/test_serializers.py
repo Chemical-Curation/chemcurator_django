@@ -2,9 +2,22 @@ import pytest
 
 from chemreg.substance.serializers import (
     HyperlinkedModelSerializer,
+    QCLevelsTypeSerializer,
     SourceSerializer,
     SynonymTypeSerializer,
 )
+
+
+@pytest.mark.django_db
+def test_qc_levels_type_serializer():
+    assert issubclass(QCLevelsTypeSerializer, HyperlinkedModelSerializer)
+
+
+@pytest.mark.django_db
+def test_qc_levels_type(qc_levels_type_factory):
+    serializer = qc_levels_type_factory.build()
+    assert serializer.is_valid()
+    serializer.save()
 
 
 @pytest.mark.django_db

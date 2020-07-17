@@ -17,6 +17,9 @@ class QCLevelsType(ControlledVocabulary):
 
     rank = models.IntegerField(unique=True)
 
+    class JSONAPIMeta:
+        resource_name = "qcLevel"
+
 
 class Source(ControlledVocabulary):
     """Controlled vocabulary for Sources

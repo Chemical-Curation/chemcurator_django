@@ -31,6 +31,7 @@ local queryStructureType = import 'compound/queryStructureType.libsonnet';
 local compound = import 'compound/compound.libsonnet';
 
 // Substance
+local qcLevelsType = import 'substance/qcLevelsType.libsonnet';
 local synonymType = import 'substance/synonymType.libsonnet';
 local source = import 'substance/source.libsonnet';
 
@@ -42,6 +43,7 @@ local objs = [
   illDefinedCompound,
   queryStructureType,
   compound,
+  qcLevelsType,
   synonymType,
   source
 ];
