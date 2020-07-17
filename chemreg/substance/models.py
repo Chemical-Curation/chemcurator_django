@@ -131,3 +131,19 @@ class Synonym(CommonInfo):
     source = models.ForeignKey(Source, on_delete=models.PROTECT)
     synonym_type = models.ForeignKey(SynonymType, null=True, on_delete=models.PROTECT)
     qc_notes = models.TextField(max_length=1024, null=True)
+
+
+class RelationshipType(ControlledVocabulary):
+    """Controlled vocabulary for Substances
+
+    Attributes:
+        Name = String (Less than 50 character, url safe, unique, required field)
+        Label = String (Less than 100 characters, unique, required field)
+        Short Description = String (Less than 500 characters, required field)
+        Long Description = TEXT (required field)
+        corrolary label = String (Less than 100 characters, unique, required field)
+        corrolary short description = String (Less than 500 characters, required field)
+    """
+
+    corrolary_label = models.CharField(max_length=99)
+    corrolary_short_description = models.CharField(max_length=499)
