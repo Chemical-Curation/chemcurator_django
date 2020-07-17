@@ -4,7 +4,7 @@
   description: 'Everything about Sources.',
   attributes: {
     name: {
-      type: 'string',
+      type: 'slug',
       maxLength: 49,
       pattern: '^[a-z0-9-]+$',
     },
