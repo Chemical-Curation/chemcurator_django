@@ -17,25 +17,15 @@ from chemreg.substance.serializers import (
 factory.Faker.add_provider(ChemicalProvider)
 
 
-class SourceFactory(DjangoSerializerFactory):
+class SourceFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
     """Manufactures `Source` models."""
-
-    name = factory.Faker("slug")
-    label = factory.LazyAttribute(lambda o: o.name.replace("-", " "))
-    short_description = factory.Faker("text")
-    long_description = factory.Faker("text")
 
     class Meta:
         model = SourceSerializer
 
 
-class SubstanceTypeFactory(DjangoSerializerFactory):
+class SubstanceTypeFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
     """Manufactures `SubstanceType` models."""
-
-    name = factory.Faker("slug")
-    label = factory.LazyAttribute(lambda o: o.name.replace("-", " "))
-    short_description = factory.Faker("text")
-    long_description = factory.Faker("text")
 
     class Meta:
         model = SubstanceTypeSerializer
@@ -78,13 +68,9 @@ class SubstanceFactory(factory.DjangoModelFactory):
         model = apps.get_model("substance", "Substance")
 
 
-class SynonymTypeFactory(DjangoSerializerFactory):
+class SynonymTypeFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
     """Manufactures `SynonymType` models."""
 
-    name = factory.Faker("slug")
-    label = factory.LazyAttribute(lambda o: o.name.replace("-", " "))
-    short_description = factory.Faker("text")
-    long_description = factory.Faker("text")
     validation_regular_expression = ".*"
     score_modifier = factory.Faker("pyfloat")
 
