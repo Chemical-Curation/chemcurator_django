@@ -1,5 +1,13 @@
+from rest_framework.exceptions import ValidationError
+
 from chemreg.jsonapi.serializers import HyperlinkedModelSerializer
-from chemreg.substance.models import QCLevelsType, Source, SubstanceType, SynonymType
+from chemreg.substance.models import (
+    QCLevelsType,
+    Source,
+    SubstanceType,
+    SynonymQuality,
+    SynonymType,
+)
 
 
 class QCLevelsTypeSerializer(HyperlinkedModelSerializer):
@@ -55,3 +63,23 @@ class SubstanceTypeSerializer(HyperlinkedModelSerializer):
             "short_description",
             "long_description",
         ]
+
+
+class SynonymQualitySerializer(HyperlinkedModelSerializer):
+    """The serializer for Synonym Qualities."""
+
+    class Meta:
+        model = SynonymQuality
+        fields = [
+            "name",
+            "label",
+            "short_description",
+            "long_description",
+            "score_weight",
+            "is_restrictive",
+        ]
+
+    def validate_score_weight(self, value):
+        if not value > 0:
+            raise ValidationError("Score Weight must be greater than zero.")
+        return value

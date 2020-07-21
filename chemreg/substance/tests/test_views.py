@@ -4,6 +4,7 @@ from chemreg.substance.views import (
     ModelViewSet,
     SourceViewSet,
     SubstanceTypeViewSet,
+    SynonymQualityViewSet,
     SynonymTypeViewSet,
 )
 
@@ -173,3 +174,35 @@ def test_substance_type_get(client, admin_user, substance_type_factory):
         assert "label" in result
         assert "short_description" in result
         assert "long_description" in result
+
+
+def test_synonym_quality_view():
+    """Tests that the Synonym Quality View Set, is a sub class of the Model View Set."""
+    assert issubclass(SynonymQualityViewSet, ModelViewSet)
+
+
+@pytest.mark.django_db
+def test_synonym_quality_post(client, admin_user, synonym_quality_factory):
+    client.force_authenticate(user=admin_user)
+    stf = synonym_quality_factory.build()
+    resp = client.post(
+        "/synonymQualities",
+        {"data": {"type": "synonymQuality", "attributes": stf.initial_data}},
+    )
+    assert resp.status_code == 201
+
+
+@pytest.mark.django_db
+def test_synonym_quality_get(client, admin_user, synonym_quality_factory):
+    client.force_authenticate(user=admin_user)
+    synonym_quality_factory.create()
+    resp = client.get("/synonymQualities")
+    assert resp.status_code == 200
+    assert resp.data["results"]
+    for result in resp.data["results"]:
+        assert "name" in result
+        assert "label" in result
+        assert "short_description" in result
+        assert "long_description" in result
+        assert "score_weight" in result
+        assert "is_restrictive" in result

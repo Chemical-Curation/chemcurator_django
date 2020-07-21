@@ -110,7 +110,6 @@ class SynonymQuality(ControlledVocabulary):
         Long Description = TEXT (required field)
         score_weight = Float (default 1.0) greater than 0
         is_restrictive = Boolean
-    TODO: Add Validation in Serializer for score_weight, unable to set minimum value for FloatField's
     """
 
     score_weight = models.FloatField(default=1.0)

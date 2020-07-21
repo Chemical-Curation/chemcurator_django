@@ -35,6 +35,7 @@ local qcLevelsType = import 'substance/qcLevelsType.libsonnet';
 local synonymType = import 'substance/synonymType.libsonnet';
 local source = import 'substance/source.libsonnet';
 local substanceType = import 'substance/substanceType.libsonnet';
+local synonymQuality = import 'substance/synonymQuality.libsonnet';
 
 ////////////////////////
 // List of all models //
@@ -47,7 +48,8 @@ local objs = [
   qcLevelsType,
   synonymType,
   source,
-  substanceType
+  substanceType,
+  synonymQuality
 ];
 
 // Build spec

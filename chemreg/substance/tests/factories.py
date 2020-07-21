@@ -11,6 +11,7 @@ from chemreg.substance.serializers import (
     QCLevelsTypeSerializer,
     SourceSerializer,
     SubstanceTypeSerializer,
+    SynonymQualitySerializer,
     SynonymTypeSerializer,
 )
 
@@ -76,3 +77,13 @@ class SynonymTypeFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
 
     class Meta:
         model = SynonymTypeSerializer
+
+
+class SynonymQualityFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
+    """Manufactures `SynonymQuality` Serializers."""
+
+    score_weight = factory.Faker("pyfloat", positive=True)
+    is_restrictive = factory.Faker("boolean")
+
+    class Meta:
+        model = SynonymQualitySerializer
