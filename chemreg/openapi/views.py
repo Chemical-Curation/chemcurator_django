@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.views.generic.base import TemplateView, View
 
 from chemreg.compound.settings import compound_settings
+from chemreg.substance.settings import substance_settings
 
 try:
     import _jsonnet as jsonnet
@@ -35,6 +36,7 @@ class OpenAPIView(View):
             ext_vars={
                 "baseServer": "__BASE_SERVER__",
                 "COMPOUND_PREFIX": compound_settings.PREFIX,
+                "SUBSTANCE_PREFIX": substance_settings.PREFIX,
             },
             jpathdir=os.path.join(os.path.dirname(__file__), "schemas"),
         )

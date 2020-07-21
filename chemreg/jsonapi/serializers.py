@@ -151,11 +151,14 @@ class PolymorphicSelfLinkMixin:
     """Fixes a bug where polymorphic serializers return the wrong self link."""
 
     def build_url_field(self, field_name, model_class):
-        if hasattr(self, "context") and "view" in self.context:
-            basename = self.context["view"].basename
-            field_class = self.serializer_url_field
-            field_kwargs = {"view_name": f"{basename}-detail"}
-            return (field_class, field_kwargs)
+        # Todo:  This was originally to fix a bug with the compounds endpoint
+        #  where the defined/ill-defined compounds were breaking.  It is also
+        #  preventing related links from populating with their serializers.
+        # if hasattr(self, "context") and "view" in self.context:
+        #     basename = self.context["view"].basename
+        #     field_class = self.serializer_url_field
+        #     field_kwargs = {"view_name": f"{basename}-detail"}
+        #     return (field_class, field_kwargs)
         return super().build_url_field(field_name, model_class)
 
 

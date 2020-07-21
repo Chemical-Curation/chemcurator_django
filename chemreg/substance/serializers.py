@@ -1,9 +1,16 @@
 from rest_framework.exceptions import ValidationError
 
+from chemreg.compound.models import BaseCompound
+from chemreg.compound.serializers import CompoundSerializer
+from chemreg.jsonapi.relations import (
+    PolymorphicResourceRelatedField,
+    ResourceRelatedField,
+)
 from chemreg.jsonapi.serializers import HyperlinkedModelSerializer
 from chemreg.substance.models import (
     QCLevelsType,
     Source,
+    Substance,
     SubstanceType,
     SynonymQuality,
     SynonymType,
@@ -49,6 +56,46 @@ class SourceSerializer(HyperlinkedModelSerializer):
             "label",
             "short_description",
             "long_description",
+        ]
+
+
+class SubstanceSerializer(HyperlinkedModelSerializer):
+    """The serializer for Substances
+    """
+
+    included_serializers = {
+        "source": "chemreg.substance.serializers.SourceSerializer",
+        "substance_type": "chemreg.substance.serializers.SubstanceTypeSerializer",
+        "qc_level": "chemreg.substance.serializers.QCLevelsTypeSerializer",
+        "associated_compound": "chemreg.compound.serializers.CompoundSerializer",
+    }
+
+    source = ResourceRelatedField(queryset=Source.objects, model=Source)
+    substance_type = ResourceRelatedField(
+        queryset=SubstanceType.objects, model=SubstanceType
+    )
+    qc_level = ResourceRelatedField(queryset=QCLevelsType.objects, model=QCLevelsType)
+    associated_compound = PolymorphicResourceRelatedField(
+        polymorphic_serializer=CompoundSerializer,
+        queryset=BaseCompound.objects,
+        required=False,
+        allow_null=True,
+    )
+
+    class Meta:
+        model = Substance
+        fields = [
+            "sid",
+            "preferred_name",
+            "display_name",
+            "description",
+            "public_qc_note",
+            "private_qc_note",
+            "casrn",
+            "source",
+            "substance_type",
+            "qc_level",
+            "associated_compound",
         ]
 
 

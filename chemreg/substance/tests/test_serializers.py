@@ -1,9 +1,12 @@
 import pytest
+from rest_framework_json_api.utils import get_included_serializers
 
+from chemreg.compound.serializers import CompoundSerializer
 from chemreg.substance.serializers import (
     HyperlinkedModelSerializer,
     QCLevelsTypeSerializer,
     SourceSerializer,
+    SubstanceSerializer,
     SubstanceTypeSerializer,
     SynonymQualitySerializer,
     SynonymTypeSerializer,
@@ -42,6 +45,41 @@ def test_source_serializer():
 @pytest.mark.django_db
 def test_source(source_factory):
     serializer = source_factory.build()
+    assert serializer.is_valid()
+    serializer.save()
+
+
+@pytest.mark.django_db
+def test_substance_serializer():
+    assert issubclass(SubstanceSerializer, HyperlinkedModelSerializer)
+
+
+@pytest.mark.django_db
+def test_substance_serializer_includes():
+    serializer = get_included_serializers(SubstanceSerializer)
+    assert serializer["source"] is SourceSerializer
+    assert serializer["substance_type"] is SubstanceTypeSerializer
+    assert serializer["qc_level"] is QCLevelsTypeSerializer
+    assert serializer["associated_compound"] is CompoundSerializer
+
+
+@pytest.mark.django_db
+def test_substance_no_associated_compound(substance_factory):
+    serializer = substance_factory.build()
+    assert serializer.is_valid()
+    serializer.save()
+
+
+@pytest.mark.django_db
+def test_substance_defined_compound(substance_factory):
+    serializer = substance_factory.build(defined=True)
+    assert serializer.is_valid()
+    serializer.save()
+
+
+@pytest.mark.django_db
+def test_substance_ill_defined_compound(substance_factory):
+    serializer = substance_factory.build(illdefined=True)
     assert serializer.is_valid()
     serializer.save()
 

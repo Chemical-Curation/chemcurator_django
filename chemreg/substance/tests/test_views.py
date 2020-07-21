@@ -1,5 +1,10 @@
-import pytest
+import json
+from collections import OrderedDict
 
+import pytest
+from rest_framework_json_api.utils import get_included_serializers
+
+from chemreg.substance.serializers import SubstanceSerializer
 from chemreg.substance.views import (
     ModelViewSet,
     SourceViewSet,
@@ -144,6 +149,150 @@ def test_source_patch(client, admin_user, source_factory):
     )
     assert resp.status_code == 200
     assert resp.data["name"] == "a-new-name"
+
+
+@pytest.mark.django_db
+def test_substance_post(client, admin_user, substance_factory):
+    client.force_authenticate(user=admin_user)
+    model_dict = substance_factory.build(defined=True).initial_data
+    resp = client.post(
+        "/substances",
+        {
+            "data": {
+                "type": "substance",
+                "attributes": model_dict,
+                "relationships": {
+                    "qcLevel": {
+                        "data": {"id": model_dict["qc_level"]["id"], "type": "qcLevel"}
+                    },
+                    "source": {
+                        "data": {"id": model_dict["source"]["id"], "type": "source"}
+                    },
+                    "substanceType": {
+                        "data": {
+                            "id": model_dict["substance_type"]["id"],
+                            "type": "substanceType",
+                        }
+                    },
+                    "associatedCompound": {
+                        "data": {
+                            "id": model_dict["associated_compound"]["id"],
+                            "type": "definedCompound",
+                        }
+                    },
+                },
+            }
+        },
+    )
+    assert resp.status_code == 201
+
+
+@pytest.mark.django_db
+def test_substance_list(client, admin_user, substance_factory):
+    client.force_authenticate(user=admin_user)
+    substance_factory()
+    resp = client.get("/substances")
+    assert resp.status_code == 200
+    # Check that all results contain
+    for result in resp.data["results"]:
+        assert "sid" in result
+        assert "preferred_name" in result
+        assert "display_name" in result
+        assert "description" in result
+        assert "public_qc_note" in result
+        assert "private_qc_note" in result
+        assert "casrn" in result
+        assert "source" in result
+        assert "substance_type" in result
+        assert "qc_level" in result
+        assert "associated_compound" in result
+
+
+@pytest.mark.django_db
+def test_substance_fetch(client, admin_user, substance_factory):
+    client.force_authenticate(user=admin_user)
+    original_model = substance_factory.create(illdefined=True).instance
+    resp = client.get("/substances/{}".format(original_model.pk))
+    assert resp.status_code == 200
+    for key in resp.data.keys() - {"url"}:
+        # Verify Attributes
+        if isinstance(resp.data[key], str):
+            assert resp.data[key] == getattr(original_model, key)
+        # Verify Related Resources
+        elif type(resp.data[key]) is OrderedDict:
+            assert resp.data[key]["id"] == str(getattr(original_model, key).id)
+
+
+@pytest.mark.django_db
+def test_substance_fetch_includes(client, admin_user, substance_factory):
+    client.force_authenticate(user=admin_user)
+    model = substance_factory(illdefined=True).instance
+    requested_includes = get_included_serializers(SubstanceSerializer)
+    resp = client.get(
+        "/substances/{}".format(model.pk),
+        data={"include": ",".join(requested_includes)},
+    )
+    assert resp.status_code == 200
+    response_included = json.loads(resp.content.decode("utf-8"))["included"]
+    # Assert there is an include resource for every requested include
+    assert len(requested_includes) == len(response_included)
+
+
+@pytest.mark.django_db
+def test_substance_patch(client, admin_user, substance_factory):
+    client.force_authenticate(user=admin_user)
+    original_model = substance_factory.create(defined=True).instance
+    model_dict = substance_factory.build(illdefined=True).initial_data
+    model_dict.update(sid="DTXSID205000001")
+    resp = client.patch(
+        "/substances/{}".format(original_model.pk),
+        {
+            "data": {
+                "type": "substance",
+                "id": original_model.pk,
+                "attributes": model_dict,
+                "relationships": {
+                    "qcLevel": {
+                        "data": {"id": model_dict["qc_level"]["id"], "type": "qcLevel"}
+                    },
+                    "source": {
+                        "data": {"id": model_dict["source"]["id"], "type": "source"}
+                    },
+                    "substanceType": {
+                        "data": {
+                            "id": model_dict["substance_type"]["id"],
+                            "type": "substanceType",
+                        }
+                    },
+                    "associatedCompound": {
+                        "data": {
+                            "id": model_dict["associated_compound"]["id"],
+                            "type": "definedCompound",
+                        }
+                    },
+                },
+            }
+        },
+    )
+    original_model.refresh_from_db()
+    assert resp.status_code == 200
+    for key in resp.data.keys() - {"url"}:
+        # Verify Attributes
+        if isinstance(resp.data[key], str):
+            assert resp.data[key] == model_dict[key]
+        # Verify Related Resources
+        elif type(resp.data[key]) is OrderedDict:
+            assert resp.data[key]["id"] == model_dict[key]["id"]
+
+
+@pytest.mark.django_db
+def test_substance_delete(client, admin_user, substance_factory):
+    client.force_authenticate(user=admin_user)
+    original_model = substance_factory.create().instance
+    resp = client.delete("/substances/{}".format(original_model.pk))
+    assert resp.status_code == 204
+    with pytest.raises(original_model.DoesNotExist):
+        original_model.refresh_from_db()
 
 
 def test_substance_type_view():

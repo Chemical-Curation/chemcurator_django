@@ -2,6 +2,7 @@ from chemreg.jsonapi.views import ModelViewSet
 from chemreg.substance.models import (
     QCLevelsType,
     Source,
+    Substance,
     SubstanceType,
     SynonymQuality,
     SynonymType,
@@ -9,6 +10,7 @@ from chemreg.substance.models import (
 from chemreg.substance.serializers import (
     QCLevelsTypeSerializer,
     SourceSerializer,
+    SubstanceSerializer,
     SubstanceTypeSerializer,
     SynonymQualitySerializer,
     SynonymTypeSerializer,
@@ -31,6 +33,12 @@ class SourceViewSet(ModelViewSet):
 
     queryset = Source.objects.all()
     serializer_class = SourceSerializer
+
+
+class SubstanceViewSet(ModelViewSet):
+
+    queryset = Substance.objects.all()
+    serializer_class = SubstanceSerializer
 
 
 class SubstanceTypeViewSet(ModelViewSet):

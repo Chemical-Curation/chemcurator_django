@@ -1,6 +1,5 @@
 import factory
 from factory.base import BaseFactory, FactoryMetaClass
-from faker.providers import BaseProvider
 from rest_framework_json_api.renderers import JSONRenderer
 from rest_framework_json_api.utils import (
     format_value,
@@ -14,24 +13,6 @@ def is_relation(obj):
     if isinstance(obj, list) and len(obj) and isinstance(dict, obj[0]):
         return is_relation(obj[0])
     return False
-
-
-class ChemicalProvider(BaseProvider):
-    """Provider to allow faker to generate cas numbers.
-
-    To add to factory_boy's instance of faker add
-    `factory.Faker.add_provider(ChemicalProvider)`
-    to the beginning of your factory file.
-    """
-
-    def cas_number(self):
-        """
-        Returns a CAS string
-        """
-        seg1 = self.generator.random.randrange(10, 9999999)
-        seg2 = self.generator.random.randrange(10, 99)
-        seg3 = self.generator.random.randrange(0, 9)
-        return f"{seg1}-{seg2}-{seg3}"
 
 
 class ControlledVocabularyFactory(factory.DjangoModelFactory):

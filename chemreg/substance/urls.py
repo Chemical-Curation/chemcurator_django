@@ -8,6 +8,7 @@ router = SimpleRouter()
 router.register(views.QCLevelsTypeViewSet, "qcLevels")
 router.register(views.SynonymTypeViewSet)
 router.register(views.SourceViewSet)
+router.register(views.SubstanceViewSet)
 router.register(views.SubstanceTypeViewSet)
 router.register(views.SynonymQualityViewSet, prefix="synonymQualities")
 

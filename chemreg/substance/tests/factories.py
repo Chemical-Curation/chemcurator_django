@@ -1,15 +1,15 @@
-from django.apps import apps
-
 import factory
 
-from chemreg.common.factory import (
-    ChemicalProvider,
-    ControlledVocabularyFactory,
-    DjangoSerializerFactory,
+from chemreg.common.factory import ControlledVocabularyFactory, DjangoSerializerFactory
+from chemreg.common.fakers import ChemicalProvider
+from chemreg.compound.tests.factories import (
+    DefinedCompoundFactory,
+    IllDefinedCompoundFactory,
 )
 from chemreg.substance.serializers import (
     QCLevelsTypeSerializer,
     SourceSerializer,
+    SubstanceSerializer,
     SubstanceTypeSerializer,
     SynonymQualitySerializer,
     SynonymTypeSerializer,
@@ -45,10 +45,9 @@ class QCLevelsTypeFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
         model = QCLevelsTypeSerializer
 
 
-class SubstanceFactory(factory.DjangoModelFactory):
+class SubstanceFactory(DjangoSerializerFactory):
     """Manufactures `Substance` models.
-
-    Todo: On creation of Substance Serializer convert this to a DjangoSerializerFactory"""
+    """
 
     preferred_name = factory.Sequence(
         lambda n: f"{factory.Faker('slug').generate()}-{n}"
@@ -60,13 +59,25 @@ class SubstanceFactory(factory.DjangoModelFactory):
     casrn = factory.Faker("cas_number")
 
     # Related Factories
-    # Todo: This is a work around to allow SerializerFactories as SubFactories. Remove when converting
-    source = factory.LazyAttribute(lambda _: SourceFactory().instance)
-    substance_type = factory.LazyAttribute(lambda _: SubstanceTypeFactory().instance)
-    qc_level = factory.LazyAttribute(lambda _: QCLevelsTypeFactory().instance)
+    source = factory.SubFactory(SourceFactory)
+    substance_type = factory.SubFactory(SubstanceTypeFactory)
+    qc_level = factory.SubFactory(QCLevelsTypeFactory)
+    associated_compound = None
 
     class Meta:
-        model = apps.get_model("substance", "Substance")
+        model = SubstanceSerializer
+
+    class Params:
+        defined = factory.Trait(
+            associated_compound=factory.SubFactory(
+                DefinedCompoundFactory, _is_sub_factory=True
+            )
+        )
+        illdefined = factory.Trait(
+            associated_compound=factory.SubFactory(
+                IllDefinedCompoundFactory, _is_sub_factory=True
+            )
+        )
 
 
 class SynonymTypeFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
