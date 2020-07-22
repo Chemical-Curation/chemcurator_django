@@ -7,7 +7,6 @@ from rest_framework_json_api.utils import get_included_serializers
 from chemreg.substance.serializers import SubstanceSerializer
 from chemreg.substance.views import (
     ModelViewSet,
-    RelationshipTypeViewSet,
     SourceViewSet,
     SubstanceTypeViewSet,
     SynonymQualityViewSet,
@@ -325,21 +324,7 @@ def test_substance_type_get(client, admin_user, substance_type_factory):
         assert "short_description" in result
         assert "long_description" in result
 
-        
-def test_relationship_type_view():
-    """Tests that the Source View Set, is a sub class of the Model View Set."""
-    assert issubclass(RelationshipTypeViewSet, ModelViewSet)
 
-
-@pytest.mark.django_db
-def test_relationship_type_create(client, admin_user, relationship_type_factory):
-    client.force_authenticate(user=admin_user)
-    stf = relationship_type_factory.build()
-    resp = client.post(
-        "/relationshipTypes",
-        {"data": {"type": "relationshipType", "attributes": stf.initial_data}},
-
-      
 def test_synonym_quality_view():
     """Tests that the Synonym Quality View Set, is a sub class of the Model View Set."""
     assert issubclass(SynonymQualityViewSet, ModelViewSet)
@@ -357,12 +342,6 @@ def test_synonym_quality_post(client, admin_user, synonym_quality_factory):
 
 
 @pytest.mark.django_db
-def test_relationship_type_list(client, admin_user, relationship_type_factory):
-    client.force_authenticate(user=admin_user)
-    relationship_type_factory.create()
-    resp = client.get("/relationshipTypes")
-
-      
 def test_synonym_quality_get(client, admin_user, synonym_quality_factory):
     client.force_authenticate(user=admin_user)
     synonym_quality_factory.create()
@@ -374,52 +353,5 @@ def test_synonym_quality_get(client, admin_user, synonym_quality_factory):
         assert "label" in result
         assert "short_description" in result
         assert "long_description" in result
-        assert "corrolary_label" in result
-        assert "corrolary_short_description" in result
-
-
-@pytest.mark.django_db
-def test_relationship_type_fetch(client, admin_user, relationship_type_factory):
-    client.force_authenticate(user=admin_user)
-    original_model = relationship_type_factory.create().instance
-    resp = client.get("/relationshipTypes/{}".format(original_model.pk))
-    assert resp.status_code == 200
-    for key in resp.data.keys() - {"url"}:
-        # Verify Attributes
-        if isinstance(resp.data[key], str):
-            assert resp.data[key] == getattr(original_model, key)
-
-
-@pytest.mark.django_db
-def test_relationship_type_patch(client, admin_user, relationship_type_factory):
-    client.force_authenticate(user=admin_user)
-    original_model = relationship_type_factory.create().instance
-    model_dict = relationship_type_factory.build().initial_data
-    model_dict.update(sid="DTXSID205000001")
-    resp = client.patch(
-        "/relationshipTypes/{}".format(original_model.pk),
-        {
-            "data": {
-                "type": "relationshipType",
-                "id": original_model.pk,
-                "attributes": model_dict,
-            }
-        },
-    )
-    assert resp.status_code == 200
-    for key in resp.data.keys() - {"url"}:
-        # Verify Attributes
-        if isinstance(resp.data[key], str):
-            assert resp.data[key] == model_dict[key]
-
-
-@pytest.mark.django_db
-def test_relationship_type_delete(client, admin_user, relationship_type_factory):
-    client.force_authenticate(user=admin_user)
-    original_model = relationship_type_factory.create().instance
-    resp = client.delete("/relationshipTypes/{}".format(original_model.pk))
-    assert resp.status_code == 204
-    with pytest.raises(original_model.DoesNotExist):
-        original_model.refresh_from_db()
         assert "score_weight" in result
         assert "is_restrictive" in result

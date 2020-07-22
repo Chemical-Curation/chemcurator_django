@@ -8,7 +8,6 @@ from chemreg.compound.tests.factories import (
 )
 from chemreg.substance.serializers import (
     QCLevelsTypeSerializer,
-    RelationshipTypeSerializer,
     SourceSerializer,
     SubstanceSerializer,
     SubstanceTypeSerializer,
@@ -47,7 +46,8 @@ class QCLevelsTypeFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
 
 
 class SubstanceFactory(DjangoSerializerFactory):
-    """Manufactures `Substance` models."""
+    """Manufactures `Substance` models.
+    """
 
     preferred_name = factory.Sequence(
         lambda n: f"{factory.Faker('slug').generate()}-{n}"
@@ -90,16 +90,6 @@ class SynonymTypeFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
         model = SynonymTypeSerializer
 
 
-class RelationshipTypeFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
-    """Manufactures `RelationshipType` models."""
-
-    corrolary_label = factory.Faker("text", max_nb_chars=99)
-    corrolary_short_description = factory.Faker("text", max_nb_chars=499)
-
-    class Meta:
-        model = RelationshipTypeSerializer
-
-        
 class SynonymQualityFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
     """Manufactures `SynonymQuality` Serializers."""
 

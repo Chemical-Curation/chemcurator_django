@@ -5,7 +5,6 @@ from chemreg.compound.serializers import CompoundSerializer
 from chemreg.substance.serializers import (
     HyperlinkedModelSerializer,
     QCLevelsTypeSerializer,
-    RelationshipTypeSerializer,
     SourceSerializer,
     SubstanceSerializer,
     SubstanceTypeSerializer,
@@ -98,17 +97,6 @@ def test_substance_type(substance_type_factory):
 
 
 @pytest.mark.django_db
-def test_relationship_type_serializer():
-    assert issubclass(RelationshipTypeSerializer, HyperlinkedModelSerializer)
-
-
-@pytest.mark.django_db
-def test_relationship_type(relationship_type_factory):
-    serializer = relationship_type_factory.build()
-    assert serializer.is_valid()
-    serializer.save()
-
-    
 def test_synonym_quality_serializer():
     assert issubclass(SynonymQualitySerializer, HyperlinkedModelSerializer)
 
