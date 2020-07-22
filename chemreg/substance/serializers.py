@@ -9,6 +9,7 @@ from chemreg.jsonapi.relations import (
 from chemreg.jsonapi.serializers import HyperlinkedModelSerializer
 from chemreg.substance.models import (
     QCLevelsType,
+    RelationshipType,
     Source,
     Substance,
     SubstanceType,
@@ -112,6 +113,21 @@ class SubstanceTypeSerializer(HyperlinkedModelSerializer):
         ]
 
 
+class RelationshipTypeSerializer(HyperlinkedModelSerializer):
+    """The serializer for Substance Types."""
+
+    class Meta:
+        model = RelationshipType
+        fields = [
+            "name",
+            "label",
+            "short_description",
+            "long_description",
+            "corrolary_label",
+            "corrolary_short_description",
+        ]
+
+        
 class SynonymQualitySerializer(HyperlinkedModelSerializer):
     """The serializer for Synonym Qualities."""
 
@@ -130,3 +146,4 @@ class SynonymQualitySerializer(HyperlinkedModelSerializer):
         if not value > 0:
             raise ValidationError("Score Weight must be greater than zero.")
         return value
+      
