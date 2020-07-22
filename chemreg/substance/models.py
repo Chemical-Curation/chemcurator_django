@@ -45,9 +45,9 @@ class Substance(CommonInfo):
         substance_type (foreign key): Controlled vocabulary for Substances
         qc_level (foreign key): ForeignKey
         description (str): A description of the substance
-        public_qc_note (str): unknown
-        private_qc_note (str): unknown
-        associated_compound (foreign key): ForeignKey
+        public_qc_note (str): Note from Quality Control.  Visible to everyone
+        private_qc_note (str): Note from Quality Control.
+        associated_compound (foreign key): ForeignKey connecting a substance to a compound
         casrn (str): CAS registry number. It is an identifier from the CAS Registry
             (https://www.cas.org/support/documentation/chemical-substances) for a chemical substance.
         synonyms (QuerySet): One to Many Synonym resources
@@ -120,31 +120,32 @@ class Synonym(CommonInfo):
     """Information to be shared across Synonyms
 
     Attributes:
-        Identifier = String (1024)) (required)
-        Synonym Quality (required)
-        Source (required)
-        Synonym Type (optional)
-        qc_notes = String (1024) (optional)
+        identifier (str): Identifier for synonym. 1024 character limit (required)
+        qc_notes (str): Quality Control note.  1024 character limit (optional)
+        substance (foreign key) : Link to a Substance (optional)
+        source (foreign key): Link to a Source (required)
+        synonym_quality (foreign key): Link to a Synonym Quality (required)
+        synonym_type (foreign key): Link to a Synonym Type (optional)
     """
 
-    substance = models.ForeignKey("Substance", on_delete=models.PROTECT)
     identifier = models.TextField(max_length=1024)
-    synonym_quality = models.ForeignKey(SynonymQuality, on_delete=models.PROTECT)
-    source = models.ForeignKey(Source, on_delete=models.PROTECT)
-    synonym_type = models.ForeignKey(SynonymType, null=True, on_delete=models.PROTECT)
     qc_notes = models.TextField(max_length=1024, null=True)
+    substance = models.ForeignKey("Substance", on_delete=models.PROTECT)
+    source = models.ForeignKey("Source", on_delete=models.PROTECT)
+    synonym_quality = models.ForeignKey("SynonymQuality", on_delete=models.PROTECT)
+    synonym_type = models.ForeignKey("SynonymType", null=True, on_delete=models.PROTECT)
 
 
 class RelationshipType(ControlledVocabulary):
     """Controlled vocabulary for Substances
 
     Attributes:
-        Name = String (Less than 50 character, url safe, unique, required field)
-        Label = String (Less than 100 characters, unique, required field)
-        Short Description = String (Less than 500 characters, required field)
-        Long Description = TEXT (required field)
-        corrolary label = String (Less than 100 characters, unique, required field)
-        corrolary short description = String (Less than 500 characters, required field)
+        name (str): Slug field of the relationship type (Less than 50 character, url safe, unique, required field)
+        label (str): Readable string field of the relationship type (Less than 100 characters, unique, required field)
+        short_description (str): Short description of the relationship type (Less than 500 characters, required field)
+        long_description (str): Long description of the relationship type (required field)
+        corrolary_label (str): (Less than 100 characters, unique, required field)
+        corrolary_short_description (str): (Less than 500 characters, required field)
     """
 
     corrolary_label = models.CharField(max_length=99)
