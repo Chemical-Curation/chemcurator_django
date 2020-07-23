@@ -1,6 +1,8 @@
 import json
 from collections import OrderedDict
 
+from django.contrib.auth.models import Permission
+
 import pytest
 from rest_framework_json_api.utils import get_included_serializers
 
@@ -13,6 +15,7 @@ from chemreg.substance.views import (
     SynonymQualityViewSet,
     SynonymTypeViewSet,
 )
+from chemreg.users.models import User
 
 
 @pytest.mark.django_db
@@ -433,3 +436,65 @@ def test_synonym_quality_get(client, admin_user, synonym_quality_factory):
         assert "long_description" in result
         assert "score_weight" in result
         assert "is_restrictive" in result
+
+
+@pytest.mark.django_db
+def test_intermediate_user_access(client, admin_user, synonym_type_factory):
+    """Tests that a non-admin user can only perform the allowed
+    operations that have been specified in the admin panel
+    DELETE https://api.chemreg.epa.gov/synonym-types/{id}
+        user.has_perm(‘foo.delete_bar’)
+    PATCH https://api.chemreg.epa.gov/synonym-types/{id}
+        user.has_perm(‘foo.change_bar’)
+    """
+
+    client.force_authenticate(user=admin_user)
+    stf = synonym_type_factory.build()
+    resp = client.post(
+        "/synonymTypes",
+        {"data": {"type": "synonymType", "attributes": stf.initial_data}},
+    )
+    assert resp.status_code == 201
+    json_data = json.loads(resp.content)
+    st_url = json_data["data"]["links"]["self"]
+
+    # make a new non-admin user
+    mook = User.objects.create_user("mook", "mook_user@epa.gov", "mookpassword")
+    permission = Permission.objects.get(codename="view_synonymtype",)
+    mook.user_permissions.add(permission)
+    client.force_authenticate(user=mook)
+
+    # the user should be able to see the record
+    resp = client.get(st_url)
+    assert resp.status_code == 200
+
+    # test that the attempt to create a new record fails
+    stf = synonym_type_factory.build()
+    resp = client.post(
+        "/synonymTypes",
+        {"data": {"type": "synonymType", "attributes": stf.initial_data}},
+    )
+    assert resp.status_code == 403
+
+
+@pytest.mark.django_db
+def test_intermediate_user_post(client, admin_user, synonym_type_factory):
+    """Tests that a non-admin user can only perform a valid POST request
+        POST https://api.chemreg.epa.gov/synonym-types
+        user.has_perm(‘foo.add_bar’)
+    """
+
+    mook = User.objects.create_user("mook", "mook_user@epa.gov", "mookpassword")
+    permission = Permission.objects.get(codename="add_synonymtype",)
+    mook.user_permissions.add(permission)
+
+    client.force_authenticate(user=mook)
+    if hasattr(mook, "_perm_cache"):
+        delattr(mook, "_perm_cache")
+
+    stf = synonym_type_factory.build()
+    resp = client.post(
+        "/synonymTypes",
+        {"data": {"type": "synonymType", "attributes": stf.initial_data}},
+    )
+    assert resp.status_code == 201
