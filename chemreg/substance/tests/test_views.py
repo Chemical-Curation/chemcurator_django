@@ -192,6 +192,42 @@ def test_substance_post(client, admin_user, substance_factory):
 
 
 @pytest.mark.django_db
+def test_required_subresource_not_specified(client, admin_user, substance_factory):
+    client.force_authenticate(user=admin_user)
+    model_dict = substance_factory.build(defined=True).initial_data
+    model_dict.pop("qc_level")
+    resp = client.post(
+        "/substances",
+        {
+            "data": {
+                "type": "substance",
+                "attributes": model_dict,
+                "relationships": {
+                    "source": {
+                        "data": {"id": model_dict["source"]["id"], "type": "source"}
+                    },
+                    "substanceType": {
+                        "data": {
+                            "id": model_dict["substance_type"]["id"],
+                            "type": "substanceType",
+                        }
+                    },
+                    "associatedCompound": {
+                        "data": {
+                            "id": model_dict["associated_compound"]["id"],
+                            "type": "definedCompound",
+                        }
+                    },
+                },
+            }
+        },
+    )
+    assert resp.status_code == 400
+    assert str(resp.data[0]["detail"]) == "This field is required."
+    assert resp.data[0]["source"]["pointer"] == "/data/attributes/qcLevel"
+
+
+@pytest.mark.django_db
 def test_substance_list(client, admin_user, substance_factory):
     client.force_authenticate(user=admin_user)
     substance_factory()
