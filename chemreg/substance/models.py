@@ -38,20 +38,21 @@ class Substance(CommonInfo):
     """Substances document chemical concepts
 
     Attributes:
-        substance_id (str): Generated SID for external use
+        sid (str): Generated SID for external use
         preferred_name (str): Name of the substance
         display_name (str): User friendly name of the substance
-        source (foreign key): ForeignKey
+        source (foreign key): Controlled vocabulary for Sources
         substance_type (foreign key): Controlled vocabulary for Substances
-        qc_level (foreign key): ForeignKey
+        qc_level (foreign key): Controlled vocabulary for QCLevels
         description (str): A description of the substance
         public_qc_note (str): Note from Quality Control.  Visible to everyone
         private_qc_note (str): Note from Quality Control.
-        associated_compound (foreign key): ForeignKey connecting a substance to a compound
+        associated_compound (foreign key): Polymorphic relationship to Compounds.Compounds.
+            Can either be either a DefinedCompound or an IllDefinedCompound
         casrn (str): CAS registry number. It is an identifier from the CAS Registry
             (https://www.cas.org/support/documentation/chemical-substances) for a chemical substance.
         synonyms (QuerySet): One to Many Synonym resources
-        substance_histories (QuerySet): Many to Many Substance history resources (not implemented yet)
+        substance_histories (QuerySet): One to Many Substance history resources (not implemented yet)
     """
 
     sid = models.CharField(default=build_sid, max_length=50, unique=True)
@@ -69,6 +70,40 @@ class Substance(CommonInfo):
         "compound.BaseCompound", on_delete=models.PROTECT, null=True
     )
     casrn = models.CharField(max_length=50, unique=True)
+
+
+class SubstanceRelationship(CommonInfo):
+    """ Through table linking Substances to each other. This is a self referential relationship.
+
+    Attributes:
+        from_substance (foreign key): The primary member in the relationship
+        to_substance (foreign key): The secondary member in the relationship
+        relationship_type (foreign key): the type of relationship between the
+            two substances (required)
+        source (foreign key): A source controlled vocabulary for the source type
+            from which this data was derived (required)
+        qc_notes (str): Quality Control Notes (optional)
+    """
+
+    from_substance = models.ForeignKey(
+        "Substance", related_name="relationships", on_delete=models.PROTECT
+    )
+    to_substance = models.ForeignKey(
+        "Substance", related_name="related_to", on_delete=models.PROTECT
+    )
+    source = models.ForeignKey("Source", on_delete=models.PROTECT)
+    relationship_type = models.ForeignKey("RelationshipType", on_delete=models.PROTECT)
+    qc_note = models.CharField(max_length=1024, blank=True)
+
+    class Meta:
+        unique_together = (
+            "from_substance",
+            "to_substance",
+            "source",
+            "relationship_type",
+        )
+        ordering = ["pk"]
+        base_manager_name = "objects"
 
 
 class SubstanceType(ControlledVocabulary):
