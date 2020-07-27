@@ -6,14 +6,16 @@ from chemreg.substance.tests.factories import (
     SourceFactory,
     SubstanceFactory,
     SubstanceTypeFactory,
+    SynonymFactory,
     SynonymQualityFactory,
     SynonymTypeFactory,
 )
 
 register(QCLevelsTypeFactory)
 register(RelationshipTypeFactory)
-register(SynonymTypeFactory)
 register(SourceFactory)
 register(SubstanceFactory)
 register(SubstanceTypeFactory)
+register(SynonymFactory)
 register(SynonymQualityFactory)
+register(SynonymTypeFactory)

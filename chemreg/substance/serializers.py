@@ -13,6 +13,7 @@ from chemreg.substance.models import (
     Source,
     Substance,
     SubstanceType,
+    Synonym,
     SynonymQuality,
     SynonymType,
 )
@@ -61,8 +62,7 @@ class SourceSerializer(HyperlinkedModelSerializer):
 
 
 class SubstanceSerializer(HyperlinkedModelSerializer):
-    """The serializer for Substances
-    """
+    """The serializer for Substances."""
 
     included_serializers = {
         "source": "chemreg.substance.serializers.SourceSerializer",
@@ -146,3 +146,23 @@ class SynonymQualitySerializer(HyperlinkedModelSerializer):
         if not value > 0:
             raise ValidationError("Score Weight must be greater than zero.")
         return value
+
+
+class SynonymSerializer(HyperlinkedModelSerializer):
+    """The serializer for Synonyms."""
+
+    source = SourceSerializer
+    substance = SubstanceSerializer
+    synonym_quality = SynonymQualitySerializer
+    synonym_type = SynonymTypeSerializer
+
+    class Meta:
+        model = Synonym
+        fields = [
+            "identifier",
+            "qc_notes",
+            "source",
+            "substance",
+            "synonym_quality",
+            "synonym_type",
+        ]

@@ -10,6 +10,7 @@ from chemreg.substance.serializers import (
     SubstanceSerializer,
     SubstanceTypeSerializer,
     SynonymQualitySerializer,
+    SynonymSerializer,
     SynonymTypeSerializer,
 )
 
@@ -126,3 +127,17 @@ def test_synonym_quality_score_weight_validation(synonym_quality_factory):
     # Negative score_weights are forbidden
     model_dict.update(score_weight=-1.0)
     assert not SynonymQualitySerializer(data=model_dict).is_valid()
+
+
+@pytest.mark.django_db
+def test_synonym_serializer():
+    assert issubclass(SynonymSerializer, HyperlinkedModelSerializer)
+
+
+@pytest.mark.django_db
+def test_synonym_serializer_includes():
+    serializer = get_included_serializers(SynonymSerializer)
+    assert serializer["source"] is SourceSerializer
+    assert serializer["substance"] is SubstanceSerializer
+    assert serializer["synonym_quality"] is SynonymQualitySerializer
+    assert serializer["synonym_type"] is SynonymTypeSerializer

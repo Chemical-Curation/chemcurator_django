@@ -164,7 +164,7 @@ class Synonym(CommonInfo):
     """
 
     identifier = models.TextField(max_length=1024)
-    qc_notes = models.TextField(max_length=1024, null=True)
+    qc_notes = models.TextField(max_length=1024, blank=True)
     substance = models.ForeignKey("Substance", on_delete=models.PROTECT)
     source = models.ForeignKey("Source", on_delete=models.PROTECT)
     synonym_quality = models.ForeignKey("SynonymQuality", on_delete=models.PROTECT)

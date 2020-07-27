@@ -24,4 +24,4 @@ def test_synonym():
     assert qc_notes.max_length == 1024
     assert type(Synonym.substance.field) is models.ForeignKey
     assert Synonym.substance.field.related_model is Substance
-    assert not qc_notes.blank
+    assert qc_notes.blank

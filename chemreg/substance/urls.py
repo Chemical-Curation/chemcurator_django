@@ -7,6 +7,7 @@ from chemreg.substance import views
 router = SimpleRouter()
 router.register(views.QCLevelsTypeViewSet, "qcLevels")
 router.register(views.RelationshipTypeViewSet)
+router.register(views.SynonymViewSet)
 router.register(views.SynonymTypeViewSet)
 router.register(views.SourceViewSet)
 router.register(views.SubstanceViewSet)

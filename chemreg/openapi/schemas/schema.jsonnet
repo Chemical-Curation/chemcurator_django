@@ -33,11 +33,12 @@ local compound = import 'compound/compound.libsonnet';
 // Substance
 local qcLevelsType = import 'substance/qcLevelsType.libsonnet';
 local relationshipType = import 'substance/relationshipType.libsonnet';
-local synonymType = import 'substance/synonymType.libsonnet';
 local source = import 'substance/source.libsonnet';
 local substance = import 'substance/substance.libsonnet';
 local substanceType = import 'substance/substanceType.libsonnet';
+local synonym = import 'substance/synonym.libsonnet';
 local synonymQuality = import 'substance/synonymQuality.libsonnet';
+local synonymType = import 'substance/synonymType.libsonnet';
 
 ////////////////////////
 // List of all models //
@@ -48,14 +49,16 @@ local objs = [
   illDefinedCompound,
   queryStructureType,
   compound,
+  
   // substances
   qcLevelsType,
   relationshipType,
-  synonymType,
   source,
   substance,
   substanceType,
-  synonymQuality
+  synonym,
+  synonymQuality,
+  synonymType
 ];
 
 // Build spec

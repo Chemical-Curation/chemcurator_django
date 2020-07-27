@@ -475,6 +475,50 @@ def test_synonym_quality_get(client, admin_user, synonym_quality_factory):
 
 
 @pytest.mark.django_db
+def test_synonym_post(client, admin_user, synonym_factory):
+    client.force_authenticate(user=admin_user)
+    sf = synonym_factory.build().initial_data
+    resp = client.post(
+        "/synonyms",
+        {
+            "data": {
+                "type": "synonym",
+                "attributes": sf,
+                "relationships": {
+                    "source": {"data": {"id": sf["source"]["id"], "type": "source"}},
+                    "synonymQuality": {
+                        "data": {
+                            "id": sf["synonym_quality"]["id"],
+                            "type": "synonymQuality",
+                        }
+                    },
+                    "synonymType": {
+                        "data": {"id": sf["synonym_type"]["id"], "type": "synonymType"}
+                    },
+                },
+            }
+        },
+    )
+    assert resp.status_code == 201
+
+
+@pytest.mark.django_db
+def test_synonym_list(client, admin_user, synonym_factory):
+    client.force_authenticate(user=admin_user)
+    synonym_factory.create()
+    resp = client.get("/synonyms")
+    assert resp.status_code == 200
+    # Check that all results contain
+    for result in resp.data["results"]:
+        assert "identifier" in result
+        assert "qc_notes" in result
+        assert "source" in result
+        assert "substance" in result
+        assert "synonym_quality" in result
+        assert "synonym_type" in result
+
+
+@pytest.mark.django_db
 def test_intermediate_user_access(client, admin_user, synonym_type_factory):
     """Tests that a non-admin user can only perform the allowed
     operations that have been specified in the admin panel

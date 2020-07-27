@@ -5,6 +5,7 @@ from chemreg.substance.models import (
     Source,
     Substance,
     SubstanceType,
+    Synonym,
     SynonymQuality,
     SynonymType,
 )
@@ -15,6 +16,7 @@ from chemreg.substance.serializers import (
     SubstanceSerializer,
     SubstanceTypeSerializer,
     SynonymQualitySerializer,
+    SynonymSerializer,
     SynonymTypeSerializer,
 )
 
@@ -59,3 +61,9 @@ class SynonymQualityViewSet(ModelViewSet):
 
     queryset = SynonymQuality.objects.all()
     serializer_class = SynonymQualitySerializer
+
+
+class SynonymViewSet(ModelViewSet):
+
+    queryset = Synonym.objects.all()
+    serializer_class = SynonymSerializer
