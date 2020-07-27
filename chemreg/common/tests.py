@@ -64,3 +64,31 @@ def test_user_link(user_factory):
 def test_prometheus_metrics_endpoint(client):
     response = client.get("/metrics")
     assert response.status_code == 200
+
+
+def controlled_vocabulary_test_helper(model):
+    """ Tests the base attributes that models inheriting from ControlledVocabulary
+
+     This tests the fields that models inheriting from ControlledVocabulary are required to have.
+     This test is not meant to run in isolation, but is meant to be called with the inherited model.
+
+     Args:
+        model (class): Django Model class inheriting from ControlledVocabulary
+    """
+    name = model._meta.get_field("name")
+    assert isinstance(name, models.SlugField)
+    assert name.max_length == 49
+    assert name.unique
+    assert not name.blank
+    label = model._meta.get_field("label")
+    assert isinstance(label, models.CharField)
+    assert label.max_length == 99
+    assert label.unique
+    assert not label.blank
+    short_description = model._meta.get_field("short_description")
+    assert isinstance(short_description, models.CharField)
+    assert short_description.max_length == 499
+    assert not short_description.blank
+    long_description = model._meta.get_field("long_description")
+    assert isinstance(long_description, models.TextField)
+    assert not long_description.blank
