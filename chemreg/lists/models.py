@@ -25,3 +25,16 @@ class IdentifierType(ControlledVocabulary):
     """
 
     pass
+
+
+class ListType(ControlledVocabulary):
+    """Controlled vocabulary for List Types
+
+    Attributes:
+        name (str): Less than 50 character, url safe, unique, (required)
+        label (str): Less than 100 characters, unique, (required)
+        short_description (str): Less than 500 characters, (required)
+        long_description (str): Text (required)
+    """
+
+    pass
