@@ -8,6 +8,6 @@ class ListsConfig(AppConfig):
 
     def ready(self):
         try:
-            import chemreg.list.signals  # noqa F401
+            import chemreg.lists.signals  # noqa F401
         except ImportError:
             pass
