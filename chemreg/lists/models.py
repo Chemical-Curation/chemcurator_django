@@ -1,6 +1,7 @@
 from django.db import models
 
 from chemreg.common.models import CommonInfo, ControlledVocabulary
+from chemreg.lists.utils import build_rid
 from chemreg.users.models import User
 
 
@@ -52,7 +53,6 @@ class List(CommonInfo):
         label (str): (Less than 255 characters, unique, required field)
         short_description (str): String (Less than 1000 characters, required field)
         long_description (str): TEXT (required)
-
         list_accessibility: (AccessibilityType) (required)
         owners: (A list of users, default current user)
         source_url (str): (Less than 500 characters, optional field)
@@ -90,3 +90,27 @@ class ListType(ControlledVocabulary):
     """
 
     pass
+
+
+class Record(CommonInfo):
+    """Store all the identifiers associated with a member of a List
+
+    Attributes:
+        rid (str): Generated ID starting with DTXRID.  Contains a checksum
+        external_id (str): ID for external use
+        list (foreign key): Foreign Key reference to a List (one to many)
+        substance (foreign key, optional): Foreign Key reference to a Substance (one to many)
+        score (float, optional): Score of this Record
+        message (str, optional): Message describing this Record
+        is_validated (bool): Boolean of this Record's validity
+    """
+
+    rid = models.CharField(default=build_rid, max_length=50, unique=True)
+    external_id = models.CharField(max_length=500, blank=False)
+    message = models.CharField(max_length=500, blank=True)
+    score = models.FloatField(null=True)
+    is_validated = models.BooleanField()
+    list = models.ForeignKey("List", on_delete=models.PROTECT)
+    substance = models.ForeignKey(
+        "substance.Substance", on_delete=models.PROTECT, null=True
+    )
