@@ -27,9 +27,9 @@ def test_substance_relationship_model_attributes():
         is apps.get_model("substance", "RelationshipType")
     )
 
-    assert type(SubstanceRelationship.qc_note.field) is models.CharField
-    assert SubstanceRelationship.qc_note.field.max_length == 1024
-    assert SubstanceRelationship.qc_note.field.blank
+    assert type(SubstanceRelationship.qc_notes.field) is models.CharField
+    assert SubstanceRelationship.qc_notes.field.max_length == 1024
+    assert SubstanceRelationship.qc_notes.field.blank
 
 
 def test_substance_relationship_constraints():

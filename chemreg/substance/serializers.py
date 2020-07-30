@@ -10,6 +10,7 @@ from chemreg.substance.models import (
     RelationshipType,
     Source,
     Substance,
+    SubstanceRelationship,
     SubstanceType,
     Synonym,
     SynonymQuality,
@@ -146,4 +147,23 @@ class SynonymSerializer(HyperlinkedModelSerializer):
             "substance",
             "synonym_quality",
             "synonym_type",
+        ]
+
+
+class SubstanceRelationshipSerializer(HyperlinkedModelSerializer):
+    """The serializer for Substance Relationships."""
+
+    from_substance = SubstanceSerializer
+    to_substance = SubstanceSerializer
+    source = SourceSerializer
+    relationship_type = RelationshipTypeSerializer
+
+    class Meta:
+        model = SubstanceRelationship
+        fields = [
+            "from_substance",
+            "to_substance",
+            "source",
+            "relationship_type",
+            "qc_notes",
         ]

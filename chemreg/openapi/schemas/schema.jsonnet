@@ -35,6 +35,7 @@ local qcLevelsType = import 'substance/qcLevelsType.libsonnet';
 local relationshipType = import 'substance/relationshipType.libsonnet';
 local source = import 'substance/source.libsonnet';
 local substance = import 'substance/substance.libsonnet';
+local substanceRelationship = import 'substance/substanceRelationship.libsonnet';
 local substanceType = import 'substance/substanceType.libsonnet';
 local synonym = import 'substance/synonym.libsonnet';
 local synonymQuality = import 'substance/synonymQuality.libsonnet';
@@ -55,6 +56,7 @@ local objs = [
   relationshipType,
   source,
   substance,
+  substanceRelationship,
   substanceType,
   synonym,
   synonymQuality,

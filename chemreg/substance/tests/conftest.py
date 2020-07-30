@@ -5,6 +5,7 @@ from chemreg.substance.tests.factories import (
     RelationshipTypeFactory,
     SourceFactory,
     SubstanceFactory,
+    SubstanceRelationshipFactory,
     SubstanceTypeFactory,
     SynonymFactory,
     SynonymQualityFactory,
@@ -15,6 +16,7 @@ register(QCLevelsTypeFactory)
 register(RelationshipTypeFactory)
 register(SourceFactory)
 register(SubstanceFactory)
+register(SubstanceRelationshipFactory)
 register(SubstanceTypeFactory)
 register(SynonymFactory)
 register(SynonymQualityFactory)

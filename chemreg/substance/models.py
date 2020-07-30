@@ -104,7 +104,7 @@ class SubstanceRelationship(CommonInfo):
     )
     source = models.ForeignKey("Source", on_delete=models.PROTECT)
     relationship_type = models.ForeignKey("RelationshipType", on_delete=models.PROTECT)
-    qc_note = models.CharField(max_length=1024, blank=True)
+    qc_notes = models.CharField(max_length=1024, blank=True)
 
     class Meta:
         unique_together = (

@@ -11,6 +11,7 @@ from chemreg.substance.views import (
     ModelViewSet,
     RelationshipTypeViewSet,
     SourceViewSet,
+    SubstanceRelationshipViewSet,
     SubstanceTypeViewSet,
     SynonymQualityViewSet,
     SynonymTypeViewSet,
@@ -654,5 +655,60 @@ def test_intermediate_user_post(client, admin_user, synonym_type_factory):
     resp = client.post(
         "/synonymTypes",
         {"data": {"type": "synonymType", "attributes": stf.initial_data}},
+    )
+    assert resp.status_code == 201
+
+
+def test_substance_relationship_view():
+    """Tests that the Substance Relationship View Set, is a sub class of the Model View Set."""
+    assert issubclass(SubstanceRelationshipViewSet, ModelViewSet)
+
+
+@pytest.mark.django_db
+def test_substance_relationship_list(
+    client, admin_user, substance_relationship_factory
+):
+    client.force_authenticate(user=admin_user)
+    substance_relationship_factory.create()
+    resp = client.get("/substanceRelationships")
+    assert resp.status_code == 200
+    # Check that all results contain
+    for result in resp.data["results"]:
+        assert "qc_notes" in result
+        assert "source" in result
+        assert "to_substance" in result
+        assert "from_substance" in result
+        assert "relationship_type" in result
+
+
+@pytest.mark.django_db
+def test_substance_relationship_post(
+    client, admin_user, substance_relationship_factory
+):
+    client.force_authenticate(user=admin_user)
+    srf = substance_relationship_factory.build().initial_data
+    resp = client.post(
+        "/substanceRelationships",
+        {
+            "data": {
+                "type": "substanceRelationship",
+                "attributes": srf,
+                "relationships": {
+                    "from_substance": {
+                        "data": {"id": srf["from_substance"]["id"], "type": "substance"}
+                    },
+                    "to_substance": {
+                        "data": {"id": srf["to_substance"]["id"], "type": "substance"}
+                    },
+                    "source": {"data": {"id": srf["source"]["id"], "type": "source"}},
+                    "relationship_type": {
+                        "data": {
+                            "id": srf["relationship_type"]["id"],
+                            "type": "relationshipType",
+                        }
+                    },
+                },
+            }
+        },
     )
     assert resp.status_code == 201

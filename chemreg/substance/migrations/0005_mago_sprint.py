@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
-                ('qc_note', models.CharField(blank=True, max_length=1024)),
+                ('qc_notes', models.CharField(blank=True, max_length=1024)),
                 ('created_by', models.ForeignKey(default=chemreg.common.utils.get_current_user_pk, editable=False, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='substancerelationship_created_by_set', to=settings.AUTH_USER_MODEL)),
                 ('from_substance', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='relationships', to='substance.Substance')),
                 ('relationship_type', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='substance.RelationshipType')),

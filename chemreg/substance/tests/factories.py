@@ -10,6 +10,7 @@ from chemreg.substance.serializers import (
     QCLevelsTypeSerializer,
     RelationshipTypeSerializer,
     SourceSerializer,
+    SubstanceRelationshipSerializer,
     SubstanceSerializer,
     SubstanceTypeSerializer,
     SynonymQualitySerializer,
@@ -125,3 +126,18 @@ class SynonymFactory(DjangoSerializerFactory):
 
     class Meta:
         model = SynonymSerializer
+
+
+class SubstanceRelationshipFactory(DjangoSerializerFactory):
+    """Manufactures `SubstanceRelationship` Serializers."""
+
+    qc_notes = factory.Faker("text")
+
+    # Related Factories
+    from_substance = factory.SubFactory(SubstanceFactory)
+    to_substance = factory.SubFactory(SubstanceFactory)
+    source = factory.SubFactory(SourceFactory)
+    relationship_type = factory.SubFactory(RelationshipTypeFactory)
+
+    class Meta:
+        model = SubstanceRelationshipSerializer

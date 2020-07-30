@@ -13,6 +13,7 @@ router.register(views.SourceViewSet)
 router.register(views.SubstanceViewSet)
 router.register(views.SubstanceTypeViewSet)
 router.register(views.SynonymQualityViewSet, prefix="synonymQualities")
+router.register(views.SubstanceRelationshipViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),

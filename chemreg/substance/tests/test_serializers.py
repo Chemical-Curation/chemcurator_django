@@ -7,6 +7,7 @@ from chemreg.substance.serializers import (
     QCLevelsTypeSerializer,
     RelationshipTypeSerializer,
     SourceSerializer,
+    SubstanceRelationshipSerializer,
     SubstanceSerializer,
     SubstanceTypeSerializer,
     SynonymQualitySerializer,
@@ -141,3 +142,17 @@ def test_synonym_serializer_includes():
     assert serializer["substance"] is SubstanceSerializer
     assert serializer["synonym_quality"] is SynonymQualitySerializer
     assert serializer["synonym_type"] is SynonymTypeSerializer
+
+
+@pytest.mark.django_db
+def test_substance_relationship_serializer():
+    assert issubclass(SubstanceRelationshipSerializer, HyperlinkedModelSerializer)
+
+
+@pytest.mark.django_db
+def test_substance_relationship_serializer_includes():
+    serializer = get_included_serializers(SubstanceRelationshipSerializer)
+    assert serializer["from_substance"] is SubstanceSerializer
+    assert serializer["to_substance"] is SubstanceSerializer
+    assert serializer["source"] is SourceSerializer
+    assert serializer["relationship_type"] is RelationshipTypeSerializer
