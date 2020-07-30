@@ -22,6 +22,7 @@ class ControlledVocabularyFactory(factory.DjangoModelFactory):
     label = factory.LazyAttribute(lambda o: o.name.replace("-", " "))
     short_description = factory.Faker("text", max_nb_chars=499)
     long_description = factory.Faker("text")
+    deprecated = False
 
     class Meta:
         abstract = True

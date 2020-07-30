@@ -229,7 +229,7 @@ def test_deprecated_qst_in_illdefined(
     assert response.status_code == 400
     assert (
         str(response.data[0]["detail"])
-        == "The Query Structure Type submitted for this compound is no longer supported."
+        == "The QueryStructureType submitted is no longer supported."
     )
 
 

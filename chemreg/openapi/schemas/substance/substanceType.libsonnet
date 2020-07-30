@@ -1,7 +1,7 @@
  {
   app: 'Substance',
   type: 'substanceType',
-  description: 'Everything about Substance Types.',
+  description: 'A controlled vocabulary for describing substances.',
   attributes: {
     name: {
       type: 'string',
@@ -18,6 +18,9 @@
     },
     longDescription: {
       type: 'string',
+    },
+    deprecated: {
+      type: 'boolean',
     },
   },
 } 

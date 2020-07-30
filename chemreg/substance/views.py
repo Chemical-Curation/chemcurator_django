@@ -1,3 +1,4 @@
+from chemreg.common.mixins import DeprecateDeleteMixin
 from chemreg.jsonapi.views import ModelViewSet
 from chemreg.substance.models import (
     QCLevelsType,
@@ -27,13 +28,13 @@ class QCLevelsTypeViewSet(ModelViewSet):
     serializer_class = QCLevelsTypeSerializer
 
 
-class SynonymTypeViewSet(ModelViewSet):
+class SynonymTypeViewSet(DeprecateDeleteMixin, ModelViewSet):
 
     queryset = SynonymType.objects.all()
     serializer_class = SynonymTypeSerializer
 
 
-class SourceViewSet(ModelViewSet):
+class SourceViewSet(DeprecateDeleteMixin, ModelViewSet):
 
     queryset = Source.objects.all()
     serializer_class = SourceSerializer

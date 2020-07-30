@@ -2,7 +2,7 @@
   app: 'Substance',
   type: 'synonymQuality',
   typePlural: 'synonymQualities',
-  description: 'Everything about Synonym Qualities.',
+  description: 'A controlled vocabulary for recording synonym quality.',
   attributes: {
     name: {
       type: 'string',
@@ -19,6 +19,9 @@
     },
     longDescription: {
       type: 'string',
+    },
+    deprecated: {
+      type: 'boolean',
     },
     scoreWeight: {
       type: 'number',

@@ -174,13 +174,6 @@ class IllDefinedCompoundSerializer(BaseCompoundSerializer):
         model = IllDefinedCompound
         fields = ["cid", "mrvfile", "query_structure_type", "qc_note", "replaced_by"]
 
-    def validate_query_structure_type(self, data):
-        if data.deprecated:
-            raise ValidationError(
-                "The Query Structure Type submitted for this compound is no longer supported."
-            )
-        return data
-
 
 class CompoundSerializer(PolymorphicModelSerializer):
     """The serializer for both ill-defined and defined compounds."""

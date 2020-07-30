@@ -1,6 +1,7 @@
 from django.db import models
 
 from chemreg.common.models import CommonInfo, ControlledVocabulary
+from chemreg.common.validators import validate_deprecated
 from chemreg.substance.utils import build_sid
 
 
@@ -58,11 +59,21 @@ class Substance(CommonInfo):
     sid = models.CharField(default=build_sid, max_length=50, unique=True)
     preferred_name = models.CharField(max_length=255, unique=True, blank=False)
     display_name = models.CharField(max_length=255, unique=True, blank=False)
-    source = models.ForeignKey("Source", on_delete=models.PROTECT, null=False)
-    substance_type = models.ForeignKey(
-        "SubstanceType", on_delete=models.PROTECT, null=False
+    source = models.ForeignKey(
+        "Source", on_delete=models.PROTECT, null=False, validators=[validate_deprecated]
     )
-    qc_level = models.ForeignKey("QCLevelsType", on_delete=models.PROTECT, null=False)
+    substance_type = models.ForeignKey(
+        "SubstanceType",
+        on_delete=models.PROTECT,
+        null=False,
+        validators=[validate_deprecated],
+    )
+    qc_level = models.ForeignKey(
+        "QCLevelsType",
+        on_delete=models.PROTECT,
+        null=False,
+        validators=[validate_deprecated],
+    )
     description = models.CharField(max_length=1024)
     public_qc_note = models.CharField(max_length=1024)
     private_qc_note = models.CharField(max_length=1024)

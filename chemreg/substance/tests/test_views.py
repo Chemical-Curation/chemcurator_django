@@ -41,6 +41,7 @@ def test_qc_levels_type_list(client, admin_user, qc_levels_type_factory):
         assert "short_description" in result
         assert "long_description" in result
         assert "rank" in result
+        assert "deprecated" in result
 
 
 @pytest.mark.django_db
@@ -111,6 +112,21 @@ def test_synonym_type_get(client, admin_user, synonym_type_factory):
         assert "short_description" in result
         assert "long_description" in result
         assert "score_modifier" in result
+        assert "deprecated" in result
+
+
+@pytest.mark.django_db
+def test_synonym_type_delete(admin_user, client, synonym_type_factory):
+    """DELETE will deprecate the record but not remove from DB"""
+    stf = synonym_type_factory.create()
+    assert stf.instance.deprecated is False
+    client.force_authenticate(user=admin_user)
+    resp = client.delete(f"/synonymTypes/{stf.instance.pk}")
+    assert resp.status_code == 204
+    stf.instance.refresh_from_db()
+    assert stf.instance.deprecated is True
+    SynonymType = stf.instance._meta.model
+    assert SynonymType.objects.filter(pk=f"{stf.instance.pk}").exists()
 
 
 def test_source_view():
@@ -121,9 +137,9 @@ def test_source_view():
 @pytest.mark.django_db
 def test_source_post(client, admin_user, source_factory):
     client.force_authenticate(user=admin_user)
-    stf = source_factory.build()
+    source = source_factory.build()
     resp = client.post(
-        "/sources", {"data": {"type": "source", "attributes": stf.initial_data}},
+        "/sources", {"data": {"type": "source", "attributes": source.initial_data}},
     )
     assert resp.status_code == 201
 
@@ -139,6 +155,7 @@ def test_source_get(client, admin_user, source_factory):
         assert "label" in result
         assert "short_description" in result
         assert "long_description" in result
+        assert "deprecated" in result
 
 
 @pytest.mark.django_db
@@ -153,6 +170,20 @@ def test_source_patch(client, admin_user, source_factory):
     )
     assert resp.status_code == 200
     assert resp.data["name"] == "a-new-name"
+
+
+@pytest.mark.django_db
+def test_source_delete(admin_user, client, source_factory):
+    """DELETE will deprecate the record but not remove from DB"""
+    source = source_factory.create()
+    assert source.instance.deprecated is False
+    client.force_authenticate(user=admin_user)
+    resp = client.delete(f"/sources/{source.instance.pk}")
+    assert resp.status_code == 204
+    source.instance.refresh_from_db()
+    assert source.instance.deprecated is True
+    Source = source.instance._meta.model
+    assert Source.objects.filter(pk=f"{source.instance.pk}").exists()
 
 
 @pytest.mark.django_db
@@ -224,6 +255,50 @@ def test_required_subresource_not_specified(client, admin_user, substance_factor
     )
     assert resp.status_code == 400
     assert str(resp.data[0]["detail"]) == "This field is required."
+    assert resp.data[0]["source"]["pointer"] == "/data/attributes/qcLevel"
+
+
+@pytest.mark.django_db
+def test_required_subresource_deprecated(
+    client, admin_user, substance_factory, qc_levels_type_factory
+):
+    client.force_authenticate(user=admin_user)
+    qc_level = qc_levels_type_factory.create().instance
+    qc_level.deprecated = True
+    qc_level.save()
+    model_dict = substance_factory.build(defined=True).initial_data
+    resp = client.post(
+        "/substances",
+        {
+            "data": {
+                "type": "substance",
+                "attributes": model_dict,
+                "relationships": {
+                    "qcLevel": {"data": {"id": f"{qc_level.pk}", "type": "qcLevel"}},
+                    "source": {
+                        "data": {"id": model_dict["source"]["id"], "type": "source"}
+                    },
+                    "substanceType": {
+                        "data": {
+                            "id": model_dict["substance_type"]["id"],
+                            "type": "substanceType",
+                        }
+                    },
+                    "associatedCompound": {
+                        "data": {
+                            "id": model_dict["associated_compound"]["id"],
+                            "type": "definedCompound",
+                        }
+                    },
+                },
+            }
+        },
+    )
+    assert resp.status_code == 400
+    assert (
+        str(resp.data[0]["detail"])
+        == "The QCLevelsType submitted is no longer supported."
+    )
     assert resp.data[0]["source"]["pointer"] == "/data/attributes/qcLevel"
 
 
@@ -363,6 +438,7 @@ def test_substance_type_get(client, admin_user, substance_type_factory):
         assert "label" in result
         assert "short_description" in result
         assert "long_description" in result
+        assert "deprecated" in result
 
 
 def test_relationship_type_view():
@@ -395,6 +471,7 @@ def test_relationship_type_list(client, admin_user, relationship_type_factory):
         assert "long_description" in result
         assert "corrolary_label" in result
         assert "corrolary_short_description" in result
+        assert "deprecated" in result
 
 
 @pytest.mark.django_db
@@ -472,6 +549,7 @@ def test_synonym_quality_get(client, admin_user, synonym_quality_factory):
         assert "long_description" in result
         assert "score_weight" in result
         assert "is_restrictive" in result
+        assert "deprecated" in result
 
 
 @pytest.mark.django_db

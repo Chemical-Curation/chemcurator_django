@@ -1,7 +1,7 @@
  {
   app: 'Substance',
   type: 'relationshipType',
-  description: 'Everything about Relationship Types.',
+  description: 'A controlled vocabulary to describe relationships among substances',
   attributes: {
     name: {
       type: 'string',
@@ -18,6 +18,9 @@
     },
     longDescription: {
       type: 'string',
+    },
+    deprecated: {
+      type: 'boolean',
     },
     corrolaryLabel: {
       type: 'string',

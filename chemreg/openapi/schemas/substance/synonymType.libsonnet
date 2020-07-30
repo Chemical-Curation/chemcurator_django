@@ -1,7 +1,7 @@
  {
   app: 'Substance',
   type: 'synonymType',
-  description: 'Everything about synonym types.',
+  description: 'A controlled vocabulary for recording and validating synonym types.',
   attributes: {
     name: {
       type: 'string',
@@ -18,6 +18,9 @@
     },
     longDescription: {
       type: 'string',
+    },
+    deprecated: {
+      type: 'boolean',
     },
     validationRegularExpression: {
       type: 'string',

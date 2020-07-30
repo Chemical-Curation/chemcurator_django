@@ -1,7 +1,7 @@
  {
   app: 'Substance',
   type: 'qcLevel',
-  description: 'Everything about Sources.',
+  description: 'A controlled vocabulary for describing QC levels',
   attributes: {
     name: {
       type: 'slug',
@@ -18,6 +18,9 @@
     },
     longDescription: {
       type: 'string',
+    },
+    deprecated: {
+      type: 'boolean',
     },
     rank: {
       type: 'integer',

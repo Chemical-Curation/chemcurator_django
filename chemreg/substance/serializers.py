@@ -2,12 +2,10 @@ from rest_framework.exceptions import ValidationError
 
 from chemreg.compound.models import BaseCompound
 from chemreg.compound.serializers import CompoundSerializer
-from chemreg.jsonapi.relations import (
-    PolymorphicResourceRelatedField,
-    ResourceRelatedField,
-)
+from chemreg.jsonapi.relations import PolymorphicResourceRelatedField
 from chemreg.jsonapi.serializers import HyperlinkedModelSerializer
 from chemreg.substance.models import (
+    ControlledVocabulary,
     QCLevelsType,
     RelationshipType,
     Source,
@@ -19,46 +17,52 @@ from chemreg.substance.models import (
 )
 
 
-class QCLevelsTypeSerializer(HyperlinkedModelSerializer):
+class ControlledVocabSerializer(HyperlinkedModelSerializer):
+    class Meta:
+        model = ControlledVocabulary
+        fields = [
+            "name",
+            "label",
+            "short_description",
+            "long_description",
+            "deprecated",
+        ]
+        abstract = True
+
+
+class QCLevelsTypeSerializer(ControlledVocabSerializer):
     """The serializer for QCLevelsType Types."""
 
-    class Meta:
-        model = QCLevelsType
-        fields = [
-            "name",
-            "label",
-            "short_description",
-            "long_description",
+    class Meta(ControlledVocabSerializer.Meta):
+        fields = ControlledVocabSerializer.Meta.fields + [
             "rank",
         ]
+        model = QCLevelsType
 
 
-class SynonymTypeSerializer(HyperlinkedModelSerializer):
+class SynonymTypeSerializer(ControlledVocabSerializer):
     """The serializer for Synonym Types."""
 
-    class Meta:
-        model = SynonymType
-        fields = [
-            "name",
-            "label",
-            "short_description",
-            "long_description",
+    class Meta(ControlledVocabSerializer.Meta):
+        fields = ControlledVocabSerializer.Meta.fields + [
             "validation_regular_expression",
             "score_modifier",
         ]
+        model = SynonymType
 
 
-class SourceSerializer(HyperlinkedModelSerializer):
+class SourceSerializer(ControlledVocabSerializer):
     """The serializer for Sources."""
 
-    class Meta:
+    class Meta(ControlledVocabSerializer.Meta):
         model = Source
-        fields = [
-            "name",
-            "label",
-            "short_description",
-            "long_description",
-        ]
+
+
+class SubstanceTypeSerializer(ControlledVocabSerializer):
+    """The serializer for Substance Types."""
+
+    class Meta(ControlledVocabSerializer.Meta):
+        model = SubstanceType
 
 
 class SubstanceSerializer(HyperlinkedModelSerializer):
@@ -71,11 +75,9 @@ class SubstanceSerializer(HyperlinkedModelSerializer):
         "associated_compound": "chemreg.compound.serializers.CompoundSerializer",
     }
 
-    source = ResourceRelatedField(queryset=Source.objects, model=Source)
-    substance_type = ResourceRelatedField(
-        queryset=SubstanceType.objects, model=SubstanceType
-    )
-    qc_level = ResourceRelatedField(queryset=QCLevelsType.objects, model=QCLevelsType)
+    source = SourceSerializer
+    substance_type = SubstanceTypeSerializer
+    qc_level = QCLevelsTypeSerializer
     associated_compound = PolymorphicResourceRelatedField(
         polymorphic_serializer=CompoundSerializer,
         queryset=BaseCompound.objects,
@@ -100,44 +102,23 @@ class SubstanceSerializer(HyperlinkedModelSerializer):
         ]
 
 
-class SubstanceTypeSerializer(HyperlinkedModelSerializer):
+class RelationshipTypeSerializer(ControlledVocabSerializer):
     """The serializer for Substance Types."""
 
-    class Meta:
-        model = SubstanceType
-        fields = [
-            "name",
-            "label",
-            "short_description",
-            "long_description",
-        ]
-
-
-class RelationshipTypeSerializer(HyperlinkedModelSerializer):
-    """The serializer for Substance Types."""
-
-    class Meta:
+    class Meta(ControlledVocabSerializer.Meta):
         model = RelationshipType
-        fields = [
-            "name",
-            "label",
-            "short_description",
-            "long_description",
+        fields = ControlledVocabSerializer.Meta.fields + [
             "corrolary_label",
             "corrolary_short_description",
         ]
 
 
-class SynonymQualitySerializer(HyperlinkedModelSerializer):
+class SynonymQualitySerializer(ControlledVocabSerializer):
     """The serializer for Synonym Qualities."""
 
-    class Meta:
+    class Meta(ControlledVocabSerializer.Meta):
         model = SynonymQuality
-        fields = [
-            "name",
-            "label",
-            "short_description",
-            "long_description",
+        fields = ControlledVocabSerializer.Meta.fields + [
             "score_weight",
             "is_restrictive",
         ]

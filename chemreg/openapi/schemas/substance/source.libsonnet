@@ -1,7 +1,7 @@
  {
   app: 'Substance',
   type: 'source',
-  description: 'Everything about Sources.',
+  description: 'A controlled vocabulary for substance sources.',
   attributes: {
     name: {
       type: 'string',
@@ -18,6 +18,9 @@
     },
     longDescription: {
       type: 'string',
+    },
+    deprecated: {
+      type: 'boolean',
     },
   },
 } 
