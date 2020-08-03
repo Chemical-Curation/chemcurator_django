@@ -3,7 +3,7 @@ from datetime import datetime
 import factory
 
 from chemreg.common.factory import ControlledVocabularyFactory
-from chemreg.lists.models import AccessibilityType, List, Record
+from chemreg.lists.models import AccessibilityType, List, ListType, Record
 
 
 # todo: convert to serializer factory
@@ -12,6 +12,14 @@ class AccessibilityTypeFactory(ControlledVocabularyFactory):
 
     class Meta:
         model = AccessibilityType
+
+
+# todo: convert to serializer factory
+class ListTypeFactory(ControlledVocabularyFactory):
+    """Manufactures `ListType` models."""
+
+    class Meta:
+        model = ListType
 
 
 # todo: convert to serializer factory

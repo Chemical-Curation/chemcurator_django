@@ -1,6 +1,10 @@
 from django.db import models
 
-from chemreg.lists.models import AccessibilityType, ExternalContact, List
+import pytest
+
+from chemreg.common.tests import controlled_vocabulary_test_helper
+from chemreg.lists.models import AccessibilityType, ExternalContact, List, ListType
+from chemreg.lists.tests.factories import ListFactory, ListTypeFactory
 from chemreg.users.models import User
 
 
@@ -39,3 +43,25 @@ def test_list():
     assert isinstance(date_of_source_collection, models.DateField)
     assert not date_of_source_collection.editable
     assert not date_of_source_collection.blank
+
+
+def test_list_type():
+    """Tests the validity of the List Type Model's attributes"""
+
+    controlled_vocabulary_test_helper(ListType)
+
+
+@pytest.mark.django_db
+def test_lists_to_types():
+    """Tests the many-to-many relationship between `List` and `ListType` objects"""
+
+    list = ListFactory()
+    assert list.types.count() == 0
+
+    types = [ListTypeFactory(), ListTypeFactory()]
+    assert len(types) == 2
+    list.types.set(types)
+    assert list.types.count() == 2
+    type = types[0]
+    list_rel = type.lists.first()
+    assert list_rel == list
