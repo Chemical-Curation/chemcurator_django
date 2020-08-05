@@ -2,15 +2,15 @@ from datetime import datetime
 
 import factory
 
-from chemreg.common.factory import ControlledVocabularyFactory
+from chemreg.common.factory import ControlledVocabularyFactory, DjangoSerializerFactory
 from chemreg.lists.models import (
     AccessibilityType,
     IdentifierType,
     List,
-    ListType,
     Record,
     RecordIdentifier,
 )
+from chemreg.lists.serializers import ListTypeSerializer
 
 
 # todo: convert to serializer factory
@@ -30,11 +30,11 @@ class IdentifierTypeFactory(ControlledVocabularyFactory):
 
 
 # todo: convert to serializer factory
-class ListTypeFactory(ControlledVocabularyFactory):
+class ListTypeFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
     """Manufactures `ListType` models."""
 
     class Meta:
-        model = ListType
+        model = ListTypeSerializer
 
 
 # todo: convert to serializer factory

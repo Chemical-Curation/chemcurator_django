@@ -1,11 +1,11 @@
 from rest_framework.exceptions import ValidationError
 
+from chemreg.common.serializers import ControlledVocabSerializer
 from chemreg.compound.models import BaseCompound
 from chemreg.compound.serializers import CompoundSerializer
 from chemreg.jsonapi.relations import PolymorphicResourceRelatedField
 from chemreg.jsonapi.serializers import HyperlinkedModelSerializer
 from chemreg.substance.models import (
-    ControlledVocabulary,
     QCLevelsType,
     RelationshipType,
     Source,
@@ -16,19 +16,6 @@ from chemreg.substance.models import (
     SynonymQuality,
     SynonymType,
 )
-
-
-class ControlledVocabSerializer(HyperlinkedModelSerializer):
-    class Meta:
-        model = ControlledVocabulary
-        fields = [
-            "name",
-            "label",
-            "short_description",
-            "long_description",
-            "deprecated",
-        ]
-        abstract = True
 
 
 class QCLevelsTypeSerializer(ControlledVocabSerializer):

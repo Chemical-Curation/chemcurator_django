@@ -41,6 +41,9 @@ local synonym = import 'substance/synonym.libsonnet';
 local synonymQuality = import 'substance/synonymQuality.libsonnet';
 local synonymType = import 'substance/synonymType.libsonnet';
 
+// Lists
+local listType = import 'lists/listType.libsonnet';
+
 ////////////////////////
 // List of all models //
 ////////////////////////
@@ -60,7 +63,10 @@ local objs = [
   substanceType,
   synonym,
   synonymQuality,
-  synonymType
+  synonymType,
+
+  //lists
+  listType
 ];
 
 // Build spec

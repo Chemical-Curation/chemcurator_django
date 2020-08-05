@@ -24,7 +24,7 @@ from chemreg.substance.serializers import (
 )
 
 
-class QCLevelsTypeViewSet(ModelViewSet):
+class QCLevelsTypeViewSet(DeprecateDeleteMixin, ModelViewSet):
 
     queryset = QCLevelsType.objects.all()
     serializer_class = QCLevelsTypeSerializer
@@ -48,19 +48,19 @@ class SubstanceViewSet(ModelViewSet):
     serializer_class = SubstanceSerializer
 
 
-class SubstanceTypeViewSet(ModelViewSet):
+class SubstanceTypeViewSet(DeprecateDeleteMixin, ModelViewSet):
 
     queryset = SubstanceType.objects.all()
     serializer_class = SubstanceTypeSerializer
 
 
-class RelationshipTypeViewSet(ModelViewSet):
+class RelationshipTypeViewSet(DeprecateDeleteMixin, ModelViewSet):
 
     queryset = RelationshipType.objects.all()
     serializer_class = RelationshipTypeSerializer
 
 
-class SynonymQualityViewSet(ModelViewSet):
+class SynonymQualityViewSet(DeprecateDeleteMixin, ModelViewSet):
 
     queryset = SynonymQuality.objects.all()
     serializer_class = SynonymQualitySerializer

@@ -58,7 +58,7 @@ def test_lists_to_types():
     list = ListFactory()
     assert list.types.count() == 0
 
-    types = [ListTypeFactory(), ListTypeFactory()]
+    types = [ListTypeFactory().instance, ListTypeFactory().instance]
     assert len(types) == 2
     list.types.set(types)
     assert list.types.count() == 2

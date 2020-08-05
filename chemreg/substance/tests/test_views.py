@@ -77,12 +77,15 @@ def test_qc_levels_type_patch(client, admin_user, qc_levels_type_factory):
 
 @pytest.mark.django_db
 def test_qc_levels_type_delete(client, admin_user, qc_levels_type_factory):
+    qcl = qc_levels_type_factory.create()
+    assert qcl.instance.deprecated is False
     client.force_authenticate(user=admin_user)
-    original_model = qc_levels_type_factory.create().instance
-    resp = client.delete("/qcLevels/{}".format(original_model.pk))
+    resp = client.delete(f"/qcLevels/{qcl.instance.pk}")
     assert resp.status_code == 204
-    with pytest.raises(original_model.DoesNotExist):
-        original_model.refresh_from_db()
+    qcl.instance.refresh_from_db()
+    assert qcl.instance.deprecated is True
+    QcLevelsType = qcl.instance._meta.model
+    assert QcLevelsType.objects.filter(pk=f"{qcl.instance.pk}").exists()
 
 
 def test_synonym_type_view():
@@ -512,12 +515,15 @@ def test_relationship_type_patch(client, admin_user, relationship_type_factory):
 
 @pytest.mark.django_db
 def test_relationship_type_delete(client, admin_user, relationship_type_factory):
+    rt = relationship_type_factory.create()
+    assert rt.instance.deprecated is False
     client.force_authenticate(user=admin_user)
-    original_model = relationship_type_factory.create().instance
-    resp = client.delete("/relationshipTypes/{}".format(original_model.pk))
+    resp = client.delete(f"/relationshipTypes/{rt.instance.pk}")
     assert resp.status_code == 204
-    with pytest.raises(original_model.DoesNotExist):
-        original_model.refresh_from_db()
+    rt.instance.refresh_from_db()
+    assert rt.instance.deprecated is True
+    RelationshipType = rt.instance._meta.model
+    assert RelationshipType.objects.filter(pk=f"{rt.instance.pk}").exists()
 
 
 def test_synonym_quality_view():
