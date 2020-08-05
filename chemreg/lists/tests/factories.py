@@ -3,7 +3,14 @@ from datetime import datetime
 import factory
 
 from chemreg.common.factory import ControlledVocabularyFactory
-from chemreg.lists.models import AccessibilityType, List, ListType, Record
+from chemreg.lists.models import (
+    AccessibilityType,
+    IdentifierType,
+    List,
+    ListType,
+    Record,
+    RecordIdentifier,
+)
 
 
 # todo: convert to serializer factory
@@ -12,6 +19,14 @@ class AccessibilityTypeFactory(ControlledVocabularyFactory):
 
     class Meta:
         model = AccessibilityType
+
+
+# todo: convert to serializer factory
+class IdentifierTypeFactory(ControlledVocabularyFactory):
+    """Manufactures `IdentifierType` models."""
+
+    class Meta:
+        model = IdentifierType
 
 
 # todo: convert to serializer factory
@@ -51,3 +66,18 @@ class RecordFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = Record
+
+
+# todo: convert to serializer factory
+class RecordIdentifierFactory(factory.DjangoModelFactory):
+    """Manufactures `RecordIdentifier` models."""
+
+    identifier = factory.Faker("text")
+    identifier_label = factory.Faker("text", max_nb_chars=100)
+
+    # Related Factories
+    record = factory.SubFactory(RecordFactory)
+    identifier_type = factory.SubFactory(IdentifierTypeFactory)
+
+    class Meta:
+        model = RecordIdentifier

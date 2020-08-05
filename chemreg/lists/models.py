@@ -116,3 +116,23 @@ class Record(CommonInfo):
     substance = models.ForeignKey(
         "substance.Substance", on_delete=models.PROTECT, null=True
     )
+
+
+class RecordIdentifier(CommonInfo):
+    """Store all the identifiers associated with a member of a Source List
+
+    Attributes:
+        record (Record): (required)
+        identifier (text): (required)
+        identifier_type (IdentifierType): (optional)
+        identifier_label (str): (Less than 100 characters, required)
+    """
+
+    record = models.ForeignKey(
+        "Record", on_delete=models.PROTECT, null=False, related_name="identifiers",
+    )
+    identifier = models.TextField(blank=False)
+    identifier_type = models.ForeignKey(
+        "IdentifierType", on_delete=models.PROTECT, null=True
+    )
+    identifier_label = models.CharField(max_length=100, blank=False)
