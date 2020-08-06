@@ -5,7 +5,6 @@ from chemreg.lists.views import ListTypeViewSet
 
 
 def test_list_type_view():
-    """Tests that the List Type View Set, is a sub class of the Model View Set."""
     assert issubclass(ListTypeViewSet, ModelViewSet)
 
 
@@ -43,6 +42,49 @@ def test_list_type_patch(client, admin_user, list_type_factory):
     resp = client.patch(
         f"/listTypes/{pk}",
         {"data": {"id": pk, "type": "listType", "attributes": new_name}},
+    )
+    assert resp.status_code == 200
+    assert resp.data["name"] == "new-name"
+
+
+def test_identifier_type_view():
+    assert issubclass(ListTypeViewSet, ModelViewSet)
+
+
+@pytest.mark.django_db
+def test_identifier_type_post(client, admin_user, identifier_type_factory):
+    client.force_authenticate(user=admin_user)
+    identifierType = identifier_type_factory.build()
+    resp = client.post(
+        "/identifierTypes",
+        {"data": {"type": "identifierType", "attributes": identifierType.initial_data}},
+    )
+    assert resp.status_code == 201
+
+
+@pytest.mark.django_db
+def test_identifier_type_get(client, admin_user, identifier_type_factory):
+    client.force_authenticate(user=admin_user)
+    identifier_type_factory.create()
+    resp = client.get("/identifierTypes")
+    assert resp.status_code == 200
+    for result in resp.data["results"]:
+        assert "name" in result
+        assert "label" in result
+        assert "short_description" in result
+        assert "long_description" in result
+        assert "deprecated" in result
+
+
+@pytest.mark.django_db
+def test_identifier_type_patch(client, admin_user, identifier_type_factory):
+    client.force_authenticate(user=admin_user)
+    identifierType = identifier_type_factory.create()
+    pk = identifierType.instance.pk
+    new_name = {"name": "new-name"}
+    resp = client.patch(
+        f"/identifierTypes/{pk}",
+        {"data": {"id": pk, "type": "identifierType", "attributes": new_name}},
     )
     assert resp.status_code == 200
     assert resp.data["name"] == "new-name"

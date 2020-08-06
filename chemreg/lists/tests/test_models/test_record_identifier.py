@@ -28,7 +28,7 @@ def test_record_identifier():
 def test_record_identifier_relationships():
     """ Tests the relationships between the RecordIdentifier, IdentifierType and Record Models"""
 
-    idt_list = [IdentifierTypeFactory(), IdentifierTypeFactory()]
+    idt_list = [IdentifierTypeFactory().instance, IdentifierTypeFactory().instance]
     assert len(idt_list) == 2
     rec = RecordFactory()
     RecordIdentifierFactory(identifier_type=idt_list[0], record=rec)

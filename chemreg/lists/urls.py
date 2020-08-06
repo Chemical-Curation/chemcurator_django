@@ -6,6 +6,7 @@ from chemreg.lists import views
 # Create a router and register our viewsets with it.
 router = SimpleRouter()
 router.register(views.ListTypeViewSet)
+router.register(views.IdentifierTypeViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),

@@ -43,6 +43,7 @@ local synonymType = import 'substance/synonymType.libsonnet';
 
 // Lists
 local listType = import 'lists/listType.libsonnet';
+local identifierType = import 'lists/identifierType.libsonnet';
 
 ////////////////////////
 // List of all models //
@@ -66,7 +67,8 @@ local objs = [
   synonymType,
 
   //lists
-  listType
+  listType,
+  identifierType
 ];
 
 // Build spec
