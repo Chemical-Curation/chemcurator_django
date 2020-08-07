@@ -3,16 +3,19 @@ from datetime import datetime
 import factory
 
 from chemreg.common.factory import ControlledVocabularyFactory, DjangoSerializerFactory
-from chemreg.lists.models import AccessibilityType, List, Record, RecordIdentifier
-from chemreg.lists.serializers import IdentifierTypeSerializer, ListTypeSerializer
+from chemreg.lists.models import List, Record, RecordIdentifier
+from chemreg.lists.serializers import (
+    AccessibilityTypeSerializer,
+    IdentifierTypeSerializer,
+    ListTypeSerializer,
+)
 
 
-# todo: convert to serializer factory
-class AccessibilityTypeFactory(ControlledVocabularyFactory):
-    """Manufactures `AccessibilityType` models."""
+class AccessibilityTypeFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
+    """Manufactures `AccessibilityType` models and serializers."""
 
     class Meta:
-        model = AccessibilityType
+        model = AccessibilityTypeSerializer
 
 
 class IdentifierTypeFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
@@ -22,9 +25,8 @@ class IdentifierTypeFactory(DjangoSerializerFactory, ControlledVocabularyFactory
         model = IdentifierTypeSerializer
 
 
-# todo: convert to serializer factory
 class ListTypeFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
-    """Manufactures `ListType` models."""
+    """Manufactures `ListType` models and serializers."""
 
     class Meta:
         model = ListTypeSerializer
@@ -40,6 +42,11 @@ class ListFactory(factory.DjangoModelFactory):
     long_description = factory.Faker("text")
     list_accessibility = factory.SubFactory(AccessibilityTypeFactory)
     date_of_source_collection = datetime.now()
+
+    # Related Factories
+    list_accessibility = factory.LazyAttribute(
+        lambda _: AccessibilityTypeFactory().instance
+    )
 
     class Meta:
         model = List

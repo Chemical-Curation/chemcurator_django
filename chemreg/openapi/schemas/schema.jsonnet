@@ -43,6 +43,7 @@ local synonymType = import 'substance/synonymType.libsonnet';
 
 // Lists
 local listType = import 'lists/listType.libsonnet';
+local accessibilityType = import 'lists/accessibilityType.libsonnet';
 local identifierType = import 'lists/identifierType.libsonnet';
 
 ////////////////////////
@@ -67,6 +68,7 @@ local objs = [
   synonymType,
 
   //lists
+  accessibilityType,
   listType,
   identifierType
 ];
