@@ -1,9 +1,28 @@
+from random import randint
+
 from django.db import models
 
 import pytest
 from crum import impersonate
 
 from chemreg.common.models import CommonInfo
+from chemreg.common.utils import compute_checksum
+
+
+def test_compute_checksum():
+    i = randint(2000000, 9999999)
+    computed = (
+        (1 * int(str(i)[0]))
+        + (2 * int(str(i)[1]))
+        + (3 * int(str(i)[2]))
+        + (4 * int(str(i)[3]))
+        + (5 * int(str(i)[4]))
+        + (6 * int(str(i)[5]))
+        + (7 * int(str(i)[6]))
+    ) % 10
+    checksum = compute_checksum(i)
+    assert computed == checksum
+    assert 0 <= checksum < 10
 
 
 def test_commoninfo_attr():
@@ -45,3 +64,31 @@ def test_user_link(user_factory):
 def test_prometheus_metrics_endpoint(client):
     response = client.get("/metrics")
     assert response.status_code == 200
+
+
+def controlled_vocabulary_test_helper(model):
+    """ Tests the base attributes that models inheriting from ControlledVocabulary
+
+     This tests the fields that models inheriting from ControlledVocabulary are required to have.
+     This test is not meant to run in isolation, but is meant to be called with the inherited model.
+
+     Args:
+        model (class): Django Model class inheriting from ControlledVocabulary
+    """
+    name = model._meta.get_field("name")
+    assert isinstance(name, models.SlugField)
+    assert name.max_length == 49
+    assert name.unique
+    assert not name.blank
+    label = model._meta.get_field("label")
+    assert isinstance(label, models.CharField)
+    assert label.max_length == 99
+    assert label.unique
+    assert not label.blank
+    short_description = model._meta.get_field("short_description")
+    assert isinstance(short_description, models.CharField)
+    assert short_description.max_length == 499
+    assert not short_description.blank
+    long_description = model._meta.get_field("long_description")
+    assert isinstance(long_description, models.TextField)
+    assert not long_description.blank

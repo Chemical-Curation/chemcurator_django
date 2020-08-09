@@ -6,6 +6,7 @@ from polymorphic.models import PolymorphicManager, PolymorphicModel
 from polymorphic.query import PolymorphicQuerySet
 
 from chemreg.common.models import CommonInfo, ControlledVocabulary
+from chemreg.common.validators import validate_deprecated
 from chemreg.compound.fields import StructureAliasField
 from chemreg.compound.utils import build_cid
 from chemreg.compound.validators import (
@@ -149,7 +150,10 @@ class IllDefinedCompound(BaseCompound):
 
     mrvfile = StructureAliasField()
     query_structure_type = models.ForeignKey(
-        "QueryStructureType", on_delete=models.PROTECT, default=get_illdefined_qst
+        "QueryStructureType",
+        on_delete=models.PROTECT,
+        default=get_illdefined_qst,
+        validators=[validate_deprecated],
     )
 
     class Meta(BaseCompound.Meta):

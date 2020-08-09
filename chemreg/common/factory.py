@@ -15,6 +15,19 @@ def is_relation(obj):
     return False
 
 
+class ControlledVocabularyFactory(factory.DjangoModelFactory):
+    """Creates faked information for Controlled Vocabulary subclasses"""
+
+    name = factory.Sequence(lambda n: f"{factory.Faker('slug').generate()}-{n}")
+    label = factory.LazyAttribute(lambda o: o.name.replace("-", " "))
+    short_description = factory.Faker("text", max_nb_chars=499)
+    long_description = factory.Faker("text")
+    deprecated = False
+
+    class Meta:
+        abstract = True
+
+
 class DjangoSerializerFactoryMetaClass(FactoryMetaClass):
     """A shim to allow SubFactories to render correctly with JSON:API."""
 

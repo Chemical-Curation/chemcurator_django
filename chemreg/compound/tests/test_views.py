@@ -1,3 +1,5 @@
+from django.apps import apps
+from django.db.models import Max
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAdminUser
 from rest_framework.test import force_authenticate
@@ -207,9 +209,7 @@ def test_deprecated_qst_in_illdefined(
     admin_user, client, ill_defined_compound_factory, query_structure_type_factory
 ):
     client.force_authenticate(user=admin_user)
-    qst = query_structure_type_factory.build(deprecated=True)
-    assert qst.is_valid()
-    deprecated_structure = qst.save()
+    deprecated_structure = query_structure_type_factory.create(deprecated=True)
     idc = ill_defined_compound_factory.build()
     post_data = {
         "data": {
@@ -219,7 +219,7 @@ def test_deprecated_qst_in_illdefined(
                 "query_structure_type": {
                     "data": {
                         "type": "queryStructureType",
-                        "id": deprecated_structure.pk,
+                        "id": deprecated_structure.instance.pk,
                     }
                 },
             },
@@ -229,7 +229,64 @@ def test_deprecated_qst_in_illdefined(
     assert response.status_code == 400
     assert (
         str(response.data[0]["detail"])
-        == "The Query Structure Type submitted for this compound is no longer supported."
+        == "The QueryStructureType submitted is no longer supported."
+    )
+
+
+@pytest.mark.django_db
+def test_nonexistent_qst_in_illdefined(
+    admin_user, client, ill_defined_compound_factory, query_structure_type_factory
+):
+    client.force_authenticate(user=admin_user)
+    qst = apps.get_model("compound", "QueryStructureType")
+    nonexistent_pk = qst.objects.aggregate(Max("pk"))["pk__max"] + 1
+    idc = ill_defined_compound_factory.build()
+    post_data = {
+        "data": {
+            "type": "illDefinedCompound",
+            "attributes": idc.initial_data,  # mrvfile
+            "relationships": {
+                "query_structure_type": {
+                    "data": {"type": "queryStructureType", "id": nonexistent_pk}
+                },
+            },
+        }
+    }
+    response = client.post("/illDefinedCompounds", post_data)
+    assert response.status_code == 400
+    assert (
+        str(response.data[0]["detail"])
+        == f'Invalid pk "{nonexistent_pk}" - object does not exist.'
+    )
+
+
+@pytest.mark.django_db
+def test_patch_nonexistent_qst_in_illdefined(
+    admin_user, client, ill_defined_compound_factory, query_structure_type_factory
+):
+    client.force_authenticate(user=admin_user)
+    qst = apps.get_model("compound", "QueryStructureType")
+    nonexistent_pk = qst.objects.aggregate(Max("pk"))["pk__max"] + 1
+    idc = ill_defined_compound_factory.create()
+    post_data = {
+        "data": {
+            "type": "illDefinedCompound",
+            "id": idc.instance.pk,
+            "relationships": {
+                "query_structure_type": {
+                    "data": {"type": "queryStructureType", "id": nonexistent_pk}
+                },
+            },
+        }
+    }
+    response = client.patch(f"/illDefinedCompounds/{idc.instance.pk}", post_data)
+    assert response.status_code == 400
+    assert (
+        str(response.data[0]["detail"])
+        == f'Invalid pk "{nonexistent_pk}" - object does not exist.'
+    )
+    assert (
+        response.data[0]["source"]["pointer"] == "/data/attributes/queryStructureType"
     )
 
 
