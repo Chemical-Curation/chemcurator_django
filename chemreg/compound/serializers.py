@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from rest_framework.reverse import reverse as drf_reverse
 
 from rest_framework_json_api.utils import format_value
 
@@ -12,7 +13,6 @@ from chemreg.compound.models import (
 )
 from chemreg.compound.validators import (
     validate_inchikey_computable,
-    validate_inchikey_unique,
     validate_molfile_v2000,
     validate_molfile_v3000_computable,
     validate_smiles,
@@ -83,10 +83,7 @@ class DefinedCompoundSerializer(BaseCompoundSerializer):
         extra_kwargs = {"molfile_v3000": {"required": False, "trim_whitespace": False}}
 
     def __init__(self, *args, admin_override=False, **kwargs):
-        if not admin_override:
-            for structure in self.alt_structures:
-                field = self.fields[structure]
-                field.validators.append(validate_inchikey_unique)
+        self.admin_override = admin_override
         super().__init__(*args, **kwargs)
 
     def validate_cid(self, value):
@@ -98,6 +95,30 @@ class DefinedCompoundSerializer(BaseCompoundSerializer):
         if "cid" not in self.initial_data:
             raise ValidationError("CID must be included when InchIKey is defined.")
         return value
+
+    def validate(self, data):
+        qs = self.Meta.model.objects.filter(inchikey=data["inchikey"])
+        if qs.exists() and not self.admin_override:
+            matched = []
+            req = self.context.get("request", None)
+            for obj in qs:
+                matched.append(
+                    drf_reverse(
+                        "definedcompound-detail", request=req, kwargs={"pk": obj.pk}
+                    )
+                )
+            raise ValidationError(
+                {
+                    "detail": {
+                        "detail": f"Inchikey conflicts with {[x.cid for x in qs]}",
+                        "links": matched,
+                        "status": "400",
+                        "source": {"pointer": "/data/attributes/inchikey"},
+                        "code": "invalid",
+                    },
+                },
+            )
+        return data
 
     def to_internal_value(self, data):
         matched_fields = set(self.alt_structures) & set(self.initial_data.keys())
