@@ -1,24 +1,43 @@
 import pytest
 
 
+@pytest.mark.parametrize("search_type", ["V3000", "V2000", "SMILES"])
 @pytest.mark.django_db
-def test_defined_compound_filters(defined_compound_factory, user, client):
+def test_defined_compound_filters(
+    search_type,
+    defined_compound_factory,
+    defined_compound_v2000_factory,
+    defined_compound_smiles_factory,
+    user,
+    client,
+):
+    def clean_molfile(mol):
+        return (
+            mol.replace("-INDIGO-", "-CHEMREG-").replace(" ", "+").replace("\n", "%0A")
+        )
+
+    factory_dict = {
+        "V3000": ("molfile_v3000", defined_compound_factory),
+        "V2000": ("molfile_v2000", defined_compound_v2000_factory),
+        "SMILES": ("smiles", defined_compound_smiles_factory),
+    }
     client.force_authenticate(user=user)
-    compounds = defined_compound_factory.create_batch(2)
+    field, factory = factory_dict.get(search_type)
+    # Add additional results to be filtered out.
+    factory.create()
+    compound = factory.build()
+    assert compound.is_valid()
+    obj = compound.save()
     # Alter the molfile so that we can ensure the lookup is done on the inchikey
     # URL encode spaces and newlines
-    molfile = (
-        compounds[0]
-        .instance.molfile_v3000.replace("-INDIGO-", "-CHEMREG-")
-        .replace(" ", "+")
-        .replace("\n", "%0A")
-    )
+    mol = compound.initial_data[field]
+    molfile = mol if field == "smiles" else clean_molfile(mol)
 
     # Test the filter with valid molfile
-    response = client.get(f"/definedCompounds?filter[molfileV3000]={molfile}")
+    response = client.get(f"/definedCompounds?filter[{field}]={molfile}")
     assert len(response.data["results"]) == 1
-    assert response.data["results"][0]["cid"] == compounds[0].instance.cid
+    assert response.data["results"][0]["cid"] == obj.cid
 
     # Test with invalid molfile
-    response = client.get(f"/definedCompounds?filter[molfileV3000]=foo")
-    assert "Structure is not in V3000 format." in response.data[0]["detail"]
+    response = client.get(f"/definedCompounds?filter[{field}]=foo")
+    assert f"Structure is not in {search_type} format" in response.data[0]["detail"]

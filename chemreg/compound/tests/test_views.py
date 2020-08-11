@@ -114,6 +114,8 @@ def test_defined_compound_view():
         "cid",
         "inchikey",
         "molfile_v3000",
+        "molfile_v2000",
+        "smiles",
     ]
 
 
