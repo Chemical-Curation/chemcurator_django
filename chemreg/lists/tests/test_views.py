@@ -137,3 +137,61 @@ def test_identifier_type_patch(client, admin_user, identifier_type_factory):
     )
     assert resp.status_code == 200
     assert resp.data["name"] == "new-name"
+
+
+@pytest.mark.django_db
+def test_list_post(client, admin_user, list_factory, list_type_factory, user_factory):
+    client.force_authenticate(user=admin_user)
+    lf = list_factory.build().initial_data
+    resp = client.post(
+        "/lists",
+        {
+            "data": {
+                "type": "list",
+                "attributes": lf,
+                "relationships": {
+                    "accessibilityType": {
+                        "data": {
+                            "id": lf["list_accessibility"]["id"],
+                            "type": "accessibilityType",
+                        }
+                    },
+                    "externalContact": {
+                        "data": {
+                            "id": lf["external_contact"]["id"],
+                            "type": "externalContact",
+                        }
+                    },
+                    "user": {"data": {"id": user_factory().pk, "type": "user"}},
+                    "listType": {
+                        "data": {
+                            "id": list_type_factory().instance.pk,
+                            "type": "listType",
+                        }
+                    },
+                },
+            }
+        },
+    )
+    assert resp.status_code == 201
+
+
+@pytest.mark.django_db
+def test_list_get(client, admin_user, list_factory):
+    client.force_authenticate(user=admin_user)
+    list_factory()
+    resp = client.get("/lists")
+    assert resp.status_code == 200
+    # Check that all results contain
+    for result in resp.data["results"]:
+        assert "name" in result
+        assert "label" in result
+        assert "short_description" in result
+        assert "long_description" in result
+        assert "list_accessibility" in result
+        assert "owners" in result
+        assert "source_url" in result
+        assert "source_reference" in result
+        assert "external_contact" in result
+        assert "date_of_source_collection" in result
+        assert "types" in result

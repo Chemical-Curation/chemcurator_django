@@ -3,10 +3,12 @@ from datetime import datetime
 import factory
 
 from chemreg.common.factory import ControlledVocabularyFactory, DjangoSerializerFactory
-from chemreg.lists.models import List, Record, RecordIdentifier
+from chemreg.lists.models import Record, RecordIdentifier
 from chemreg.lists.serializers import (
     AccessibilityTypeSerializer,
+    ExternalContactSerializer,
     IdentifierTypeSerializer,
+    ListSerializer,
     ListTypeSerializer,
 )
 
@@ -16,6 +18,17 @@ class AccessibilityTypeFactory(DjangoSerializerFactory, ControlledVocabularyFact
 
     class Meta:
         model = AccessibilityTypeSerializer
+
+
+class ExternalContactFactory(DjangoSerializerFactory):
+    """Manufactures `ExternalContact` models and serializers."""
+
+    name = factory.Faker("text", max_nb_chars=49)
+    email = factory.Faker("text", max_nb_chars=49)
+    phone = factory.Faker("text", max_nb_chars=15)
+
+    class Meta:
+        model = ExternalContactSerializer
 
 
 class IdentifierTypeFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
@@ -32,24 +45,38 @@ class ListTypeFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
         model = ListTypeSerializer
 
 
-# todo: convert to serializer factory
-class ListFactory(factory.DjangoModelFactory):
-    """Manufactures `List` models."""
+class ListFactory(DjangoSerializerFactory):
+    """Manufactures `List` models and serializers."""
 
-    name = factory.Faker("text", max_nb_chars=49)
+    name = factory.Sequence(lambda n: f"{factory.Faker('slug').generate()}-{n}")
     label = factory.Faker("text", max_nb_chars=255)
     short_description = factory.Faker("text", max_nb_chars=1000)
     long_description = factory.Faker("text")
-    list_accessibility = factory.SubFactory(AccessibilityTypeFactory)
+    source_url = factory.Faker("text", max_nb_chars=500)
+    source_reference = factory.Faker("text", max_nb_chars=500)
+    source_doi = factory.Faker("text", max_nb_chars=500)
     date_of_source_collection = datetime.now()
 
     # Related Factories
-    list_accessibility = factory.LazyAttribute(
-        lambda _: AccessibilityTypeFactory().instance
-    )
+    list_accessibility = factory.SubFactory(AccessibilityTypeFactory)
+    external_contact = factory.SubFactory(ExternalContactFactory)
 
     class Meta:
-        model = List
+        model = ListSerializer
+
+    @factory.post_generation
+    def owners(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            self.owners.add(extracted)
+
+    @factory.post_generation
+    def types(self, create, extracted, **kwargs):
+        if not create:
+            return
+        if extracted:
+            self.types.add(extracted)
 
 
 # todo: convert to serializer factory
@@ -62,7 +89,7 @@ class RecordFactory(factory.DjangoModelFactory):
     is_validated = factory.Faker("pybool")
 
     # Related Factories
-    list = factory.SubFactory(ListFactory)
+    list = factory.LazyAttribute(lambda _: ListFactory().instance)
 
     class Meta:
         model = Record

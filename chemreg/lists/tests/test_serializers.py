@@ -3,7 +3,9 @@ import pytest
 from chemreg.jsonapi.serializers import HyperlinkedModelSerializer
 from chemreg.lists.serializers import (
     AccessibilityTypeSerializer,
+    ExternalContactSerializer,
     IdentifierTypeSerializer,
+    ListSerializer,
     ListTypeSerializer,
 )
 
@@ -39,5 +41,27 @@ def test_identifier_type_serializer():
 @pytest.mark.django_db
 def test_identifier_type(identifier_type_factory):
     serializer = identifier_type_factory.build()
+    assert serializer.is_valid()
+    serializer.save()
+
+
+def test_external_contact_serializer():
+    assert issubclass(ExternalContactSerializer, HyperlinkedModelSerializer)
+
+
+@pytest.mark.django_db
+def test_external_contact(external_contact_factory):
+    serializer = external_contact_factory.build()
+    assert serializer.is_valid()
+    serializer.save()
+
+
+def test_list_serializer():
+    assert issubclass(ListSerializer, HyperlinkedModelSerializer)
+
+
+@pytest.mark.django_db
+def test_list(list_factory):
+    serializer = list_factory.build()
     assert serializer.is_valid()
     serializer.save()

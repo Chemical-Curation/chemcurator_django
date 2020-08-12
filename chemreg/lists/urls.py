@@ -6,6 +6,7 @@ from chemreg.lists import views
 # Create a router and register our viewsets with it.
 router = SimpleRouter()
 router.register(views.AccessibilityTypeViewSet)
+router.register(views.ListViewSet)
 router.register(views.ListTypeViewSet)
 router.register(views.IdentifierTypeViewSet)
 

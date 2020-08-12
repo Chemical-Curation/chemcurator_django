@@ -42,9 +42,14 @@ local synonymQuality = import 'substance/synonymQuality.libsonnet';
 local synonymType = import 'substance/synonymType.libsonnet';
 
 // Lists
+local externalContact = import 'lists/externalContact.libsonnet';
+local list = import 'lists/list.libsonnet';
 local listType = import 'lists/listType.libsonnet';
 local accessibilityType = import 'lists/accessibilityType.libsonnet';
 local identifierType = import 'lists/identifierType.libsonnet';
+
+// Users
+local user = import 'users/user.libsonnet';
 
 ////////////////////////
 // List of all models //
@@ -69,8 +74,9 @@ local objs = [
 
   //lists
   accessibilityType,
+  list,
   listType,
-  identifierType
+  identifierType,
 ];
 
 // Build spec

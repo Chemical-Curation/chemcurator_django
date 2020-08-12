@@ -60,7 +60,7 @@ class List(CommonInfo):
         source_doi (str): (Less than 500 characters, optional field)
         external_contact (ExternalContact): (optional)
         date_of_source_collection (date): (required)
-        list_to_list_type (many-to-many): Linkage between List and ListType Models (optional)
+        types (many-to-many): Linkage between List and ListType Models (optional)
     """
 
     name = models.SlugField(max_length=49, unique=True)
@@ -77,7 +77,7 @@ class List(CommonInfo):
     external_contact = models.ForeignKey(
         "ExternalContact", on_delete=models.PROTECT, null=True
     )
-    date_of_source_collection = models.DateTimeField(editable=False, blank=False)
+    date_of_source_collection = models.DateTimeField(blank=False)
     types = models.ManyToManyField("ListType", blank=True, related_name="lists")
 
 

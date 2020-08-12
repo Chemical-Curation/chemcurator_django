@@ -3,7 +3,7 @@ local baseCompound = import 'baseCompound.libsonnet';
 {
   app: 'Compound',
   type: 'definedCompound',
-  description: 'Everything about defined compounds.',
+  description: 'Compounds that have been defined and identified with a molfile.',
   queryParams: [
     {
       parameter: 'override',

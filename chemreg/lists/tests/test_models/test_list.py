@@ -41,7 +41,6 @@ def test_list():
     assert List.external_contact.field.related_model is ExternalContact
     date_of_source_collection = List._meta.get_field("date_of_source_collection")
     assert isinstance(date_of_source_collection, models.DateField)
-    assert not date_of_source_collection.editable
     assert not date_of_source_collection.blank
 
 
@@ -55,7 +54,7 @@ def test_list_type():
 def test_lists_to_types():
     """Tests the many-to-many relationship between `List` and `ListType` objects"""
 
-    list = ListFactory()
+    list = ListFactory().instance
     assert list.types.count() == 0
 
     types = [ListTypeFactory().instance, ListTypeFactory().instance]
