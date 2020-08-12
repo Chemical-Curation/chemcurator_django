@@ -1,7 +1,11 @@
 from django.db import models
 
 from chemreg.common.models import CommonInfo, ControlledVocabulary
-from chemreg.common.validators import validate_deprecated
+from chemreg.common.validators import (
+    validate_casrn_checksum,
+    validate_casrn_format,
+    validate_deprecated,
+)
 from chemreg.substance.utils import build_sid
 
 
@@ -80,7 +84,11 @@ class Substance(CommonInfo):
     associated_compound = models.ForeignKey(
         "compound.BaseCompound", on_delete=models.PROTECT, null=True
     )
-    casrn = models.CharField(max_length=50, unique=True)
+    casrn = models.CharField(
+        max_length=50,
+        unique=True,
+        validators=[validate_casrn_format, validate_casrn_checksum],
+    )
 
 
 class SubstanceRelationship(CommonInfo):
@@ -134,16 +142,18 @@ class SynonymType(ControlledVocabulary):
     """Controlled vocabulary for SynonymTypes
 
     Attributes:
-        Name = String (Less than 50 character, url safe, unique, required field)
-        Label = String (Less than 100 characters, unique, required field)
-        Short Description = String (Less than 500 characters, required field)
-        Long Description = TEXT (required field)
-        Validation Regular Expression = String (not required)
-        Score modifier = Float (default 0)
+        name (str): Slug field of the synonym type (Less than 50 character, url safe, unique, required field)
+        label (str): Readable string field of the synonym type (Less than 100 characters, unique, required field)
+        short_description (str): Short description of the synonym type (Less than 500 characters, required field)
+        long_description (str): Long description of the synonym type (required field)
+        validation_regular_expression (str): (optional)
+        score_modifier (float): (default 0)
+        is_casrn (bool): Whether the synonyms related to this type have identifiers that are valid CAS_RNs (required)
     """
 
     validation_regular_expression = models.TextField(blank=True)
     score_modifier = models.FloatField(default=0)
+    is_casrn = models.BooleanField()
 
 
 class SynonymQuality(ControlledVocabulary):

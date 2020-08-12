@@ -1,6 +1,8 @@
 from django.apps import apps
 from django.db import models
 
+import pytest
+
 from chemreg.substance.models import Substance
 
 
@@ -60,3 +62,20 @@ def test_substance_model():
     assert Substance.related_to.field.model is apps.get_model(
         "substance", "SubstanceRelationship"
     )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "casrn,validity,code",
+    [
+        ("1234567-89-5", True, None),
+        ("Non-CASRN String", False, "format"),
+        ("1-89-5", False, "format"),
+        ("1234567-89-0", False, "checksum"),
+    ],
+)
+def test_validate_casrn(substance_factory, casrn, validity, code):
+    substance = substance_factory.build(casrn=casrn)
+    assert substance.is_valid() == validity
+    if substance.errors:
+        assert substance.errors["casrn"][0].code == code

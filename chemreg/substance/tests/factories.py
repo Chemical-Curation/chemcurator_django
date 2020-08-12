@@ -87,6 +87,7 @@ class SynonymTypeFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
 
     validation_regular_expression = ".*"
     score_modifier = factory.Faker("pyfloat")
+    is_casrn = False
 
     class Meta:
         model = SynonymTypeSerializer

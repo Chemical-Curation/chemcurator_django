@@ -145,6 +145,100 @@ def test_synonym_serializer_includes():
 
 
 @pytest.mark.django_db
+def test_synonym_validates_synonym_type_is_casrn(synonym_factory, synonym_type_factory):
+    """ This test verifies that if a synonym type has is_casrn set to True,
+    synonyms that are added are only permitted if they meet valid CAS-RN specs.
+
+    2-7 digits - 2 digits - 1 digit checksum
+    """
+    synonym_type = synonym_type_factory(
+        is_casrn=True, validation_regular_expression="^[0-9]{2,7}-[0-9]{2,7}-[0-9]$"
+    ).instance
+
+    synonym_correct = synonym_factory.build(
+        identifier="1234567-89-5",
+        synonym_type={"type": "synonymType", "id": synonym_type.pk},
+    )
+    # todo: Regex is not included in this ticket.  Readd this test when
+    # synonym_invalid_format = synonym_factory.build(
+    #     identifier="Non-CASRN string",
+    #     synonym_type={"type": "synonymType", "id": synonym_type.pk},
+    # )
+    synonym_invalid_checksum = synonym_factory.build(
+        identifier="1234567-89-0",
+        synonym_type={"type": "synonymType", "id": synonym_type.pk},
+    )
+
+    assert synonym_correct.is_valid()
+    assert not synonym_correct.errors
+    synonym_correct.save()
+
+    synonym_invalid_update = SynonymSerializer(
+        synonym_correct.instance, {"identifier": "1234567-89-0"}, partial=True
+    )
+    assert not synonym_invalid_update.is_valid()
+    assert synonym_invalid_update.errors
+
+    # todo: Readd assertions with regex validation
+    # assert not synonym_invalid_format.is_valid()
+    # assert synonym_invalid_format.errors
+
+    assert not synonym_invalid_checksum.is_valid()
+    assert synonym_invalid_checksum.errors
+
+
+@pytest.mark.django_db
+def test_synonym_type_validates_is_casrn(synonym_factory, synonym_type_factory):
+    """ This test verifies that if a synonym type is set where `is_casrn = False`,
+    and a user requests the `is_casrn = True`, the change will only happen if all
+    child synonym identifiers are valid.
+    """
+
+    # Create 2 synonym types, both with CAS-RN false
+    synonym_type_valid = synonym_type_factory(
+        is_casrn=False, validation_regular_expression="^[0-9]{2,7}-[0-9]{2,7}-[0-9]$"
+    ).instance
+    synonym_type_invalid = synonym_type_factory(
+        is_casrn=False, validation_regular_expression="^[0-9]{2,7}-[0-9]{2,7}-[0-9]$"
+    ).instance
+
+    # Attach a valid casrn to one and an invalid casrn to the other.
+    synonym_factory(
+        identifier="1234567-89-5",
+        synonym_type={"type": "synonymType", "id": synonym_type_valid.pk},
+    )  # valid
+    synonym_factory(
+        identifier="1234567-89-0",
+        synonym_type={"type": "synonymType", "id": synonym_type_invalid.pk},
+    )  # invalid
+
+    # Partial update, Validate, and Save
+    synonym_type_valid_serializer = SynonymTypeSerializer(
+        synonym_type_valid, data={"is_casrn": True}, partial=True
+    )
+    assert synonym_type_valid_serializer.is_valid()
+    assert not synonym_type_valid_serializer.errors
+    synonym_type_valid_serializer.save()
+
+    synonym_type_valid_revert_to_false = SynonymTypeSerializer(
+        synonym_type_valid_serializer.instance, data={"is_casrn": True}, partial=True
+    )
+    assert synonym_type_valid_revert_to_false.is_valid()
+    assert not synonym_type_valid_revert_to_false.errors
+    synonym_type_valid_revert_to_false.save()
+
+    synonym_type_invalid_serializer = SynonymTypeSerializer(
+        synonym_type_invalid, data={"is_casrn": True}, partial=True
+    )
+    assert not synonym_type_invalid_serializer.is_valid()
+    assert synonym_type_invalid_serializer.errors
+    assert (
+        "invalid_data"
+        == synonym_type_invalid_serializer.errors["non_field_errors"][0].code
+    )
+
+
+@pytest.mark.django_db
 def test_substance_relationship_serializer():
     assert issubclass(SubstanceRelationshipSerializer, HyperlinkedModelSerializer)
 

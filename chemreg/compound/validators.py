@@ -7,7 +7,7 @@ import partialsmiles as ps
 from indigo import IndigoException
 
 from chemreg.compound.settings import compound_settings
-from chemreg.compound.utils import compute_checksum, extract_checksum, extract_int
+from chemreg.compound.utils import chemreg_checksum, extract_checksum, extract_int
 from chemreg.indigo.inchi import get_inchikey
 from chemreg.indigo.molfile import get_molfile_v3000
 
@@ -131,6 +131,6 @@ def validate_cid_checksum(cid: str) -> None:
     """
     given_checksum = extract_checksum(cid)
     i = extract_int(cid)
-    real_checksum = compute_checksum(i)
+    real_checksum = chemreg_checksum(i)
     if not given_checksum == real_checksum:
         raise ValidationError(f"Invalid checksum. Expected {real_checksum}.")

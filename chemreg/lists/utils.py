@@ -6,7 +6,7 @@ from django.core.cache import cache
 from django.db.models import IntegerField, Max
 from django.db.models.functions import Cast, Substr
 
-from chemreg.common.utils import compute_checksum
+from chemreg.common.utils import chemreg_checksum
 from chemreg.lists.settings import record_settings
 
 
@@ -51,7 +51,7 @@ def build_rid(i=None) -> str:
                     cache.delete(seq_key + ".lock")
             time.sleep(0.01)
 
-    checksum = compute_checksum(i)
+    checksum = chemreg_checksum(i)
     return f"{record_settings.PREFIX}RID{checksum}0{i}"
 
 

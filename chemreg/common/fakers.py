@@ -1,5 +1,7 @@
 from faker.providers import BaseProvider
 
+from chemreg.common.utils import casrn_checksum
+
 
 class ChemicalProvider(BaseProvider):
     """Provider to allow faker to generate cas numbers.
@@ -15,5 +17,5 @@ class ChemicalProvider(BaseProvider):
         """
         seg1 = self.generator.random.randrange(10, 9999999)
         seg2 = self.generator.random.randrange(10, 99)
-        seg3 = self.generator.random.randrange(0, 9)
+        seg3 = casrn_checksum(int(f"{seg1}{seg2}"))
         return f"{seg1}-{seg2}-{seg3}"

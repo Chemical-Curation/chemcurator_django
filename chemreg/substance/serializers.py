@@ -1,6 +1,7 @@
 from rest_framework.exceptions import ValidationError
 
 from chemreg.common.serializers import ControlledVocabSerializer
+from chemreg.common.validators import validate_casrn_checksum
 from chemreg.compound.models import BaseCompound
 from chemreg.compound.serializers import CompoundSerializer
 from chemreg.jsonapi.relations import PolymorphicResourceRelatedField
@@ -35,8 +36,34 @@ class SynonymTypeSerializer(ControlledVocabSerializer):
         fields = ControlledVocabSerializer.Meta.fields + [
             "validation_regular_expression",
             "score_modifier",
+            "is_casrn",
         ]
         model = SynonymType
+
+    def validate(self, data):
+        # todo: validate the validation_regular_expression before validating checksum
+        if self.instance and data.get("is_casrn"):
+            self.validate_synonym_set_casrn_checksum()
+        return data
+
+    def validate_synonym_set_casrn_checksum(self):
+        """This validates the checksum for CAS-RNs.
+
+        This will need to be called after regex validation for self.validation_regular_expression
+        as an additional non-regex check
+        """
+        failed_synonyms = []
+        for synonym in self.instance.synonym_set.all():
+            try:
+                validate_casrn_checksum(synonym.identifier)
+            except ValidationError:
+                failed_synonyms.append(synonym)
+        if failed_synonyms:
+            raise ValidationError(
+                "Synonyms with invalid CAS-RN checksums: ["
+                f"{', '.join(syn.identifier for syn in failed_synonyms)}]",
+                "invalid_data",
+            )
 
 
 class SourceSerializer(ControlledVocabSerializer):
@@ -135,6 +162,14 @@ class SynonymSerializer(HyperlinkedModelSerializer):
             "synonym_quality",
             "synonym_type",
         ]
+
+    def validate(self, data):
+        synonym_type = data.get("synonym_type", None) or self.instance.synonym_type
+        # If the synonym type is casrn
+        if synonym_type.is_casrn:
+            # Verify that the identifier has a valid casrn checksum
+            validate_casrn_checksum(data["identifier"])
+        return data
 
 
 class SubstanceRelationshipSerializer(HyperlinkedModelSerializer):
