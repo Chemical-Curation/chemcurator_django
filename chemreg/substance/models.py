@@ -5,6 +5,7 @@ from chemreg.common.validators import (
     validate_casrn_checksum,
     validate_casrn_format,
     validate_deprecated,
+    validate_is_regex,
 )
 from chemreg.substance.utils import build_sid
 
@@ -151,7 +152,9 @@ class SynonymType(ControlledVocabulary):
         is_casrn (bool): Whether the synonyms related to this type have identifiers that are valid CAS_RNs (required)
     """
 
-    validation_regular_expression = models.TextField(blank=True)
+    validation_regular_expression = models.TextField(
+        blank=True, validators=[validate_is_regex]
+    )
     score_modifier = models.FloatField(default=0)
     is_casrn = models.BooleanField()
 

@@ -66,3 +66,20 @@ def validate_casrn_format(value):
         raise ValidationError(
             "Provided CAS-RN does not meet format requirements.", "format"
         )
+
+
+def validate_is_regex(value):
+    """ Validates a string is valid re regex
+
+    https://docs.python.org/3/library/re.html#regular-expression-syntax
+
+    Args:
+        value (str): A valid regex string
+
+    Raises:
+        ValidationError: The provided RegExp is invalid
+    """
+    try:
+        re.compile(value)
+    except re.error:
+        raise ValidationError("The provided RegExp is invalid")

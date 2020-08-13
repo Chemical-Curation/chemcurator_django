@@ -1,3 +1,5 @@
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.core.validators import RegexValidator
 from rest_framework.exceptions import ValidationError
 
 from chemreg.common.serializers import ControlledVocabSerializer
@@ -41,29 +43,89 @@ class SynonymTypeSerializer(ControlledVocabSerializer):
         model = SynonymType
 
     def validate(self, data):
-        # todo: validate the validation_regular_expression before validating checksum
-        if self.instance and data.get("is_casrn"):
-            self.validate_synonym_set_casrn_checksum()
+        """Validates non-field related errors.
+
+        Args:
+            data (dict): The dictionary of the newly updated or created SynonymType
+
+        Returns:
+            Validated data dictionary.
+        """
+        if self.instance:
+            self.validate_synonym_set(data)
         return data
 
-    def validate_synonym_set_casrn_checksum(self):
-        """This validates the checksum for CAS-RNs.
+    def validate_synonym_set(self, data):
+        """This validates that all Synonyms belonging to this SynonymType are valid
 
-        This will need to be called after regex validation for self.validation_regular_expression
-        as an additional non-regex check
+        Note:
+            This test only needs to be run on updates.  On creates it will fail as
+            there is no instance to validate against.
+
+        Args:
+            data (dict): The dictionary of the newly updated SynonymType
+
+        Raises:
+            ValidationError:  Raises an error that contains an error message with
+                all synonym identifiers that fail to meet the updated type.
         """
-        failed_synonyms = []
+        failed_checksum_synonyms = []
+        failed_format_synonyms = []
         for synonym in self.instance.synonym_set.all():
+            # Verify synonym.identifier matches the validation_regular_expression
             try:
-                validate_casrn_checksum(synonym.identifier)
+                RegexValidator(
+                    data.get("validation_regular_expression"), code="format",
+                )(synonym.identifier)
+            except DjangoValidationError:
+                failed_format_synonyms.append(synonym)
+
+            # If the synonym is a casrn, verify it has the correct checksum
+            try:
+                if data.get("is_casrn"):
+                    validate_casrn_checksum(synonym.identifier)
             except ValidationError:
-                failed_synonyms.append(synonym)
-        if failed_synonyms:
-            raise ValidationError(
-                "Synonyms with invalid CAS-RN checksums: ["
-                f"{', '.join(syn.identifier for syn in failed_synonyms)}]",
-                "invalid_data",
+                failed_checksum_synonyms.append(synonym)
+
+        if failed_checksum_synonyms or failed_format_synonyms:
+            error_message = self._construct_error_message(
+                failed_checksum_synonyms, failed_format_synonyms
             )
+            raise ValidationError(
+                error_message, "invalid_data",
+            )
+
+    def _construct_error_message(self, failed_checksums, failed_formats):
+        """Accepts lists of synonyms and constructs an error message containing their
+        identifiers.
+
+        Args:
+            failed_checksums (list): Synonyms that failed an update due to incorrect
+                checksums
+            failed_formats (list): Synonyms that failed an update due to failing to
+                meet the regex formatting
+
+        Returns:
+            String containing the failing synonyms organized by how they failed
+        """
+        checksum_string = (
+            (
+                "Synonyms with invalid CAS-RN checksums: ["
+                f"{', '.join(syn.identifier for syn in failed_checksums)}]"
+            )
+            if failed_checksums
+            else None
+        )
+        format_string = (
+            (
+                "Synonyms associated with this Synonym Type do not match "
+                "the proposed regular expression: ["
+                f"{', '.join(syn.identifier for syn in failed_formats)}]"
+            )
+            if failed_formats
+            else None
+        )
+        return "\n".join(filter(None, [checksum_string, format_string]))
 
 
 class SourceSerializer(ControlledVocabSerializer):

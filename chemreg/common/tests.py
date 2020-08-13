@@ -8,7 +8,11 @@ from crum import impersonate
 
 from chemreg.common.models import CommonInfo
 from chemreg.common.utils import casrn_checksum, chemreg_checksum
-from chemreg.common.validators import validate_casrn_checksum, validate_casrn_format
+from chemreg.common.validators import (
+    validate_casrn_checksum,
+    validate_casrn_format,
+    validate_is_regex,
+)
 
 
 def test_casrn_checksum():
@@ -116,6 +120,16 @@ def test_validate_casrn_checksum():
         validate_casrn_checksum(invalid_checksum)
     # Assert string throws an errors for checksum, not formatting
     assert ["checksum"] == exception.value.get_codes()
+
+
+def test_validate_is_regex():
+    valid_regex = ".*"
+    invalid_regex = "\\"
+
+    assert validate_is_regex(valid_regex) is None
+
+    with pytest.raises(ValidationError):
+        validate_is_regex(invalid_regex)
 
 
 def controlled_vocabulary_test_helper(model):

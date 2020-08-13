@@ -145,6 +145,68 @@ def test_synonym_serializer_includes():
 
 
 @pytest.mark.django_db
+def test_synonym_type_validation_regular_expression(
+    synonym_factory, synonym_type_factory,
+):
+    """ This test verifies that if a synonym type has its
+    validation_regular_expression updated.  All synonyms attached must pass validation.
+    """
+
+    # Create 2 synonym types with no validation constraint
+    synonym_type_valid = synonym_type_factory(
+        validation_regular_expression=".*"
+    ).instance
+    synonym_type_invalid = synonym_type_factory(
+        validation_regular_expression=".*"
+    ).instance
+
+    # Attach a synonym to the synonym type created above.  The identifier
+    #   will decide whether validation_regular_expression can be changed without error.
+    synonym_factory(
+        identifier="1234567-89-0",
+        synonym_type={"type": "synonymType", "id": synonym_type_invalid.pk},
+    )  # valid
+    synonym_factory(
+        identifier="12345678-89-0",
+        synonym_type={"type": "synonymType", "id": synonym_type_invalid.pk},
+    )  # invalid
+
+    # Test Valid
+    # Partial update validation_regular_expression and validate
+    synonym_type_valid_serializer = SynonymTypeSerializer(
+        synonym_type_valid,
+        data={"validation_regular_expression": "^[0-9]{2,7}-[0-9]{2,7}-[0-9]$"},
+        partial=True,
+    )
+    assert synonym_type_valid_serializer.is_valid()
+    assert not synonym_type_valid_serializer.errors
+    synonym_type_valid_serializer.save()
+
+    # Revert back to false.
+    synonym_type_valid_revert_to_false = SynonymTypeSerializer(
+        synonym_type_valid_serializer.instance,
+        data={"validation_regular_expression": ".*"},
+        partial=True,
+    )
+    assert synonym_type_valid_revert_to_false.is_valid()
+    assert not synonym_type_valid_revert_to_false.errors
+    synonym_type_valid_revert_to_false.save()
+
+    # Test Invalid
+    synonym_type_invalid_serializer = SynonymTypeSerializer(
+        synonym_type_invalid,
+        data={"validation_regular_expression": "^[0-9]{2,7}-[0-9]{2,7}-[0-9]$"},
+        partial=True,
+    )
+    assert not synonym_type_invalid_serializer.is_valid()
+    assert synonym_type_invalid_serializer.errors
+    assert (
+        "invalid_data"
+        == synonym_type_invalid_serializer.errors["non_field_errors"][0].code
+    )
+
+
+@pytest.mark.django_db
 def test_synonym_validates_synonym_type_is_casrn(synonym_factory, synonym_type_factory):
     """ This test verifies that if a synonym type has is_casrn set to True,
     synonyms that are added are only permitted if they meet valid CAS-RN specs.
