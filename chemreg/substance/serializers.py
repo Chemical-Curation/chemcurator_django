@@ -226,7 +226,24 @@ class SynonymSerializer(HyperlinkedModelSerializer):
         ]
 
     def validate(self, data):
+        """Validates non-field related errors.
+
+        Args:
+            data (dict): The dictionary of the newly updated or created Synonym
+
+        Returns:
+            Validated data dictionary.
+        """
         synonym_type = data.get("synonym_type", None) or self.instance.synonym_type
+
+        # Validate data.identifier is a valid synonym_type.validation_regular_expression
+        RegexValidator(
+            synonym_type.validation_regular_expression,
+            "The proposed Synonym identifier does not conform to "
+            "the regexp for the associated Synonym Type",
+            "format",
+        )(data.get("identifier"))
+
         # If the synonym type is casrn
         if synonym_type.is_casrn:
             # Verify that the identifier has a valid casrn checksum
