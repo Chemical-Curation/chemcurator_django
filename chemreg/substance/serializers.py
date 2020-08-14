@@ -205,6 +205,23 @@ class SynonymQualitySerializer(ControlledVocabSerializer):
             raise ValidationError("Score Weight must be greater than zero.")
         return value
 
+    def validate_is_restrictive(self, value):
+        if value and self.instance:
+            # get list of unique identifiers
+            qs = self.instance.synonym_set.order_by("identifier").values_list(
+                "identifier", flat=True
+            )
+            if qs.distinct().count() != qs.count():
+                # find equivalent values
+                equiv = qs.intersection(qs.distinct())
+                raise ValidationError(
+                    (
+                        "Synonyms associated with this SynonymQuality do not "
+                        f"meet uniqueness constraints. {[e for e in equiv]}"
+                    )
+                )
+        return value
+
 
 class SynonymSerializer(HyperlinkedModelSerializer):
     """The serializer for Synonyms."""
