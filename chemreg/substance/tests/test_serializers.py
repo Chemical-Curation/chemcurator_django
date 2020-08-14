@@ -175,6 +175,7 @@ def test_synonym_validation_regular_expression(synonym_factory, synonym_type_fac
     assert synonym_invalid_format.errors
 
 
+@pytest.mark.django_db
 def test_synonym_type_validation_regular_expression(
     synonym_factory, synonym_type_factory,
 ):
