@@ -11,11 +11,6 @@ def test_defined_compound_filters(
     user,
     client,
 ):
-    def clean_molfile(mol):
-        return (
-            mol.replace("-INDIGO-", "-CHEMREG-").replace(" ", "+").replace("\n", "%0A")
-        )
-
     factory_dict = {
         "V3000": ("molfile_v3000", defined_compound_factory),
         "V2000": ("molfile_v2000", defined_compound_v2000_factory),
@@ -31,10 +26,9 @@ def test_defined_compound_filters(
     # Alter the molfile so that we can ensure the lookup is done on the inchikey
     # URL encode spaces and newlines
     mol = compound.initial_data[field]
-    molfile = mol if field == "smiles" else clean_molfile(mol)
 
     # Test the filter with valid molfile
-    response = client.get(f"/definedCompounds?filter[{field}]={molfile}")
+    response = client.get("/definedCompounds?", {f"filter[{field}]": mol})
     assert len(response.data["results"]) == 1
     assert response.data["results"][0]["cid"] == obj.cid
 

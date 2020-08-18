@@ -8,6 +8,7 @@ from chemreg.compound.validators import (
     validate_smiles,
 )
 from chemreg.indigo.inchi import get_inchikey
+from chemreg.indigo.molfile import get_molfile_v3000
 
 
 class DefinedCompoundFilter(filters.FilterSet):
@@ -30,6 +31,9 @@ class DefinedCompoundFilter(filters.FilterSet):
     def filter_smiles(self, queryset, name, value):
         validate_smiles(value)
         validate_inchikey_computable(value)
+        # There is an inconsistency w/ inchikey conversion, discussion below
+        # https://github.com/Chemical-Curation/chemcurator_django/pull/224#issuecomment-675129692
+        value = get_molfile_v3000(value)
         inchikey = get_inchikey(value)
         return queryset.filter(inchikey=inchikey)
 
