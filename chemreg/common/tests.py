@@ -6,7 +6,7 @@ from rest_framework.exceptions import ValidationError
 import pytest
 from crum import impersonate
 
-from chemreg.common.models import CommonInfo
+from chemreg.common.models import CommonInfo, HTMLTextField
 from chemreg.common.utils import casrn_checksum, chemreg_checksum
 from chemreg.common.validators import (
     validate_casrn_checksum,
@@ -130,6 +130,37 @@ def test_validate_is_regex():
 
     with pytest.raises(ValidationError):
         validate_is_regex(invalid_regex)
+
+
+def test_htmltextfield():
+    class HTMLTextModel(models.Model):
+        field = HTMLTextField(sanitizer_type="default")
+
+        def pre_save(self):
+            """Perform pre_save validations
+
+            pre_save validation is typically called before saving.  As we
+            do not have a migration for this anonymous model it makes more
+            sense to simply call the function responsible for making the
+            data ready to be saved
+
+            Note:
+                This only pre_saves the HTMLTextField"""
+            f = [
+                f
+                for f in self._meta.local_concrete_fields
+                if isinstance(f, HTMLTextField)
+            ][0]
+            f.pre_save(self, False)
+
+    m = HTMLTextModel()
+    m.field = '<script>evil()</script><b>foo</b><em>bar</em><a href="http://www.google.com/">Link'
+    m.pre_save()
+
+    assert (
+        m.field
+        == '<strong>foo</strong><em>bar</em><a href="http://www.google.com/">Link</a>'
+    )
 
 
 def controlled_vocabulary_test_helper(model):

@@ -1,6 +1,6 @@
 from django.db import models
 
-from chemreg.common.models import CommonInfo, ControlledVocabulary
+from chemreg.common.models import CommonInfo, ControlledVocabulary, HTMLTextField
 from chemreg.lists.utils import build_rid
 from chemreg.users.models import User
 
@@ -49,24 +49,24 @@ class List(CommonInfo):
     """List Model Definition
 
     Attributes:
-        name (str): (Less than 50 character, url safe, unique, required field)
-        label (str): (Less than 255 characters, unique, required field)
-        short_description (str): String (Less than 1000 characters, required field)
-        long_description (str): TEXT (required)
-        list_accessibility: (AccessibilityType) (required)
-        owners: (A list of users, default current user)
-        source_url (str): (Less than 500 characters, optional field)
-        source_reference (str): (Less than 500 characters, optional field)
-        source_doi (str): (Less than 500 characters, optional field)
-        external_contact (ExternalContact): (optional)
-        date_of_source_collection (date): (required)
-        types (many-to-many): Linkage between List and ListType Models (optional)
+        name (str): Less than 50 character, url safe, unique
+        label (str): Less than 255 characters, unique
+        short_description (str): HTML Sanitized description with a 1000 char length limit
+        long_description (str): HTML Sanitized description with a large length limit
+        list_accessibility (AccessibilityType): An Accessibility Type model instance
+        owners (many-to-many): A list of users, default current user
+        source_url (str, optional): Less than 500 characters
+        source_reference (str, optional): Less than 500 characters
+        source_doi (str, optional): Less than 500 characters
+        external_contact (ExternalContact, optional): A External Contact model instance
+        date_of_source_collection (date): Date that this information was collected
+        types (many-to-many, optional): Linkage between List and ListType Models
     """
 
     name = models.SlugField(max_length=49, unique=True)
     label = models.CharField(max_length=255, unique=True, blank=False)
-    short_description = models.TextField(max_length=1000, blank=False)
-    long_description = models.TextField(blank=False)
+    short_description = HTMLTextField(max_length=1000, blank=False)
+    long_description = HTMLTextField(blank=False)
     list_accessibility = models.ForeignKey(
         "AccessibilityType", on_delete=models.PROTECT, null=False
     )

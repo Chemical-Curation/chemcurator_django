@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     # Third party apps
     "computed_property",
     "django_prometheus",
+    "html_sanitizer",
     "polymorphic",
     "rest_framework",
     "partialsmiles",
