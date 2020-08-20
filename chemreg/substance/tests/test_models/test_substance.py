@@ -66,11 +66,46 @@ def test_substance_model():
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
+    "preferred_name,validity,code",
+    [
+        ("Valid String?", True, None),
+        ("Invalid String!", False, "invalid"),  # '!' is an invalid character
+    ],
+)
+def test_validate_preferred_name(substance_factory, preferred_name, validity, code):
+    substance = substance_factory.build(preferred_name=preferred_name)
+    assert substance.is_valid() == validity
+    if not validity:
+        assert code == substance.errors["preferred_name"][0].code
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "display_name,validity,code",
+    [
+        ("Valid String?", True, None),
+        ("Invalid String!", False, "invalid"),  # '!' is an invalid character
+    ],
+)
+def test_validate_display_name(substance_factory, display_name, validity, code):
+    substance = substance_factory.build(display_name=display_name)
+    assert substance.is_valid() == validity
+    if not validity:
+        assert code == substance.errors["display_name"][0].code
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
     "casrn,validity,code",
     [
         ("1234567-89-5", True, None),
-        ("Non-CASRN String", False, "format"),
-        ("1-89-5", False, "format"),
+        ("Non-CASRN String", False, "invalid_format"),  # invalid characters
+        ("1-89-0", False, "invalid_format"),  # seg 1 too short
+        ("12345678-89-0", False, "invalid_format"),  # seg 1 too long
+        ("1234567-8-0", False, "invalid_format"),  # seg 2 too short
+        ("12345678-890-0", False, "invalid_format"),  # seg2 too long
+        ("1234567-89-", False, "invalid_format"),  # no checksum
+        ("1234567-89-05", False, "invalid_format"),  # multiple checksums
         ("1234567-89-0", False, "checksum"),
     ],
 )

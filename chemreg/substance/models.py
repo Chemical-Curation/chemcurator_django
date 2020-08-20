@@ -1,9 +1,9 @@
+from django.core.validators import RegexValidator
 from django.db import models
 
 from chemreg.common.models import CommonInfo, ControlledVocabulary
 from chemreg.common.validators import (
     validate_casrn_checksum,
-    validate_casrn_format,
     validate_deprecated,
     validate_is_regex,
 )
@@ -61,9 +61,35 @@ class Substance(CommonInfo):
         substance_histories (QuerySet): One to Many Substance history resources (not implemented yet)
     """
 
+    preferred_name_regex = "^[a-zA-Z0-9 =<>\\-:.,^%&/{}[\\]()+?=]{3,}$"
+    display_name_regex = "^[a-zA-Z0-9 =<>\\-:.,^%&/{}[\\]()+?=]{3,}$"
+    casrn_regex = "^[0-9]{2,7}-[0-9]{2}-[0-9]$"
+
     sid = models.CharField(default=build_sid, max_length=50, unique=True)
-    preferred_name = models.CharField(max_length=255, unique=True, blank=False)
-    display_name = models.CharField(max_length=255, unique=True, blank=False)
+    preferred_name = models.CharField(
+        max_length=255,
+        unique=True,
+        blank=False,
+        validators=[
+            RegexValidator(
+                preferred_name_regex,
+                message="The proposed Preferred Name does not conform "
+                f"to the regular expression {preferred_name_regex}",
+            )
+        ],
+    )
+    display_name = models.CharField(
+        max_length=255,
+        unique=True,
+        blank=False,
+        validators=[
+            RegexValidator(
+                display_name_regex,
+                message="The proposed display name does not conform "
+                f"to the regular expression {display_name_regex}",
+            )
+        ],
+    )
     source = models.ForeignKey(
         "Source", on_delete=models.PROTECT, null=False, validators=[validate_deprecated]
     )
@@ -88,7 +114,14 @@ class Substance(CommonInfo):
     casrn = models.CharField(
         max_length=50,
         unique=True,
-        validators=[validate_casrn_format, validate_casrn_checksum],
+        validators=[
+            RegexValidator(
+                casrn_regex,
+                "Provided CAS-RN does not meet format requirements",
+                "invalid_format",
+            ),
+            validate_casrn_checksum,
+        ],
     )
 
 

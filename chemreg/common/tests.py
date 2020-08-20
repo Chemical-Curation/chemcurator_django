@@ -8,11 +8,7 @@ from crum import impersonate
 
 from chemreg.common.models import CommonInfo, HTMLTextField
 from chemreg.common.utils import casrn_checksum, chemreg_checksum
-from chemreg.common.validators import (
-    validate_casrn_checksum,
-    validate_casrn_format,
-    validate_is_regex,
-)
+from chemreg.common.validators import validate_casrn_checksum, validate_is_regex
 
 
 def test_casrn_checksum():
@@ -91,26 +87,7 @@ def test_prometheus_metrics_endpoint(client):
 def test_validate_casrn_valid():
     valid_casrn = "1234567-89-5"
     # No exception thrown, Nothing was returned
-    assert validate_casrn_format(valid_casrn) is None
     assert validate_casrn_checksum(valid_casrn) is None
-
-
-def test_validate_casrn_formatting():
-    invalid_strings = [
-        "abcdefg",  # invalid characters
-        "1-89-0",  # seg 1 too short
-        "12345678-89-0",  # seg 1 too long
-        "1234567-8-0",  # seg 2 too short
-        "12345678-890-0",  # seg2 too long
-        "1234567-89-",  # no checksum
-        "1234567-89-05",  # multiple checksums
-    ]
-
-    for invalid_string in invalid_strings:
-        with pytest.raises(ValidationError) as exception:
-            validate_casrn_format(invalid_string)
-        # Assert all codes are throwing errors for formatting, not checksum
-        assert ["format"] == exception.value.get_codes()
 
 
 def test_validate_casrn_checksum():

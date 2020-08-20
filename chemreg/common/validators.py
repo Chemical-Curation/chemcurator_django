@@ -47,27 +47,6 @@ def validate_casrn_checksum(value):
         )
 
 
-def validate_casrn_format(value):
-    """ Validates a CAS-RN formatting using regex
-
-    https://en.wikipedia.org/wiki/CAS_Registry_Number#Format
-
-    Args:
-        value (str): A CAS-RN string.
-            Format should be 2-7 digits hyphen 2 digits hyphen 1 digit.
-
-    Raises:
-        ValidationError: The provided CAS-RN is formatted incorrectly
-
-    """
-
-    # Validate formatting
-    if not re.match("^[0-9]{2,7}-[0-9]{2}-[0-9]$", value):
-        raise ValidationError(
-            "Provided CAS-RN does not meet format requirements.", "format"
-        )
-
-
 def validate_is_regex(value):
     """ Validates a string is valid re regex
 
