@@ -99,13 +99,13 @@ def test_validate_display_name(substance_factory, display_name, validity, code):
     "casrn,validity,code",
     [
         ("1234567-89-5", True, None),
-        ("Non-CASRN String", False, "invalid_format"),  # invalid characters
-        ("1-89-0", False, "invalid_format"),  # seg 1 too short
-        ("12345678-89-0", False, "invalid_format"),  # seg 1 too long
-        ("1234567-8-0", False, "invalid_format"),  # seg 2 too short
-        ("12345678-890-0", False, "invalid_format"),  # seg2 too long
-        ("1234567-89-", False, "invalid_format"),  # no checksum
-        ("1234567-89-05", False, "invalid_format"),  # multiple checksums
+        ("Non-CASRN String", False, "invalid"),  # invalid characters
+        ("1-89-0", False, "invalid"),  # seg 1 too short
+        ("12345678-89-0", False, "invalid"),  # seg 1 too long
+        ("1234567-8-0", False, "invalid"),  # seg 2 too short
+        ("12345678-890-0", False, "invalid"),  # seg2 too long
+        ("1234567-89-", False, "invalid"),  # no checksum
+        ("1234567-89-05", False, "invalid"),  # multiple checksums
         ("1234567-89-0", False, "checksum"),
     ],
 )

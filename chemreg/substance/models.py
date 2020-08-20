@@ -117,8 +117,8 @@ class Substance(CommonInfo):
         validators=[
             RegexValidator(
                 casrn_regex,
-                "Provided CAS-RN does not meet format requirements",
-                "invalid_format",
+                message="The proposed CASRN does not conform "
+                f"to the regular expression {casrn_regex}",
             ),
             validate_casrn_checksum,
         ],
