@@ -30,7 +30,13 @@ def test_record_identifier_relationships():
 
     idt_list = [IdentifierTypeFactory().instance, IdentifierTypeFactory().instance]
     assert len(idt_list) == 2
-    rec = RecordFactory()
-    RecordIdentifierFactory(identifier_type=idt_list[0], record=rec)
-    RecordIdentifierFactory(identifier_type=idt_list[1], record=rec)
+    rec = RecordFactory().instance
+    RecordIdentifierFactory(
+        identifier_type={"id": idt_list[0].pk, "type": "identifierType"},
+        record={"id": rec.pk, "type": "record"},
+    )
+    RecordIdentifierFactory(
+        identifier_type={"id": idt_list[1].pk, "type": "identifierType"},
+        record={"id": rec.pk, "type": "record"},
+    )
     assert rec.identifiers.count() == 2

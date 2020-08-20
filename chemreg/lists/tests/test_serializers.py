@@ -7,6 +7,8 @@ from chemreg.lists.serializers import (
     IdentifierTypeSerializer,
     ListSerializer,
     ListTypeSerializer,
+    RecordIdentifierSerializer,
+    RecordSerializer,
 )
 
 
@@ -63,5 +65,27 @@ def test_list_serializer():
 @pytest.mark.django_db
 def test_list(list_factory):
     serializer = list_factory.build()
+    assert serializer.is_valid()
+    serializer.save()
+
+
+def test_record_serializer():
+    assert issubclass(RecordSerializer, HyperlinkedModelSerializer)
+
+
+@pytest.mark.django_db
+def test_record(record_factory):
+    serializer = record_factory.build()
+    assert serializer.is_valid()
+    serializer.save()
+
+
+def test_record_identifier_serializer():
+    assert issubclass(RecordIdentifierSerializer, HyperlinkedModelSerializer)
+
+
+@pytest.mark.django_db
+def test_record_identifier(record_identifier_factory):
+    serializer = record_identifier_factory.build()
     assert serializer.is_valid()
     serializer.save()

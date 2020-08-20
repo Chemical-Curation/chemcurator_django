@@ -47,6 +47,8 @@ local list = import 'lists/list.libsonnet';
 local listType = import 'lists/listType.libsonnet';
 local accessibilityType = import 'lists/accessibilityType.libsonnet';
 local identifierType = import 'lists/identifierType.libsonnet';
+local record = import 'lists/record.libsonnet';
+local recordIdentifier = import 'lists/recordIdentifier.libsonnet';
 
 // Users
 local user = import 'users/user.libsonnet';
@@ -77,6 +79,8 @@ local objs = [
   list,
   listType,
   identifierType,
+  record,
+  recordIdentifier,
 ];
 
 // Build spec

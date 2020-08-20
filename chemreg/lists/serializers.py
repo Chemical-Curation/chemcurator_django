@@ -6,7 +6,10 @@ from chemreg.lists.models import (
     IdentifierType,
     List,
     ListType,
+    Record,
+    RecordIdentifier,
 )
+from chemreg.substance.serializers import SubstanceSerializer
 from chemreg.users.serializers import UserSerializer
 
 
@@ -18,7 +21,7 @@ class AccessibilityTypeSerializer(ControlledVocabSerializer):
 
 
 class IdentifierTypeSerializer(ControlledVocabSerializer):
-    """The serializer for List Types."""
+    """The serializer for Identifier Types."""
 
     class Meta(ControlledVocabSerializer.Meta):
         model = IdentifierType
@@ -66,4 +69,39 @@ class ListSerializer(HyperlinkedModelSerializer):
             "external_contact",
             "date_of_source_collection",
             "types",
+        ]
+
+
+class RecordSerializer(HyperlinkedModelSerializer):
+    """The serializer for Records."""
+
+    list = ListSerializer
+    substance = SubstanceSerializer
+
+    class Meta:
+        model = Record
+        fields = [
+            "rid",
+            "external_id",
+            "message",
+            "score",
+            "is_validated",
+            "list",
+            "substance",
+        ]
+
+
+class RecordIdentifierSerializer(HyperlinkedModelSerializer):
+    """The serializer for Record Identifiers."""
+
+    record = RecordSerializer
+    identifier_type = IdentifierTypeSerializer
+
+    class Meta:
+        model = RecordIdentifier
+        fields = [
+            "record",
+            "identifier",
+            "identifier_type",
+            "identifier_label",
         ]

@@ -6,6 +6,8 @@ from chemreg.lists.models import (
     IdentifierType,
     List,
     ListType,
+    Record,
+    RecordIdentifier,
 )
 from chemreg.lists.serializers import (
     AccessibilityTypeSerializer,
@@ -13,6 +15,8 @@ from chemreg.lists.serializers import (
     IdentifierTypeSerializer,
     ListSerializer,
     ListTypeSerializer,
+    RecordIdentifierSerializer,
+    RecordSerializer,
 )
 
 
@@ -44,3 +48,15 @@ class ListTypeViewSet(DeprecateDeleteMixin, ModelViewSet):
 
     queryset = ListType.objects.all()
     serializer_class = ListTypeSerializer
+
+
+class RecordViewSet(ModelViewSet):
+
+    queryset = Record.objects.all()
+    serializer_class = RecordSerializer
+
+
+class RecordIdentifierViewSet(ModelViewSet):
+
+    queryset = RecordIdentifier.objects.all()
+    serializer_class = RecordIdentifierSerializer

@@ -195,3 +195,85 @@ def test_list_get(client, admin_user, list_factory):
         assert "external_contact" in result
         assert "date_of_source_collection" in result
         assert "types" in result
+
+
+@pytest.mark.django_db
+def test_record_post(client, admin_user, record_factory):
+    client.force_authenticate(user=admin_user)
+    rf = record_factory.build().initial_data
+    resp = client.post(
+        "/records",
+        {
+            "data": {
+                "type": "record",
+                "attributes": rf,
+                "relationships": {
+                    "list": {"data": {"id": rf["list"]["id"], "type": "list"}},
+                    "substance": {
+                        "data": {"id": rf["substance"]["id"], "type": "substance"}
+                    },
+                },
+            }
+        },
+    )
+    assert resp.status_code == 201
+
+
+@pytest.mark.django_db
+def test_record_get(client, admin_user, record_factory):
+    client.force_authenticate(user=admin_user)
+    record_factory()
+    resp = client.get("/records")
+    assert resp.status_code == 200
+    # Check that all results contain
+    for result in resp.data["results"]:
+        assert "rid" in result
+        assert "external_id" in result
+        assert "list" in result
+        assert "substance" in result
+        assert "score" in result
+        assert "message" in result
+        assert "is_validated" in result
+
+
+@pytest.mark.django_db
+def test_record_identifer_post(
+    client, admin_user, record_identifier_factory, record_factory
+):
+    client.force_authenticate(user=admin_user)
+    rif = record_identifier_factory.build().initial_data
+    resp = client.post(
+        "/recordIdentifiers",
+        {
+            "data": {
+                "type": "recordIdentifier",
+                "attributes": rif,
+                "relationships": {
+                    "identifier_type": {
+                        "data": {
+                            "id": rif["identifier_type"]["id"],
+                            "type": "identifierType",
+                        }
+                    },
+                    "record": {
+                        "data": {"id": record_factory().instance.pk, "type": "record"}
+                    },
+                },
+            }
+        },
+    )
+    assert resp.status_code == 201
+
+
+@pytest.mark.django_db
+def test_record_identifier_get(client, admin_user, record_identifier_factory):
+    client.force_authenticate(user=admin_user)
+    record_identifier_factory()
+    resp = client.get("/recordIdentifiers")
+    assert resp.status_code == 200
+    # Check that all results contain
+    for result in resp.data["results"]:
+        assert "record" in result
+        assert "identifier" in result
+        assert "identifier_type" in result
+        assert "identifier_label" in result

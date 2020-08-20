@@ -3,14 +3,16 @@ from datetime import datetime
 import factory
 
 from chemreg.common.factory import ControlledVocabularyFactory, DjangoSerializerFactory
-from chemreg.lists.models import Record, RecordIdentifier
 from chemreg.lists.serializers import (
     AccessibilityTypeSerializer,
     ExternalContactSerializer,
     IdentifierTypeSerializer,
     ListSerializer,
     ListTypeSerializer,
+    RecordIdentifierSerializer,
+    RecordSerializer,
 )
+from chemreg.substance.tests.factories import SubstanceFactory
 
 
 class AccessibilityTypeFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
@@ -79,9 +81,8 @@ class ListFactory(DjangoSerializerFactory):
             self.types.add(extracted)
 
 
-# todo: convert to serializer factory
-class RecordFactory(factory.DjangoModelFactory):
-    """Manufactures `Record` models."""
+class RecordFactory(DjangoSerializerFactory):
+    """Manufactures `Record` models and serializers."""
 
     external_id = factory.Sequence(lambda n: n)
     score = factory.Faker("pyfloat")
@@ -89,15 +90,15 @@ class RecordFactory(factory.DjangoModelFactory):
     is_validated = factory.Faker("pybool")
 
     # Related Factories
-    list = factory.LazyAttribute(lambda _: ListFactory().instance)
+    list = factory.SubFactory(ListFactory)
+    substance = factory.SubFactory(SubstanceFactory)
 
     class Meta:
-        model = Record
+        model = RecordSerializer
 
 
-# todo: convert to serializer factory
-class RecordIdentifierFactory(factory.DjangoModelFactory):
-    """Manufactures `RecordIdentifier` models."""
+class RecordIdentifierFactory(DjangoSerializerFactory):
+    """Manufactures `RecordIdentifier` models and serializers."""
 
     identifier = factory.Faker("text")
     identifier_label = factory.Faker("text", max_nb_chars=100)
@@ -107,4 +108,4 @@ class RecordIdentifierFactory(factory.DjangoModelFactory):
     identifier_type = factory.SubFactory(IdentifierTypeFactory)
 
     class Meta:
-        model = RecordIdentifier
+        model = RecordIdentifierSerializer

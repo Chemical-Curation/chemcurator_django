@@ -7,7 +7,9 @@ from chemreg.lists.tests.factories import (
     ListFactory,
     ListTypeFactory,
     RecordFactory,
+    RecordIdentifierFactory,
 )
+from chemreg.substance.tests.factories import SubstanceFactory
 from chemreg.users.tests.factories import UserFactory
 
 register(AccessibilityTypeFactory)
@@ -16,4 +18,6 @@ register(IdentifierTypeFactory)
 register(ListFactory)
 register(ListTypeFactory)
 register(RecordFactory)
+register(RecordIdentifierFactory)
 register(UserFactory)
+register(SubstanceFactory)
