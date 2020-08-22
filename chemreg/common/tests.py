@@ -1,15 +1,33 @@
 from random import randint
 
 from django.db import models
+from rest_framework.exceptions import ValidationError
 
 import pytest
 from crum import impersonate
 
-from chemreg.common.models import CommonInfo
-from chemreg.common.utils import compute_checksum
+from chemreg.common.models import CommonInfo, HTMLTextField
+from chemreg.common.utils import casrn_checksum, chemreg_checksum
+from chemreg.common.validators import validate_casrn_checksum, validate_is_regex
 
 
-def test_compute_checksum():
+def test_casrn_checksum():
+    i = randint(2000000, 9999999)
+    computed = (
+        (1 * int(str(i)[-1]))
+        + (2 * int(str(i)[-2]))
+        + (3 * int(str(i)[-3]))
+        + (4 * int(str(i)[-4]))
+        + (5 * int(str(i)[-5]))
+        + (6 * int(str(i)[-6]))
+        + (7 * int(str(i)[-7]))
+    ) % 10
+    checksum = casrn_checksum(i)
+    assert computed == checksum
+    assert 0 <= checksum < 10
+
+
+def test_chemreg_checksum():
     i = randint(2000000, 9999999)
     computed = (
         (1 * int(str(i)[0]))
@@ -20,7 +38,7 @@ def test_compute_checksum():
         + (6 * int(str(i)[5]))
         + (7 * int(str(i)[6]))
     ) % 10
-    checksum = compute_checksum(i)
+    checksum = chemreg_checksum(i)
     assert computed == checksum
     assert 0 <= checksum < 10
 
@@ -64,6 +82,62 @@ def test_user_link(user_factory):
 def test_prometheus_metrics_endpoint(client):
     response = client.get("/metrics")
     assert response.status_code == 200
+
+
+def test_validate_casrn_valid():
+    valid_casrn = "1234567-89-5"
+    # No exception thrown, Nothing was returned
+    assert validate_casrn_checksum(valid_casrn) is None
+
+
+def test_validate_casrn_checksum():
+    invalid_checksum = "1234567-89-1"
+
+    with pytest.raises(ValidationError) as exception:
+        validate_casrn_checksum(invalid_checksum)
+    # Assert string throws an errors for checksum, not formatting
+    assert ["checksum"] == exception.value.get_codes()
+
+
+def test_validate_is_regex():
+    valid_regex = ".*"
+    invalid_regex = "\\"
+
+    assert validate_is_regex(valid_regex) is None
+
+    with pytest.raises(ValidationError):
+        validate_is_regex(invalid_regex)
+
+
+def test_htmltextfield():
+    class HTMLTextModel(models.Model):
+        field = HTMLTextField(sanitizer_type="default")
+
+        def pre_save(self):
+            """Perform pre_save validations
+
+            pre_save validation is typically called before saving.  As we
+            do not have a migration for this anonymous model it makes more
+            sense to simply call the function responsible for making the
+            data ready to be saved
+
+            Note:
+                This only pre_saves the HTMLTextField"""
+            f = [
+                f
+                for f in self._meta.local_concrete_fields
+                if isinstance(f, HTMLTextField)
+            ][0]
+            f.pre_save(self, False)
+
+    m = HTMLTextModel()
+    m.field = '<script>evil()</script><b>foo</b><em>bar</em><a href="http://www.google.com/">Link'
+    m.pre_save()
+
+    assert (
+        m.field
+        == '<strong>foo</strong><em>bar</em><a href="http://www.google.com/">Link</a>'
+    )
 
 
 def controlled_vocabulary_test_helper(model):

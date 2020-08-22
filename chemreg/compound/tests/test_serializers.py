@@ -45,9 +45,9 @@ def test_unique_inchikey(defined_compound_factory):
     compound = serializer.save()
     serialized = defined_compound_factory.build(**serializer.initial_data)
     assert not serialized.is_valid()
-    assert "molfile_v3000" in serialized.errors
-    conflict = f"Conflicting compound ID: {compound.id}"
-    assert conflict in str(serialized.errors["molfile_v3000"][0])
+    assert "links" in serialized.errors["detail"]
+    conflict = f"Inchikey conflicts with ['{compound.cid}']"
+    assert conflict in str(serialized.errors["detail"]["detail"])
 
 
 @pytest.mark.django_db
@@ -121,6 +121,7 @@ def test_override_unique_inchikey_via_smiles(defined_compound_smiles_factory):
     assert not serialized.is_valid()  # fails without override
 
     serialized = defined_compound_smiles_factory.build(**data, admin_override=True)
+
     assert serialized.is_valid()  # succeeds with override
     two = serialized.save()
     assert one.cid != two.cid

@@ -5,7 +5,7 @@ local qc_level = import 'qcLevelsType.libsonnet';
  {
   app: 'Substance',
   type: 'substance',
-  description: 'Everything about Substances.',
+  description: 'Substances.',
   attributes: {
     sid: {
       type: 'string',

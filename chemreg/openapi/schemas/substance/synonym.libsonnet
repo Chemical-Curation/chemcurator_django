@@ -6,7 +6,7 @@ local synonym_type = import 'synonymType.libsonnet';
  {
   app: 'Substance',
   type: 'synonym',
-  description: 'Everything about Synonyms.',
+  description: 'Substance synonyms.',
   attributes: {
     identifier: {
       type: 'string',

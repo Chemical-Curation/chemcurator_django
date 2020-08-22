@@ -1,5 +1,7 @@
 from django.db import models
 
+import pytest
+
 from chemreg.substance.models import SynonymType
 
 
@@ -31,3 +33,14 @@ def test_synonym_type():
     score_modifier = SynonymType._meta.get_field("score_modifier")
     assert isinstance(score_modifier, models.FloatField)
     assert score_modifier.default == 0.0
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "regex,validity", [(".*", True), ("\\", False)],
+)
+def test_synonym_type_validation_regular_expression(
+    synonym_type_factory, regex, validity
+):
+    synonym_type = synonym_type_factory.build(validation_regular_expression=regex)
+    assert synonym_type.is_valid() == validity

@@ -36,3 +36,6 @@ class CompoundFaker(BaseProvider):
         smiles_str = self.random_element(self.compounds)
         self.indigo.setOption("molfile-saving-mode", "2000")
         return self.indigo.loadMolecule(smiles_str).molfile()
+
+    def smile(self):
+        return self.random_element(self.compounds)

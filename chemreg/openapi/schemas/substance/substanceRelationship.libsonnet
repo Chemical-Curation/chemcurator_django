@@ -8,7 +8,7 @@ local to_substance = substance;
  {
   app: 'Substance',
   type: 'substanceRelationship',
-  description: 'Everything about Substance Relationships.',
+  description: 'Relationships between substances.',
   attributes: {
     qc_notes: {
       type: 'string',

@@ -718,3 +718,38 @@ def test_substance_relationship_post(
         },
     )
     assert resp.status_code == 201
+
+
+@pytest.mark.django_db
+def test_is_restrictive_on_synonyms(
+    client, admin_user, synonym_factory, synonym_quality_factory
+):
+    """ This test verifies that if a synonym quality has the is_restrictive field
+    set to True, associated synonym.identifier fields will be validated to be unique.
+    """
+    synonym_quality = synonym_quality_factory.create(is_restrictive=False).instance
+
+    synonym_factory.create(
+        identifier="1234567-89-5",
+        synonym_quality={"type": "synonymQuality", "id": synonym_quality.pk},
+    )
+    synonym_factory.create(
+        identifier="1234567-89-5",
+        synonym_quality={"type": "synonymQuality", "id": synonym_quality.pk},
+    )
+    client.force_authenticate(user=admin_user)
+    resp = client.patch(
+        f"/synonymQualities/{synonym_quality.pk}",
+        {
+            "data": {
+                "id": synonym_quality.pk,
+                "type": "synonymQuality",
+                "attributes": {"is_restrictive": True},
+            }
+        },
+    )
+    assert resp.status_code == 400
+    assert (
+        resp.data[0]["detail"]
+        == "Synonyms associated with this SynonymQuality do not meet uniqueness constraints. ['1234567-89-5']"
+    )

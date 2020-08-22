@@ -4,7 +4,7 @@ local queryStructureType = import 'queryStructureType.libsonnet';
 {
   app: 'Compound',
   type: 'illDefinedCompound',
-  description: 'Everything about ill defined compounds.',
+  description: 'Compounds that cannot be defined with molfiles.',
   attributes: {
     cid: baseCompound.attributes.cid,
     qcNote: baseCompound.attributes.qcNote,

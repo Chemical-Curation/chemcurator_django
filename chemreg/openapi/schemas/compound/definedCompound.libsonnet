@@ -3,7 +3,7 @@ local baseCompound = import 'baseCompound.libsonnet';
 {
   app: 'Compound',
   type: 'definedCompound',
-  description: 'Everything about defined compounds.',
+  description: 'Compounds that have been defined and identified with a molfile.',
   queryParams: [
     {
       parameter: 'override',
@@ -27,6 +27,7 @@ local baseCompound = import 'baseCompound.libsonnet';
       example: 'O=O',
       detailRead: true,
       oneOfGroup: 'structure',
+      filter: true,
     },
     molfileV2000: {
       type: 'string',
@@ -34,6 +35,7 @@ local baseCompound = import 'baseCompound.libsonnet';
       example: '\n  -INDIGO-04292017242D\n\n  2  1  0  0  0  0  0  0  0  0999 V2000\n    0.0000    0.0000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n    0.0000    0.0000    0.0000 O   0  0  0  0  0  0  0  0  0  0  0  0\n  1  2  2  0  0  0  0\nM  END\n',
       writeOnly: true,
       oneOfGroup: 'structure',
+      filter: true,
     },
     inchikey: {
       type: 'string',

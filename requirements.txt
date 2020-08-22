@@ -8,6 +8,7 @@ djangorestframework==3.11.0  # https://github.com/encode/django-rest-framework
 djangorestframework-jsonapi[django-filter,django-polymorphic]==3.1.0  # https://github.com/django-json-api/django-rest-framework-json-api
 epam.indigo==1.4.0b0  # https://github.com/epam/Indigo
 gunicorn[gevent,setproctitle]==20.0.4  # https://github.com/benoitc/gunicorn
+html-sanitizer==1.9.1  # https://github.com/matthiask/html-sanitizer
 jsonnet==0.16.0; sys_platform == 'linux' or sys_platform == 'darwin'  # https://github.com/google/jsonnet
 jsonnetbin==0.16.0; sys_platform == 'win32' or sys_platform == 'cygwin' or sys_platform == 'msys'  # https://github.com/mcovalt/jsonnetbin
 partialsmiles==1.0 # https://github.com/baoilleach/partialsmiles

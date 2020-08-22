@@ -1,7 +1,12 @@
+from django.core.validators import RegexValidator
 from django.db import models
 
 from chemreg.common.models import CommonInfo, ControlledVocabulary
-from chemreg.common.validators import validate_deprecated
+from chemreg.common.validators import (
+    validate_casrn_checksum,
+    validate_deprecated,
+    validate_is_regex,
+)
 from chemreg.substance.utils import build_sid
 
 
@@ -56,9 +61,35 @@ class Substance(CommonInfo):
         substance_histories (QuerySet): One to Many Substance history resources (not implemented yet)
     """
 
+    preferred_name_regex = "^[a-zA-Z0-9 =<>\\-:.,^%&/{}[\\]()+?=]{3,}$"
+    display_name_regex = "^[a-zA-Z0-9 =<>\\-:.,^%&/{}[\\]()+?=]{3,}$"
+    casrn_regex = "^[0-9]{2,7}-[0-9]{2}-[0-9]$"
+
     sid = models.CharField(default=build_sid, max_length=50, unique=True)
-    preferred_name = models.CharField(max_length=255, unique=True, blank=False)
-    display_name = models.CharField(max_length=255, unique=True, blank=False)
+    preferred_name = models.CharField(
+        max_length=255,
+        unique=True,
+        blank=False,
+        validators=[
+            RegexValidator(
+                preferred_name_regex,
+                message="The proposed Preferred Name does not conform "
+                f"to the regular expression {preferred_name_regex}",
+            )
+        ],
+    )
+    display_name = models.CharField(
+        max_length=255,
+        unique=True,
+        blank=False,
+        validators=[
+            RegexValidator(
+                display_name_regex,
+                message="The proposed display name does not conform "
+                f"to the regular expression {display_name_regex}",
+            )
+        ],
+    )
     source = models.ForeignKey(
         "Source", on_delete=models.PROTECT, null=False, validators=[validate_deprecated]
     )
@@ -80,7 +111,18 @@ class Substance(CommonInfo):
     associated_compound = models.ForeignKey(
         "compound.BaseCompound", on_delete=models.PROTECT, null=True
     )
-    casrn = models.CharField(max_length=50, unique=True)
+    casrn = models.CharField(
+        max_length=50,
+        unique=True,
+        validators=[
+            RegexValidator(
+                casrn_regex,
+                message="The proposed CASRN does not conform "
+                f"to the regular expression {casrn_regex}",
+            ),
+            validate_casrn_checksum,
+        ],
+    )
 
 
 class SubstanceRelationship(CommonInfo):
@@ -134,16 +176,20 @@ class SynonymType(ControlledVocabulary):
     """Controlled vocabulary for SynonymTypes
 
     Attributes:
-        Name = String (Less than 50 character, url safe, unique, required field)
-        Label = String (Less than 100 characters, unique, required field)
-        Short Description = String (Less than 500 characters, required field)
-        Long Description = TEXT (required field)
-        Validation Regular Expression = String (not required)
-        Score modifier = Float (default 0)
+        name (str): Slug field of the synonym type (Less than 50 character, url safe, unique, required field)
+        label (str): Readable string field of the synonym type (Less than 100 characters, unique, required field)
+        short_description (str): Short description of the synonym type (Less than 500 characters, required field)
+        long_description (str): Long description of the synonym type (required field)
+        validation_regular_expression (str): (optional)
+        score_modifier (float): (default 0)
+        is_casrn (bool): Whether the synonyms related to this type have identifiers that are valid CAS_RNs (required)
     """
 
-    validation_regular_expression = models.TextField(blank=True)
+    validation_regular_expression = models.TextField(
+        blank=True, validators=[validate_is_regex]
+    )
     score_modifier = models.FloatField(default=0)
+    is_casrn = models.BooleanField()
 
 
 class SynonymQuality(ControlledVocabulary):

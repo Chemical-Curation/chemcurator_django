@@ -1,6 +1,5 @@
 import re
 
-from django.apps import apps
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -8,7 +7,7 @@ import partialsmiles as ps
 from indigo import IndigoException
 
 from chemreg.compound.settings import compound_settings
-from chemreg.compound.utils import compute_checksum, extract_checksum, extract_int
+from chemreg.compound.utils import chemreg_checksum, extract_checksum, extract_int
 from chemreg.indigo.inchi import get_inchikey
 from chemreg.indigo.molfile import get_molfile_v3000
 
@@ -26,30 +25,6 @@ def validate_inchikey_computable(molfile: str) -> None:
         get_inchikey(molfile)
     except IndigoException:
         raise ValidationError("InChIKey not computable for provided structure.")
-
-
-def validate_inchikey_unique(structure: str) -> None:
-    """Validates that an InChIKey computed from the provided molfile is unique.
-
-    Typically, we'd use unique=True to enforce this at the database level, however,
-    sometimes a non-unique inchikey can exist. An admin must verify this is allowed.
-
-    Args:
-        structure: The defined compound structure.
-
-    Raises:
-        ValidationError: If the InChIKey is not unique.
-    """
-    DefinedCompound = apps.get_model("compound", "DefinedCompound")
-    try:
-        inchikey = get_inchikey(structure)
-        qs = DefinedCompound.objects.filter(inchikey=inchikey)
-        if qs.exists():
-            raise serializers.ValidationError(
-                f"InChIKey already exists.\nConflicting compound ID: {qs.last().pk}"
-            )
-    except IndigoException:
-        pass
 
 
 def validate_smiles(smiles: str) -> None:
@@ -156,6 +131,6 @@ def validate_cid_checksum(cid: str) -> None:
     """
     given_checksum = extract_checksum(cid)
     i = extract_int(cid)
-    real_checksum = compute_checksum(i)
+    real_checksum = chemreg_checksum(i)
     if not given_checksum == real_checksum:
         raise ValidationError(f"Invalid checksum. Expected {real_checksum}.")

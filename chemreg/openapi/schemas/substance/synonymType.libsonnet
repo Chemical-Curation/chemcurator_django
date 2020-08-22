@@ -31,5 +31,8 @@
       format: 'float',
       default: '0',
     },
+    isCasrn: {
+      type: 'boolean',
+    },
   },
 }

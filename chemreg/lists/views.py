@@ -1,17 +1,23 @@
 from chemreg.common.mixins import DeprecateDeleteMixin
 from chemreg.jsonapi.views import ModelViewSet
-from chemreg.lists.models import AccessibilityType, IdentifierType, ListType
+from chemreg.lists.models import (
+    AccessibilityType,
+    ExternalContact,
+    IdentifierType,
+    List,
+    ListType,
+    Record,
+    RecordIdentifier,
+)
 from chemreg.lists.serializers import (
     AccessibilityTypeSerializer,
+    ExternalContactSerializer,
     IdentifierTypeSerializer,
+    ListSerializer,
     ListTypeSerializer,
+    RecordIdentifierSerializer,
+    RecordSerializer,
 )
-
-
-class ListTypeViewSet(DeprecateDeleteMixin, ModelViewSet):
-
-    queryset = ListType.objects.all()
-    serializer_class = ListTypeSerializer
 
 
 class AccessibilityTypeViewSet(DeprecateDeleteMixin, ModelViewSet):
@@ -20,7 +26,37 @@ class AccessibilityTypeViewSet(DeprecateDeleteMixin, ModelViewSet):
     serializer_class = AccessibilityTypeSerializer
 
 
+class ExternalContactViewSet(ModelViewSet):
+
+    queryset = ExternalContact.objects.all()
+    serializer_class = ExternalContactSerializer
+
+
 class IdentifierTypeViewSet(DeprecateDeleteMixin, ModelViewSet):
 
     queryset = IdentifierType.objects.all()
     serializer_class = IdentifierTypeSerializer
+
+
+class ListViewSet(ModelViewSet):
+
+    queryset = List.objects.all()
+    serializer_class = ListSerializer
+
+
+class ListTypeViewSet(DeprecateDeleteMixin, ModelViewSet):
+
+    queryset = ListType.objects.all()
+    serializer_class = ListTypeSerializer
+
+
+class RecordViewSet(ModelViewSet):
+
+    queryset = Record.objects.all()
+    serializer_class = RecordSerializer
+
+
+class RecordIdentifierViewSet(ModelViewSet):
+
+    queryset = RecordIdentifier.objects.all()
+    serializer_class = RecordIdentifierSerializer

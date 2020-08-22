@@ -2,6 +2,7 @@ from django.db import models
 
 import pytest
 
+from chemreg.common.models import HTMLTextField
 from chemreg.common.tests import controlled_vocabulary_test_helper
 from chemreg.lists.models import AccessibilityType, ExternalContact, List, ListType
 from chemreg.lists.tests.factories import ListFactory, ListTypeFactory
@@ -20,9 +21,11 @@ def test_list():
     assert label.unique
     assert not label.blank
     short_description = List._meta.get_field("short_description")
+    assert isinstance(short_description, HTMLTextField)
     assert short_description.max_length == 1000
     assert not short_description.blank
     long_description = List._meta.get_field("long_description")
+    assert isinstance(long_description, HTMLTextField)
     assert not long_description.blank
     assert List.list_accessibility.field.related_model is AccessibilityType
     assert List.owners.field.related_model is User
@@ -41,7 +44,6 @@ def test_list():
     assert List.external_contact.field.related_model is ExternalContact
     date_of_source_collection = List._meta.get_field("date_of_source_collection")
     assert isinstance(date_of_source_collection, models.DateField)
-    assert not date_of_source_collection.editable
     assert not date_of_source_collection.blank
 
 
@@ -55,7 +57,7 @@ def test_list_type():
 def test_lists_to_types():
     """Tests the many-to-many relationship between `List` and `ListType` objects"""
 
-    list = ListFactory()
+    list = ListFactory().instance
     assert list.types.count() == 0
 
     types = [ListTypeFactory().instance, ListTypeFactory().instance]
@@ -65,3 +67,16 @@ def test_lists_to_types():
     type = types[0]
     list_rel = type.lists.first()
     assert list_rel == list
+
+
+@pytest.mark.django_db
+def test_lists_html_fields(list_factory):
+    unsanitized_html = '<script>func</script>Foobar<a href="https://www.google.com/">'
+    sanitized_html = 'Foobar<a href="https://www.google.com/"></a>'
+
+    m = list_factory(
+        long_description=unsanitized_html, short_description=unsanitized_html
+    ).instance
+
+    assert m.long_description == sanitized_html
+    assert m.short_description == sanitized_html

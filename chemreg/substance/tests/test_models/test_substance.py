@@ -1,6 +1,8 @@
 from django.apps import apps
 from django.db import models
 
+import pytest
+
 from chemreg.substance.models import Substance
 
 
@@ -60,3 +62,55 @@ def test_substance_model():
     assert Substance.related_to.field.model is apps.get_model(
         "substance", "SubstanceRelationship"
     )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "preferred_name,validity,code",
+    [
+        ("Valid String?", True, None),
+        ("Invalid String!", False, "invalid"),  # '!' is an invalid character
+    ],
+)
+def test_validate_preferred_name(substance_factory, preferred_name, validity, code):
+    substance = substance_factory.build(preferred_name=preferred_name)
+    assert substance.is_valid() == validity
+    if not validity:
+        assert code == substance.errors["preferred_name"][0].code
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "display_name,validity,code",
+    [
+        ("Valid String?", True, None),
+        ("Invalid String!", False, "invalid"),  # '!' is an invalid character
+    ],
+)
+def test_validate_display_name(substance_factory, display_name, validity, code):
+    substance = substance_factory.build(display_name=display_name)
+    assert substance.is_valid() == validity
+    if not validity:
+        assert code == substance.errors["display_name"][0].code
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "casrn,validity,code",
+    [
+        ("1234567-89-5", True, None),
+        ("Non-CASRN String", False, "invalid"),  # invalid characters
+        ("1-89-0", False, "invalid"),  # seg 1 too short
+        ("12345678-89-0", False, "invalid"),  # seg 1 too long
+        ("1234567-8-0", False, "invalid"),  # seg 2 too short
+        ("12345678-890-0", False, "invalid"),  # seg2 too long
+        ("1234567-89-", False, "invalid"),  # no checksum
+        ("1234567-89-05", False, "invalid"),  # multiple checksums
+        ("1234567-89-0", False, "checksum"),
+    ],
+)
+def test_validate_casrn(substance_factory, casrn, validity, code):
+    substance = substance_factory.build(casrn=casrn)
+    assert substance.is_valid() == validity
+    if substance.errors:
+        assert substance.errors["casrn"][0].code == code

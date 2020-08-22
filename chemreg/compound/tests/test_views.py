@@ -11,7 +11,6 @@ from chemreg.compound.tests.factories import (
     DefinedCompoundFactory,
     IllDefinedCompoundFactory,
 )
-from chemreg.compound.validators import validate_inchikey_unique
 from chemreg.compound.views import CompoundViewSet, DefinedCompoundViewSet
 from chemreg.jsonapi.views import ReadOnlyModelViewSet
 
@@ -34,25 +33,10 @@ def test_definedcompound_override(api_request_factory):
     view = DefinedCompoundViewSet(
         action_map={"post": "create"}, kwargs={}, format_kwarg={}
     )
-
-    view.request = view.initialize_request(
-        api_request_factory.post("/definedCompounds")
-    )
-    for field in ("molfile_v2000", "molfile_v3000", "smiles"):
-        assert (
-            validate_inchikey_unique in view.get_serializer().fields[field].validators
-        )
-
     view.request = view.initialize_request(
         api_request_factory.post("/definedCompounds?override")
     )
     assert any(isinstance(p, IsAdminUser) for p in view.get_permissions())
-    for field in ("molfile_v2000", "molfile_v3000", "smiles"):
-        assert (
-            validate_inchikey_unique
-            not in view.get_serializer().fields[field].validators
-        )
-
     view.request = view.initialize_request(
         api_request_factory.post("/definedCompounds?overRide")
     )
@@ -130,6 +114,8 @@ def test_defined_compound_view():
         "cid",
         "inchikey",
         "molfile_v3000",
+        "molfile_v2000",
+        "smiles",
     ]
 
 
