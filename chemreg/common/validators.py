@@ -39,6 +39,8 @@ def validate_casrn_checksum(value):
 
     """
     value_stripped = re.sub("[^0-9]", "", value)  # Strip all non-digits
+    if len(value_stripped) < 5:
+        return  # the value will not pass formatting validation
     if value_stripped and int(value_stripped[-1]) != casrn_checksum(
         int(value_stripped[:-1])
     ):

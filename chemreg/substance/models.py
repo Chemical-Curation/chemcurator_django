@@ -1,5 +1,6 @@
 from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models import Q
 
 from chemreg.common.models import CommonInfo, ControlledVocabulary
 from chemreg.common.validators import (
@@ -38,6 +39,14 @@ class Source(ControlledVocabulary):
     """
 
     pass
+
+
+class SubstanceQuerySet(models.QuerySet):
+    def restrictive_fields(self, value):
+        qs = self.filter(
+            Q(preferred_name=value) | Q(display_name=value) | Q(casrn=value)
+        )
+        return qs
 
 
 class Substance(CommonInfo):
@@ -124,6 +133,8 @@ class Substance(CommonInfo):
         ],
     )
 
+    objects = SubstanceQuerySet.as_manager()
+
 
 class SubstanceRelationship(CommonInfo):
     """ Through table linking Substances to each other. This is a self referential relationship.
@@ -208,6 +219,11 @@ class SynonymQuality(ControlledVocabulary):
     is_restrictive = models.BooleanField(default=False)
 
 
+class RestrictiveQuerySet(models.QuerySet):
+    def restricted(self):
+        return self.filter(synonym_quality__is_restrictive=True)
+
+
 class Synonym(CommonInfo):
     """Information to be shared across Synonyms
 
@@ -226,6 +242,8 @@ class Synonym(CommonInfo):
     source = models.ForeignKey("Source", on_delete=models.PROTECT)
     synonym_quality = models.ForeignKey("SynonymQuality", on_delete=models.PROTECT)
     synonym_type = models.ForeignKey("SynonymType", null=True, on_delete=models.PROTECT)
+
+    objects = RestrictiveQuerySet.as_manager()
 
 
 class RelationshipType(ControlledVocabulary):

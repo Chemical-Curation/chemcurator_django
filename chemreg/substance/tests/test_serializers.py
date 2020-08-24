@@ -67,6 +67,60 @@ def test_substance_serializer_includes():
 
 
 @pytest.mark.django_db
+def test_unique_name_field_on_substance(
+    substance_factory, synonym_factory, synonym_quality_factory
+):
+    """ This test verifies that a substance will have a unique name across the
+    "preferred_name", "display_name", "casrn", and "synonym.identifier" fields
+    upon creation or update amongst all existing in the db.
+    """
+    synonym_quality = synonym_quality_factory.create(is_restrictive=True).instance
+    synonym = synonym_factory.create(
+        identifier="47474-74-8",  # has to be valid for CASRN, see below
+        synonym_quality={"type": "synonymQuality", "id": synonym_quality.pk},
+    ).instance
+    sub1 = substance_factory.create(
+        # these fields need to pass casrn validation when passed to that attr
+        preferred_name="4747-47-1",
+        display_name="47-47-2",
+    ).instance
+
+    err_msg = "The identifier/s ['{}'] is not unique in restrictive name fields."
+
+    sub2 = substance_factory.build(display_name=sub1.preferred_name)
+    assert not sub2.is_valid()
+    assert (
+        err_msg.format(sub1.preferred_name)[:47] in sub2.errors["non_field_errors"][0]
+    )
+    sub2 = substance_factory.build(display_name=sub1.casrn)
+    assert not sub2.is_valid()
+    assert err_msg.format(sub1.casrn)[:47] in sub2.errors["non_field_errors"][0]
+    sub2 = substance_factory.build(display_name=synonym.identifier)
+    assert not sub2.is_valid()
+    assert err_msg.format(synonym.identifier)[:47] in sub2.errors["non_field_errors"][0]
+    sub2 = substance_factory.build(casrn=sub1.preferred_name)
+    assert not sub2.is_valid()
+    assert (
+        err_msg.format(sub1.preferred_name)[:47] in sub2.errors["non_field_errors"][0]
+    )
+    sub2 = substance_factory.build(casrn=sub1.display_name)
+    assert not sub2.is_valid()
+    assert err_msg.format(sub1.display_name)[:47] in sub2.errors["non_field_errors"][0]
+    sub2 = substance_factory.build(casrn=synonym.identifier)
+    assert not sub2.is_valid()
+    assert err_msg.format(synonym.identifier)[:47] in sub2.errors["non_field_errors"][0]
+    sub2 = substance_factory.build(preferred_name=sub1.display_name)
+    assert not sub2.is_valid()
+    assert err_msg.format(sub1.display_name)[:47] in sub2.errors["non_field_errors"][0]
+    sub2 = substance_factory.build(preferred_name=sub1.casrn)
+    assert not sub2.is_valid()
+    assert err_msg.format(sub1.casrn)[:47] in sub2.errors["non_field_errors"][0]
+    sub2 = substance_factory.build(preferred_name=synonym.identifier)
+    assert not sub2.is_valid()
+    assert err_msg.format(synonym.identifier)[:47] in sub2.errors["non_field_errors"][0]
+
+
+@pytest.mark.django_db
 def test_substance_no_associated_compound(substance_factory):
     serializer = substance_factory.build()
     assert serializer.is_valid()
@@ -173,6 +227,42 @@ def test_synonym_validation_regular_expression(synonym_factory, synonym_type_fac
 
     assert not synonym_invalid_format.is_valid()
     assert synonym_invalid_format.errors
+
+
+@pytest.mark.django_db
+def test_synonym_identifier_unique(
+    substance_factory, synonym_factory, synonym_quality_factory
+):
+    """ This test verifies that a synonym.identifier will have a unique name across the
+    "preferred_name", "display_name", "casrn", and "synonym.identifier" fields
+    upon creation or update amongst all existing in the db.
+    """
+    substance = substance_factory.create().instance
+    synonym_quality = synonym_quality_factory.create(is_restrictive=True).instance
+    syn1 = synonym_factory.create(
+        synonym_quality={"type": "synonymQuality", "id": synonym_quality.pk},
+    ).instance
+
+    err_msg = "The identifier '{}' is not unique in restrictive name fields."
+
+    syn2 = synonym_factory.build(identifier=substance.preferred_name)
+    assert not syn2.is_valid()
+    assert (
+        err_msg.format(substance.preferred_name)[:47]
+        in syn2.errors["non_field_errors"][0]
+    )
+    syn2 = synonym_factory.build(identifier=substance.display_name)
+    assert not syn2.is_valid()
+    assert (
+        err_msg.format(substance.display_name)[:47]
+        in syn2.errors["non_field_errors"][0]
+    )
+    syn2 = synonym_factory.build(identifier=substance.casrn)
+    assert not syn2.is_valid()
+    assert err_msg.format(substance.casrn)[:47] in syn2.errors["non_field_errors"][0]
+    syn2 = synonym_factory.build(identifier=syn1.identifier)
+    assert not syn2.is_valid()
+    assert err_msg.format(syn1.identifier)[:47] in syn2.errors["non_field_errors"][0]
 
 
 @pytest.mark.django_db
@@ -334,3 +424,37 @@ def test_substance_relationship_serializer_includes():
     assert serializer["to_substance"] is SubstanceSerializer
     assert serializer["source"] is SourceSerializer
     assert serializer["relationship_type"] is RelationshipTypeSerializer
+
+
+@pytest.mark.django_db
+def test_is_restrictive_on_synonyms(synonym_factory, synonym_quality_factory):
+    """ This test verifies that if a synonym quality has the is_restrictive field
+    set to True, associated synonym.identifier fields will be validated to be unique.
+    """
+    synonym_quality = synonym_quality_factory.create(is_restrictive=False).instance
+
+    synonym_factory.create(
+        identifier="1234567-89-5",
+        synonym_quality={"type": "synonymQuality", "id": synonym_quality.pk},
+    )
+    syn2 = synonym_factory.build(
+        identifier="1234567-89-5",
+        synonym_quality={"type": "synonymQuality", "id": synonym_quality.pk},
+    )
+    assert syn2.is_valid()  # if False, they can have the same names
+
+    synonym_quality = synonym_quality_factory.create(is_restrictive=True).instance
+
+    synonym_factory.create(
+        identifier="1234567-89-5",
+        synonym_quality={"type": "synonymQuality", "id": synonym_quality.pk},
+    )
+    syn2 = synonym_factory.build(
+        identifier="1234567-89-5",
+        synonym_quality={"type": "synonymQuality", "id": synonym_quality.pk},
+    )
+    assert not syn2.is_valid()  # if True, same name is restricted
+    assert (
+        syn2.errors["non_field_errors"][0]
+        == "The identifier '1234567-89-5' is not unique in restrictive name fields."
+    )

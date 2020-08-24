@@ -1,3 +1,5 @@
+from itertools import chain
+
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.validators import RegexValidator
 from rest_framework.exceptions import ValidationError
@@ -178,6 +180,29 @@ class SubstanceSerializer(HyperlinkedModelSerializer):
             "associated_compound",
         ]
 
+    def validate(self, data):
+        fields = ["preferred_name", "display_name", "casrn"]
+        field_data = [
+            data.get(f)  # get values in the serializer
+            for f in fields
+            if f in data.keys()
+        ]
+        if (duplicated := set([x for x in field_data if field_data.count(x) > 1])) :
+            raise ValidationError(f"{duplicated.pop()} is not unique in {fields}")
+        errors = []
+        for field in field_data:
+            restricted_identifiers = Synonym.objects.restricted().filter(
+                identifier=field
+            )
+            restricted_substance_fields = Substance.objects.restrictive_fields(field)
+            if set(chain(restricted_substance_fields, restricted_identifiers)):
+                errors.append(field)
+        if errors:
+            raise ValidationError(
+                f"The identifier/s {[e for e in errors]} is not unique in restrictive name fields."
+            )
+        return data
+
 
 class RelationshipTypeSerializer(ControlledVocabSerializer):
     """The serializer for Substance Types."""
@@ -261,10 +286,18 @@ class SynonymSerializer(HyperlinkedModelSerializer):
             "format",
         )(data.get("identifier"))
 
-        # If the synonym type is casrn
         if synonym_type.is_casrn:
-            # Verify that the identifier has a valid casrn checksum
             validate_casrn_checksum(data["identifier"])
+
+        identifier = data.get("identifier", None) or self.instance.identifier
+        restricted_identifiers = Synonym.objects.restricted().filter(
+            identifier=identifier
+        )
+        restricted_substance_fields = Substance.objects.restrictive_fields(identifier)
+        if set(chain(restricted_identifiers, restricted_substance_fields)):
+            raise ValidationError(
+                f"The identifier '{identifier}' is not unique in restrictive name fields."
+            )
         return data
 
 

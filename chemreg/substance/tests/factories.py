@@ -54,7 +54,7 @@ class SubstanceFactory(DjangoSerializerFactory):
     preferred_name = factory.Sequence(
         lambda n: f"{factory.Faker('slug').generate()}-{n}"
     )
-    display_name = factory.LazyAttribute(lambda o: o.preferred_name.replace("-", " "))
+    display_name = factory.LazyAttribute(lambda o: o.preferred_name + " display")
     description = factory.Faker("text")
     public_qc_note = factory.Faker("text")
     private_qc_note = factory.Faker("text")

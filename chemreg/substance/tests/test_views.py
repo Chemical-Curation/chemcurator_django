@@ -227,6 +227,48 @@ def test_substance_post(client, admin_user, substance_factory):
 
 
 @pytest.mark.django_db
+def test_substance_unique_fields_post(client, admin_user, substance_factory):
+    client.force_authenticate(user=admin_user)
+    model_dict = substance_factory.build(defined=True).initial_data
+    duplicator = model_dict["preferred_name"]
+    model_dict["display_name"] = duplicator
+    resp = client.post(  # POST w/ same "display_name" and "preferred_name"
+        "/substances",
+        {
+            "data": {
+                "type": "substance",
+                "attributes": model_dict,
+                "relationships": {
+                    "qcLevel": {
+                        "data": {"id": model_dict["qc_level"]["id"], "type": "qcLevel"}
+                    },
+                    "source": {
+                        "data": {"id": model_dict["source"]["id"], "type": "source"}
+                    },
+                    "substanceType": {
+                        "data": {
+                            "id": model_dict["substance_type"]["id"],
+                            "type": "substanceType",
+                        }
+                    },
+                    "associatedCompound": {
+                        "data": {
+                            "id": model_dict["associated_compound"]["id"],
+                            "type": "definedCompound",
+                        }
+                    },
+                },
+            }
+        },
+    )
+    assert resp.status_code == 400
+    assert (
+        resp.data[0]["detail"]
+        == f"{duplicator} is not unique in ['preferred_name', 'display_name', 'casrn']"
+    )
+
+
+@pytest.mark.django_db
 def test_required_subresource_not_specified(client, admin_user, substance_factory):
     client.force_authenticate(user=admin_user)
     model_dict = substance_factory.build(defined=True).initial_data
@@ -585,6 +627,68 @@ def test_synonym_post(client, admin_user, synonym_factory):
         },
     )
     assert resp.status_code == 201
+
+
+@pytest.mark.django_db
+def test_synonym_unique_identifier_post(
+    client, admin_user, substance_factory, synonym_factory, synonym_quality_factory
+):
+    client.force_authenticate(user=admin_user)
+    substance = substance_factory.create().instance
+    synonym_quality = synonym_quality_factory.create(is_restrictive=True).instance
+    synonym = synonym_factory.create(
+        synonym_quality={"type": "synonymQuality", "id": synonym_quality.pk},
+    ).instance
+    sf = synonym_factory.build().initial_data
+    sf["identifier"] = substance.preferred_name
+    resp = client.post(
+        "/synonyms",
+        {
+            "data": {
+                "type": "synonym",
+                "attributes": sf,
+                "relationships": {
+                    "source": {"data": {"id": sf["source"]["id"], "type": "source"}},
+                    "synonymQuality": {
+                        "data": {"id": synonym_quality.pk, "type": "synonymQuality"}
+                    },
+                    "synonymType": {
+                        "data": {"id": sf["synonym_type"]["id"], "type": "synonymType"}
+                    },
+                },
+            }
+        },
+    )
+    assert resp.status_code == 400
+    assert (
+        resp.data[0]["detail"]
+        == f"The identifier '{substance.preferred_name}' is not unique in restrictive name fields."
+    )
+    sf = synonym_factory.build().initial_data
+    sf["identifier"] = synonym.identifier
+    resp = client.post(
+        "/synonyms",
+        {
+            "data": {
+                "type": "synonym",
+                "attributes": sf,
+                "relationships": {
+                    "source": {"data": {"id": sf["source"]["id"], "type": "source"}},
+                    "synonymQuality": {
+                        "data": {"id": synonym_quality.pk, "type": "synonymQuality"}
+                    },
+                    "synonymType": {
+                        "data": {"id": sf["synonym_type"]["id"], "type": "synonymType"}
+                    },
+                },
+            }
+        },
+    )
+    assert resp.status_code == 400
+    assert (
+        resp.data[0]["detail"]
+        == f"The identifier '{synonym.identifier}' is not unique in restrictive name fields."
+    )
 
 
 @pytest.mark.django_db
