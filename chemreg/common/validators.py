@@ -1,6 +1,8 @@
 import re
 
 from rest_framework.exceptions import ValidationError
+from rest_framework.serializers import UniqueTogetherValidator
+from rest_framework.validators import qs_exists
 
 from chemreg.common.utils import casrn_checksum
 
@@ -64,3 +66,32 @@ def validate_is_regex(value):
         re.compile(value)
     except re.error:
         raise ValidationError("The provided RegExp is invalid")
+
+
+class ExternalIdUniqueTogetherValidator(UniqueTogetherValidator):
+    """
+        A validator that will allow for a custom error message.
+    """
+
+    def __init__(self, queryset, fields, message=None, duplicate_field=None):
+        self.queryset = queryset
+        self.fields = fields
+        self.message = message or self.message
+        self.duplicate_field = duplicate_field
+
+    def __call__(self, attrs, serializer):
+        self.enforce_required_fields(attrs, serializer)
+        queryset = self.queryset
+        queryset = self.filter_queryset(attrs, queryset, serializer)
+        queryset = self.exclude_current_instance(attrs, queryset, serializer.instance)
+
+        # Ignore validation if any field is None
+        checked_values = [
+            value for field, value in attrs.items() if field in self.fields
+        ]
+        if None not in checked_values and qs_exists(queryset):
+            duplicated_record = queryset.values_list(
+                self.duplicate_field, flat=True
+            ).first()
+            message = self.message.format(duplicate_field=duplicated_record)
+            raise ValidationError(message, code="unique")

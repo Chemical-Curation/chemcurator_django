@@ -27,7 +27,7 @@ factory-boy==2.12.0  # https://github.com/FactoryBoy/factory_boy
 flake8==3.8.3  # https://github.com/PyCQA/flake8
 flake8-black==0.1.1  # https://github.com/peterjc/flake8-black
 flake8-bugbear==20.1.4  # https://github.com/PyCQA/flake8-bugbear
-flake8-isort==2.8.0  # https://github.com/gforcada/flake8-isort
+flake8-isort==4.0.0  # https://github.com/gforcada/flake8-isort
 isort==4.3.21  # https://github.com/timothycrosley/isort
 mypy==0.761  # https://github.com/python/mypy
 pre-commit==2.1.1  # https://github.com/pre-commit/pre-commit

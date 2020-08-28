@@ -69,8 +69,22 @@ def test_list(list_factory):
     serializer.save()
 
 
-def test_record_serializer():
+@pytest.mark.django_db
+def test_record_serializer(record_factory, list_factory):
     assert issubclass(RecordSerializer, HyperlinkedModelSerializer)
+    chem_list = list_factory.create().instance
+    rec1 = record_factory.create(
+        external_id="47", list={"type": "list", "id": chem_list.pk}
+    ).instance
+    rec2 = record_factory.build(
+        external_id="47", list={"type": "list", "id": chem_list.pk}
+    )
+    assert not rec2.is_valid()
+    assert rec2.errors["non_field_errors"][0].code == "unique"
+    assert (
+        rec2.errors["non_field_errors"][0]
+        == f"External IDs must be unique within a list. The External ID submitted is already associated with '{rec1.rid}'"
+    )
 
 
 @pytest.mark.django_db

@@ -217,6 +217,48 @@ def test_record_post(client, admin_user, record_factory):
         },
     )
     assert resp.status_code == 201
+    # user can't POST the same external_id and list relationship
+    minted_rid = resp.data["rid"]
+    resp = client.post(
+        "/records",
+        {
+            "data": {
+                "type": "record",
+                "attributes": rf,
+                "relationships": {
+                    "list": {"data": {"id": rf["list"]["id"], "type": "list"}},
+                    "substance": {
+                        "data": {"id": rf["substance"]["id"], "type": "substance"}
+                    },
+                },
+            }
+        },
+    )
+    assert resp.status_code == 400
+    assert resp.data[0]["detail"].code == "unique"
+    assert (
+        resp.data[0]["detail"]
+        == f"External IDs must be unique within a list. The External ID submitted is already associated with '{minted_rid}'"
+    )
+    # user can't PATCH the same external_id and list relationship
+    record1 = record_factory.create(list=rf["list"]).instance
+    assert record1.list_id == int(rf["list"]["id"])
+    resp = client.patch(
+        f"/records/{record1.pk}",
+        {
+            "data": {
+                "id": record1.pk,
+                "type": "record",
+                "attributes": {"external_id": rf["external_id"]},
+            }
+        },
+    )
+    assert resp.status_code == 400
+    assert resp.data[0]["detail"].code == "unique"
+    assert (
+        resp.data[0]["detail"]
+        == f"External IDs must be unique within a list. The External ID submitted is already associated with '{minted_rid}'"
+    )
 
 
 @pytest.mark.django_db

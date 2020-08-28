@@ -37,9 +37,8 @@ class CommonInfo(models.Model):
     )
 
     class Meta:
-        abstract = True
         ordering = ["pk"]
-        base_manager_name = "objects"
+        abstract = True
 
 
 class ControlledVocabulary(CommonInfo):

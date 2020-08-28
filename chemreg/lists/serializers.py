@@ -1,4 +1,7 @@
+from django.utils.translation import gettext_lazy as _
+
 from chemreg.common.serializers import ControlledVocabSerializer
+from chemreg.common.validators import ExternalIdUniqueTogetherValidator
 from chemreg.jsonapi.serializers import HyperlinkedModelSerializer
 from chemreg.lists.models import (
     AccessibilityType,
@@ -88,6 +91,16 @@ class RecordSerializer(HyperlinkedModelSerializer):
             "is_validated",
             "list",
             "substance",
+        ]
+        validators = [
+            ExternalIdUniqueTogetherValidator(
+                queryset=model.objects.all(),
+                fields=("external_id", "list"),
+                message=_(
+                    "External IDs must be unique within a list. The External ID submitted is already associated with '{duplicate_field}'"
+                ),
+                duplicate_field="rid",
+            )
         ]
 
 

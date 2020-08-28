@@ -117,6 +117,14 @@ class Record(CommonInfo):
         "substance.Substance", on_delete=models.PROTECT, null=True
     )
 
+    class Meta:
+        ordering = ["pk"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["external_id", "list"], name="unique_external_id"
+            )
+        ]
+
 
 class RecordIdentifier(CommonInfo):
     """Store all the identifiers associated with a member of a Source List
