@@ -236,13 +236,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/illDefinedCompounds",
+							"raw": "{{baseUrl}}/illDefinedCompounds",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{baseUrl}}"
 							],
 							"port": "8000",
 							"path": [
@@ -409,13 +406,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/definedCompounds",
+							"raw": "{{baseUrl}}/definedCompounds",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{baseUrl}}"
 							],
 							"port": "8000",
 							"path": [
@@ -520,13 +514,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/definedCompounds",
+							"raw": "{{baseUrl}}/definedCompounds",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{baseUrl}}"
 							],
 							"port": "8000",
 							"path": [
@@ -578,13 +569,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/definedCompounds",
+							"raw": "{{baseUrl}}/definedCompounds",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{baseUrl}}"
 							],
 							"port": "8000",
 							"path": [
@@ -636,13 +624,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/definedCompounds",
+							"raw": "{{baseUrl}}/definedCompounds",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{baseUrl}}"
 							],
 							"port": "8000",
 							"path": [
@@ -695,13 +680,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/definedCompounds",
+							"raw": "{{baseUrl}}/definedCompounds",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{baseUrl}}"
 							],
 							"port": "8000",
 							"path": [
@@ -753,13 +735,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/definedCompounds?override",
+							"raw": "{{baseUrl}}/definedCompounds?override",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{baseUrl}}"
 							],
 							"port": "8000",
 							"path": [
@@ -812,13 +791,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/definedCompounds/637",
+							"raw": "{{baseUrl}}/definedCompounds/637",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{baseUrl}}"
 							],
 							"port": "8000",
 							"path": [
@@ -1679,13 +1655,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/illDefinedCompounds",
+							"raw": "{{baseUrl}}/illDefinedCompounds",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{baseUrl}}"
 							],
 							"port": "8000",
 							"path": [
@@ -2163,13 +2136,10 @@
 							}
 						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/illDefinedCompounds",
+							"raw": "{{baseUrl}}/illDefinedCompounds",
 							"protocol": "http",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{baseUrl}}"
 							],
 							"port": "8000",
 							"path": [
@@ -3910,7 +3880,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://127.0.0.1:8000/illDefinedCompounds",
+									"raw": "{{baseUrl}}/illDefinedCompounds",
 									"protocol": "http",
 									"host": [
 										"127",
@@ -5357,7 +5327,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://127.0.0.1:8000/login/",
+					"raw": "{{baseUrl}}/login/",
 					"protocol": "http",
 					"host": [
 						"127",
