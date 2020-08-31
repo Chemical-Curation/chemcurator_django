@@ -8,7 +8,6 @@ from rest_framework.test import force_authenticate
 
 import pytest
 
-from chemreg.compound.models import DefinedCompound, IllDefinedCompound
 from chemreg.compound.tests.factories import (
     DefinedCompoundFactory,
     IllDefinedCompoundFactory,
@@ -143,7 +142,7 @@ def test_compound_includes(client, compound_factory, endpoint, substance_factory
     """Tests that /compound endpoints can be provided an include parameter"""
     compound = compound_factory().instance
     substance_factory(
-        associated_compound={"type": "definedCompound", "id": compound.pk}
+        associated_compound={"type": compound.serializer_name, "id": compound.pk}
     )
 
     response = json.loads(client.get(endpoint, {"include": "substance"}).content)
@@ -312,13 +311,9 @@ def test_compound_soft_delete(user, admin_user, compound_factory, client):
     Soft delete of Compounds can only be done by an Admin user who
     is also providing a valid replacement CID and a QC note
     """
-    if compound_factory == DefinedCompoundFactory:
-        compound_json_type = "definedCompound"
-        model = DefinedCompound
-    elif compound_factory == IllDefinedCompoundFactory:
-        compound_json_type = "illDefinedCompound"
-        model = IllDefinedCompound
     compounds = [serializer.instance for serializer in compound_factory.create_batch(3)]
+    compound_json_type = compounds[0].serializer_name
+    model = compounds[0]._meta.model
 
     # Compound 1 will replace 2 and 3
     client.force_authenticate(user=admin_user)
@@ -357,12 +352,9 @@ def test_compound_forbidden_soft_delete(user, compound_factory, client):
     Tests:
     A non-admin user cannot perform the soft-deleted done in the test above
     """
-    if compound_factory == DefinedCompoundFactory:
-        compound_json_type = "definedCompound"
-    elif compound_factory == IllDefinedCompoundFactory:
-        compound_json_type = "illDefinedCompound"
 
     serializers = compound_factory.create_batch(2)
+    compound_json_type = serializers[0].instance.serializer_name
     compound_1 = serializers[0].instance
     compound_2 = serializers[1].instance
 
@@ -380,12 +372,9 @@ def test_compound_forbidden_soft_delete(user, compound_factory, client):
 @pytest.mark.django_db
 def test_compound_redirect(user, admin_user, compound_factory, client):
     """Tests that soft-deleted compounds will redirect when non-admin."""
-    if compound_factory == DefinedCompoundFactory:
-        compound_json_type = "definedCompound"
-    elif compound_factory == IllDefinedCompoundFactory:
-        compound_json_type = "illDefinedCompound"
 
     serializers = compound_factory.create_batch(3)
+    compound_json_type = serializers[0].instance.serializer_name
     compound_1 = serializers[0].instance
     compound_2 = serializers[1].instance
     compound_3 = serializers[2].instance

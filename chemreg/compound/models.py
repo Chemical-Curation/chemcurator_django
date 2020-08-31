@@ -80,6 +80,12 @@ class BaseCompound(PolymorphicModel, CommonInfo):
     def is_deleted(self):
         return self.replaced_by_id is not None
 
+    @property
+    def serializer_name(self):
+        """Camel cased string of model for serializer"""
+        s = self._meta.label.split(".")[-1]
+        return s[0].lower() + s[1:]
+
     def delete(self, force=False):
         if not force:
             raise Exception(

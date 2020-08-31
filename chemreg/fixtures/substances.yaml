@@ -470,7 +470,7 @@
     description: area professor home
     public_qc_note: this may be acceptable.
     private_qc_note: Houston, we have a problem!
-    associated_compound: null
+    associated_compound: 10
     casrn: 9876543-21-5
     created_at: 2020-08-06 16:50:03.781903
     created_by: 1
