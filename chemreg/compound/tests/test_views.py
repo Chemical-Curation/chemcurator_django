@@ -1,3 +1,5 @@
+import json
+
 from django.apps import apps
 from django.db.models import Max
 from rest_framework.exceptions import ValidationError
@@ -64,6 +66,7 @@ def test_definedcompound_detail_attrs(
         "cid",
         "inchikey",
         "molfile_v3000",
+        "substance",
         "url",
     ]
 
@@ -77,6 +80,7 @@ def test_definedcompound_detail_attrs(
         "inchikey",
         "molfile_v3000",
         "smiles",
+        "substance",
         "molecular_weight",
         "molecular_formula",
         "calculated_inchikey",
@@ -123,6 +127,27 @@ def test_compound_view():
     """Tests that the Compound View Set, is ReadOnly and has the inclusion of cid as a filterset field."""
     assert issubclass(CompoundViewSet, ReadOnlyModelViewSet)
     assert CompoundViewSet.filterset_fields == ["cid"]
+
+
+@pytest.mark.parametrize(
+    "compound_factory,endpoint",
+    [
+        (DefinedCompoundFactory, "/compounds"),
+        (IllDefinedCompoundFactory, "/compounds"),
+        (DefinedCompoundFactory, "/definedCompounds"),
+        (IllDefinedCompoundFactory, "/illDefinedCompounds"),
+    ],
+)
+@pytest.mark.django_db
+def test_compound_includes(client, compound_factory, endpoint, substance_factory):
+    """Tests that /compound endpoints can be provided an include parameter"""
+    compound = compound_factory().instance
+    substance_factory(
+        associated_compound={"type": "definedCompound", "id": compound.pk}
+    )
+
+    response = json.loads(client.get(endpoint, {"include": "substance"}).content)
+    assert response["included"] is not None
 
 
 @pytest.mark.django_db

@@ -28,9 +28,14 @@ from chemreg.jsonapi.serializers import (
 class BaseCompoundSerializer(HyperlinkedModelSerializer):
     """The base serializer for compounds."""
 
+    included_serializers = {
+        "substance": "chemreg.substance.serializers.SubstanceSerializer"
+    }
+
     serializer_field_mapping = HyperlinkedModelSerializer.serializer_field_mapping
     serializer_field_mapping.update({StructureAliasField: serializers.CharField})
     replaced_by = "chemreg.compound.serializers.CompoundSerializer"
+    substance = "chemreg.substance.serializers.SubstanceSerializer"
 
     class Meta:
         fields = ["qc_note", "replaced_by"]
@@ -79,8 +84,12 @@ class DefinedCompoundSerializer(BaseCompoundSerializer):
             "smiles",
             "qc_note",
             "replaced_by",
+            "substance",
         ]
-        extra_kwargs = {"molfile_v3000": {"required": False, "trim_whitespace": False}}
+        extra_kwargs = {
+            "molfile_v3000": {"required": False, "trim_whitespace": False},
+            "substance": {"required": False},
+        }
 
     def __init__(self, *args, admin_override=False, **kwargs):
         self.admin_override = admin_override
@@ -193,7 +202,17 @@ class IllDefinedCompoundSerializer(BaseCompoundSerializer):
 
     class Meta:
         model = IllDefinedCompound
-        fields = ["cid", "mrvfile", "query_structure_type", "qc_note", "replaced_by"]
+        fields = [
+            "cid",
+            "mrvfile",
+            "query_structure_type",
+            "qc_note",
+            "replaced_by",
+            "substance",
+        ]
+        extra_kwargs = {
+            "substance": {"required": False},
+        }
 
 
 class CompoundSerializer(PolymorphicModelSerializer):

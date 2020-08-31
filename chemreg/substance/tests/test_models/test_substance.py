@@ -50,7 +50,7 @@ def test_substance_model():
         "substance", "QCLevelsType"
     )
 
-    assert type(Substance.associated_compound.field) is models.ForeignKey
+    assert type(Substance.associated_compound.field) is models.OneToOneField
     assert Substance.associated_compound.field.related_model is apps.get_model(
         "compound", "BaseCompound"
     )

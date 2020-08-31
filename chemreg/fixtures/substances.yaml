@@ -1,21 +1,15 @@
 - model: substance.qclevelstype
   pk: 1
   fields:
-    created_at: 2020-07-29 17:14:33.382747
+    name: qc-level-1
+    label: QC Level 1
+    short_description: This is the first QC Level
+    long_description: This is the long description for the first QC Level
+    created_at: 2020-06-18 02:41:57.241921
     created_by: 1
-    updated_at: 2020-07-29 17:14:33.382778
+    updated_at: 2020-06-18 02:41:57.241957
     updated_by: 1
-    name: area-professor-home
-    label: area professor home
-    short_description: 'Serious final new three ago. Nice these voice effort accept
-      new.
-
-      Most wear so agreement yes. Benefit mean eat care develop shake learn. Whole
-      north amount relate here.'
-    long_description: Nature least information east throughout fear performance. Close
-      smile possible use. Suggest red kid lead force. Draw beyond green figure site.
-    deprecated: false
-    rank: 4
+    rank: 1
 - model: substance.qclevelstype
   pk: 2
   fields:
@@ -89,7 +83,7 @@
     long_description: Leg need though send. Necessary from impact cup tree reason.
       Say someone follow beautiful.
     deprecated: false
-    rank: 1
+    rank: 47
 - model: substance.qclevelstype
   pk: 5
   fields:
@@ -279,16 +273,14 @@
 - model: substance.source
   pk: 1
   fields:
-    created_at: 2020-07-28 22:43:35.297648
+    name: source-1
+    label: Source 1
+    short_description: This is the first source
+    long_description: This is the long description for the first source
+    created_at: 2020-06-18 02:41:57.241921
     created_by: 1
-    updated_at: 2020-07-29 17:10:25.840447
+    updated_at: 2020-06-18 02:41:57.241957
     updated_by: 1
-    name: Source-One
-    label: A single source label
-    short_description: This is the first source to have been made
-    long_description: this is the long description for a source that will be tested
-      for arriving on a GET request when it is deprecated.
-    deprecated: true
 - model: substance.source
   pk: 2
   fields:
@@ -449,18 +441,29 @@
       No total experience pretty as.'
     deprecated: false
 - model: substance.substance
+  pk: 1
+  fields:
+    sid: DTXSID502000000
+    preferred_name: Sample Substance
+    display_name: Sample Substance
+    description: This is the description for the test substance
+    casrn: 1234567-89-5
+    public_qc_note: Public QC notes
+    private_qc_note: Private QC notes
+    associated_compound: 4
+    qc_level: 1
+    substance_type: 1
+    source: 1
+    created_at: 2020-06-18 02:41:57.241921
+    created_by: 1
+    updated_at: 2020-06-18 02:41:57.241957
+    updated_by: 1
+- model: substance.substance
   pk: 2
   fields:
-    created_at: 2020-08-06 16:50:03.781903
-    created_by: 1
-    updated_at: 2020-08-20 19:07:43.844757
-    updated_by: 1
-    sid: DTXSID202000000
-    preferred_name: Invalid String
-    display_name: 'Serious final new three ago. Nice these voice effort accept new.
-
-      Most wear so agreement yes. Benefit mean eat care develop shake learn. Whole
-      north amount relate here.'
+    sid: DTXSID602000001
+    preferred_name: Sample Substance 2
+    display_name: Sample Substance 2
     source: 2
     substance_type: 2
     qc_level: 1
@@ -468,43 +471,29 @@
     public_qc_note: this may be acceptable.
     private_qc_note: Houston, we have a problem!
     associated_compound: null
-    casrn: 1234567-89-5
+    casrn: 9876543-21-5
+    created_at: 2020-08-06 16:50:03.781903
+    created_by: 1
+    updated_at: 2020-08-20 19:07:43.844757
+    updated_by: 1
 - model: substance.substance
   pk: 3
   fields:
+    sid: DTXSID202000002
+    preferred_name: Sample Substance 3
+    display_name: Sample Substance 3
+    source: 2
+    substance_type: 1
+    qc_level: 1
+    description: area professor home
+    public_qc_note: this may be acceptable.
+    private_qc_note: Houston, we have a problem!
+    associated_compound: null
+    casrn: 47-47-8
     created_at: 2020-08-06 18:02:45.470694
     created_by: 1
     updated_at: 2020-08-06 18:02:45.470722
     updated_by: 1
-    sid: DTXSID902000001
-    preferred_name: ray finkle
-    display_name: laces out
-    source: 2
-    substance_type: 1
-    qc_level: 1
-    description: area professor home
-    public_qc_note: this may be acceptable.
-    private_qc_note: Houston, we have a problem!
-    associated_compound: null
-    casrn: floogalbinder
-- model: substance.substance
-  pk: 4
-  fields:
-    created_at: 2020-08-06 18:41:42.514462
-    created_by: 1
-    updated_at: 2020-08-06 18:41:42.514492
-    updated_by: 1
-    sid: DTXSID602000002
-    preferred_name: betsy
-    display_name: heavens
-    source: 2
-    substance_type: 1
-    qc_level: 1
-    description: area professor home
-    public_qc_note: this may be acceptable.
-    private_qc_note: Houston, we have a problem!
-    associated_compound: null
-    casrn: another substance
 - model: substance.substancerelationship
   pk: 1
   fields:
@@ -532,20 +521,14 @@
 - model: substance.substancetype
   pk: 1
   fields:
-    created_at: 2020-07-28 14:12:23.733908
+    name: substance-type-1
+    label: Substance Type 1
+    short_description: This is the first substance type
+    long_description: This is the long description for the first substance type
+    created_at: 2020-06-18 02:41:57.241921
     created_by: 1
-    updated_at: 2020-07-28 14:12:23.733954
+    updated_at: 2020-06-18 02:41:57.241957
     updated_by: 1
-    name: area-professor-home
-    label: area professor home
-    short_description: 'Serious final new three ago. Nice these voice effort accept
-      new.
-
-      Most wear so agreement yes. Benefit mean eat care develop shake learn. Whole
-      north amount relate here.'
-    long_description: Nature least information east throughout fear performance. Close
-      smile possible use. Suggest red kid lead force. Draw beyond green figure site.
-    deprecated: false
 - model: substance.substancetype
   pk: 2
   fields:

@@ -117,8 +117,11 @@ class Substance(CommonInfo):
     description = models.CharField(max_length=1024)
     public_qc_note = models.CharField(max_length=1024)
     private_qc_note = models.CharField(max_length=1024)
-    associated_compound = models.ForeignKey(
-        "compound.BaseCompound", on_delete=models.PROTECT, null=True
+    associated_compound = models.OneToOneField(
+        "compound.BaseCompound",
+        on_delete=models.PROTECT,
+        null=True,
+        related_name="substance",
     )
     casrn = models.CharField(
         max_length=50,
