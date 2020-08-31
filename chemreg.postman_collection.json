@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "73433c2b-4db1-437f-b2a7-4250eed5d526",
+		"_postman_id": "0107651d-0c9c-4359-828f-485bc145627b",
 		"name": "chemreg",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -237,11 +237,9 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/illDefinedCompounds",
-							"protocol": "http",
 							"host": [
 								"{{baseUrl}}"
 							],
-							"port": "8000",
 							"path": [
 								"illDefinedCompounds"
 							]
@@ -407,11 +405,9 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/definedCompounds",
-							"protocol": "http",
 							"host": [
 								"{{baseUrl}}"
 							],
-							"port": "8000",
 							"path": [
 								"definedCompounds"
 							]
@@ -515,11 +511,9 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/definedCompounds",
-							"protocol": "http",
 							"host": [
 								"{{baseUrl}}"
 							],
-							"port": "8000",
 							"path": [
 								"definedCompounds"
 							]
@@ -570,11 +564,9 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/definedCompounds",
-							"protocol": "http",
 							"host": [
 								"{{baseUrl}}"
 							],
-							"port": "8000",
 							"path": [
 								"definedCompounds"
 							]
@@ -625,11 +617,9 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/definedCompounds",
-							"protocol": "http",
 							"host": [
 								"{{baseUrl}}"
 							],
-							"port": "8000",
 							"path": [
 								"definedCompounds"
 							]
@@ -681,11 +671,9 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/definedCompounds",
-							"protocol": "http",
 							"host": [
 								"{{baseUrl}}"
 							],
-							"port": "8000",
 							"path": [
 								"definedCompounds"
 							]
@@ -736,11 +724,9 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/definedCompounds?override",
-							"protocol": "http",
 							"host": [
 								"{{baseUrl}}"
 							],
-							"port": "8000",
 							"path": [
 								"definedCompounds"
 							],
@@ -792,11 +778,9 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/definedCompounds/637",
-							"protocol": "http",
 							"host": [
 								"{{baseUrl}}"
 							],
-							"port": "8000",
 							"path": [
 								"definedCompounds",
 								"637"
@@ -1656,11 +1640,9 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/illDefinedCompounds",
-							"protocol": "http",
 							"host": [
 								"{{baseUrl}}"
 							],
-							"port": "8000",
 							"path": [
 								"illDefinedCompounds"
 							]
@@ -2136,14 +2118,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/illDefinedCompounds",
-							"protocol": "http",
+							"raw": "{{baseUrl}}/illDefinedCompounds/10",
 							"host": [
 								"{{baseUrl}}"
 							],
-							"port": "8000",
 							"path": [
-								"illDefinedCompounds"
+								"illDefinedCompounds",
+								"10"
 							]
 						}
 					},
@@ -3880,17 +3861,13 @@
 									}
 								},
 								"url": {
-									"raw": "{{baseUrl}}/illDefinedCompounds",
-									"protocol": "http",
+									"raw": "{{baseUrl}}/illDefinedCompounds/10",
 									"host": [
-										"127",
-										"0",
-										"0",
-										"1"
+										"{{baseUrl}}"
 									],
-									"port": "8000",
 									"path": [
-										"illDefinedCompounds"
+										"illDefinedCompounds",
+										"10"
 									]
 								}
 							},
@@ -5328,14 +5305,9 @@
 				},
 				"url": {
 					"raw": "{{baseUrl}}/login/",
-					"protocol": "http",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"login",
 						""
