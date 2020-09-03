@@ -445,7 +445,7 @@
   fields:
     sid: DTXSID502000000
     preferred_name: Sample Substance
-    display_name: Sample Substance
+    display_name: Display Sample Substance
     description: This is the description for the test substance
     casrn: 1234567-89-5
     public_qc_note: Public QC notes
@@ -463,7 +463,7 @@
   fields:
     sid: DTXSID602000001
     preferred_name: Sample Substance 2
-    display_name: Sample Substance 2
+    display_name: Display Sample Substance 2
     source: 2
     substance_type: 2
     qc_level: 1
@@ -481,7 +481,7 @@
   fields:
     sid: DTXSID202000002
     preferred_name: Sample Substance 3
-    display_name: Sample Substance 3
+    display_name: Display Sample Substance 3
     source: 2
     substance_type: 1
     qc_level: 1

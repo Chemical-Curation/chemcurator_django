@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "0107651d-0c9c-4359-828f-485bc145627b",
+		"_postman_id": "164b8b6e-bd5f-49e7-9496-601b22e90452",
 		"name": "chemreg",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -5175,7 +5175,82 @@
 			"name": "Issue_198",
 			"item": [
 				{
-					"name": "record",
+					"name": "records external_id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/records?fields[record]=external_id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"records"
+							],
+							"query": [
+								{
+									"key": "fields[record]",
+									"value": "external_id"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "record to patch",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "specialP@55word",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "karyn",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/records/37",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"records",
+								"37"
+							]
+						},
+						"description": "update record to have same \"external_id\" \"list_id\" for unique error"
+					},
+					"response": []
+				},
+				{
+					"name": "record with existing external ID Copy",
 					"request": {
 						"auth": {
 							"type": "basic",
@@ -5224,7 +5299,7 @@
 					"response": []
 				},
 				{
-					"name": "record",
+					"name": "record with existing external ID",
 					"request": {
 						"auth": {
 							"type": "basic",
@@ -5268,6 +5343,406 @@
 							]
 						},
 						"description": "create record to have same \"external_id\" \"list_id\" for unique error"
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Issue_145",
+			"item": [
+				{
+					"name": "substance to match display/preffered name, casrn",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "specialP@55word",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "karyn",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"data\": {\n        \"type\": \"record\",\n        \"attributes\": {\n        \t\"external_id\": \"49\",\n        \t\"score\": 4.7,\n        \t\"message\": \"I made a record\",\n        \t\"is_validated\": false\n        },\n        \"relationships\": {\n            \"list\": {\n            \t\"data\": {\n            \t\"id\": 2,\n            \t\"type\": \"list\"\n            \t}\n        \t},\n            \"substance\": {\n                \"data\": {\n                \"id\": 2,\n                \"type\": \"substance\"\n                }\n            }\n        }\n    }\n}\n"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/substances/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"substances",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "duplicated fields",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "specialP@55word",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "karyn",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n  \t\"attributes\": {\n\t\t\"casrn\": \"1234567-89-5\",\n\t\t\"display_name\": \"Display Sample Substance\",\n\t\t\"preferred_name\": \"Sample Substance\",\n\t\t\"description\": \"area professor home\",\n\t\t\"private_qc_note\": \"Houston, we have a problem!\",\n\t\t\"public_qc_note\": \"this may be acceptable.\"\n\t},\n\t\"relationships\": {\n\t\t\"definedCompound\": {\n\t\t\t\"data\": {\n\t\t\t\t\"type\": \"definedCompound\",\n\t\t\t\t\"id\": 4\n\t\t\t}\n\t\t},\n\t\t\"qcLevel\": {\n\t\t\t\"data\": {\n\t\t\t\t\"type\": \"qcLevel\",\n\t\t\t\t\"id\": 1\n\t\t\t}\n\t\t},\n\t\t\"source\": {\n\t\t\t\"data\": {\n\t\t\t\t\"type\": \"source\",\n\t\t\t\t\"id\": 2\n\t\t\t}\n\t\t},\n\t\t\"substanceType\": {\n\t\t\t\"data\": {\n\t\t\t\t\"type\": \"substanceType\",\n\t\t\t\t\"id\": 1\n\t\t\t}\n\t\t}\n\t},\n    \"type\": \"substance\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/substances",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"substances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "existing synonym.identifier with resticted synonym quality",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "specialP@55word",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "karyn",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"data\": {\n        \"type\": \"record\",\n        \"attributes\": {\n        \t\"external_id\": \"49\",\n        \t\"score\": 4.7,\n        \t\"message\": \"I made a record\",\n        \t\"is_validated\": false\n        },\n        \"relationships\": {\n            \"list\": {\n            \t\"data\": {\n            \t\"id\": 2,\n            \t\"type\": \"list\"\n            \t}\n        \t},\n            \"substance\": {\n                \"data\": {\n                \"id\": 2,\n                \"type\": \"substance\"\n                }\n            }\n        }\n    }\n}\n"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/synonyms/10?fields[synonym]=identifier,synonym_quality,substance",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"synonyms",
+								"10"
+							],
+							"query": [
+								{
+									"key": "include",
+									"value": "synonym_quality",
+									"disabled": true
+								},
+								{
+									"key": "fields[synonym]",
+									"value": "identifier,synonym_quality,substance"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "restricted synonymQuality",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/synonymQualities/8",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"synonymQualities",
+								"8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "substance related to synonym with restricted Quality",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "specialP@55word",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "karyn",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"data\": {\n        \"type\": \"record\",\n        \"attributes\": {\n        \t\"external_id\": \"49\",\n        \t\"score\": 4.7,\n        \t\"message\": \"I made a record\",\n        \t\"is_validated\": false\n        },\n        \"relationships\": {\n            \"list\": {\n            \t\"data\": {\n            \t\"id\": 2,\n            \t\"type\": \"list\"\n            \t}\n        \t},\n            \"substance\": {\n                \"data\": {\n                \"id\": 2,\n                \"type\": \"substance\"\n                }\n            }\n        }\n    }\n}\n"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/substances/2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"substances",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "substance with existing synonym.identifier",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "karyn",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "specialP@55word",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n  \t\"id\": 2,\n  \t\"attributes\": {\n\t\t\"display_name\": \"Chem-5ical\"\n\t},\n    \"type\": \"substance\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/substances/2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"substances",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "resticted synonym",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "specialP@55word",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "karyn",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"data\": {\n        \"type\": \"record\",\n        \"attributes\": {\n        \t\"external_id\": \"49\",\n        \t\"score\": 4.7,\n        \t\"message\": \"I made a record\",\n        \t\"is_validated\": false\n        },\n        \"relationships\": {\n            \"list\": {\n            \t\"data\": {\n            \t\"id\": 2,\n            \t\"type\": \"list\"\n            \t}\n        \t},\n            \"substance\": {\n                \"data\": {\n                \"id\": 2,\n                \"type\": \"substance\"\n                }\n            }\n        }\n    }\n}\n"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/synonyms/3",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"synonyms",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "synonym identifier",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "specialP@55word",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "karyn",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n  \t\"id\": 3,\n    \"type\": \"synonym\",\n    \"attributes\": {\n    \t\"identifier\": \"Sample Substance 2\"\n    },\n\t\"relationships\": {\n\t\t\"synonymQuality\":{\n\t\t\t\"data\": {\n\t\t\t\t\"id\": 8,\n\t\t\t\t\"type\": \"synonymQuality\"\n\t\t\t}\n\t\t}\n\t}\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/synonyms/3",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"synonyms",
+								"3"
+							]
+						}
 					},
 					"response": []
 				}
