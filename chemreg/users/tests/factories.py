@@ -2,6 +2,9 @@ from typing import Any, Sequence
 
 from factory import DjangoModelFactory, Faker, post_generation
 
+# will probably need to be used, but may need a separate user
+# serializer and user model facotry, not sure yet.
+# from chemreg.common.factory import DjangoSerializerFactory
 from chemreg.users.models import User
 
 

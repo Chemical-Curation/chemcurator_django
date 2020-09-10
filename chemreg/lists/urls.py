@@ -11,6 +11,7 @@ router.register(views.ListViewSet)
 router.register(views.ListTypeViewSet)
 router.register(views.RecordViewSet)
 router.register(views.RecordIdentifierViewSet)
+router.register(views.ExternalContactViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),

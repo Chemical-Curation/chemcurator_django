@@ -1,9 +1,8 @@
-from rest_framework import serializers
-
+from chemreg.jsonapi.serializers import HyperlinkedModelSerializer
 from chemreg.users.models import User
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(HyperlinkedModelSerializer):
     """The serializer for `User`."""
 
     class Meta:

@@ -54,7 +54,7 @@ class ListSerializer(HyperlinkedModelSerializer):
 
     list_accessibility = AccessibilityTypeSerializer
     external_contact = ExternalContactSerializer
-    owners = UserSerializer(read_only=True, many=True)
+    owners = UserSerializer
     types = ListTypeSerializer
 
     class Meta:

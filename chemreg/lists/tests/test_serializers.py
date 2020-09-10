@@ -65,6 +65,7 @@ def test_list_serializer():
 @pytest.mark.django_db
 def test_list(list_factory):
     serializer = list_factory.build()
+    assert 1 == 0
     assert serializer.is_valid()
     serializer.save()
 
