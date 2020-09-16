@@ -461,6 +461,21 @@
       M  V30 BEGIN BOND\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n"
     replaced_by: null
     qc_note: ''
+- model: compound.basecompound
+  pk: 25
+  fields:
+    polymorphic_ctype: 7
+    created_at: 2020-08-10 19:48:02.999317
+    created_by: 1
+    updated_at: 2020-08-10 19:48:02.999350
+    updated_by: 1
+    cid: DTXCID502000024
+    structure: "\n  -INDIGO-09142016052D\n\n  0  0  0  0  0  0  0  0  0  0  0 V3000\n\
+      M  V30 BEGIN CTAB\nM  V30 COUNTS 2 1 0 0 0\nM  V30 BEGIN ATOM\n\
+      M  V30 1 O 15.525 -5.625 0.0 0\nM  V30 2 O 14.525 -5.625 0.0 0\nM  V30 END ATOM\n\
+      M  V30 BEGIN BOND\nM  V30 1 1 1 2\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n"
+    replaced_by: null
+    qc_note: ''
 - model: compound.definedcompound
   pk: 4
   fields:
@@ -497,6 +512,10 @@
   pk: 24
   fields:
     inchikey: MOSFIJXAXDLOML-UHFFFAOYSA-N
+- model: compound.definedcompound
+  pk: 25
+  fields:
+    inchikey: MHAJPDPJQMAIIY-UHFFFAOYSA-N
 - model: compound.illdefinedcompound
   pk: 10
   fields:
