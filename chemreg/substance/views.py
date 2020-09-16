@@ -70,6 +70,7 @@ class SynonymViewSet(ModelViewSet):
 
     queryset = Synonym.objects.all()
     serializer_class = SynonymSerializer
+    filterset_fields = ["substance__id"]
 
 
 class SubstanceRelationshipViewSet(ModelViewSet):

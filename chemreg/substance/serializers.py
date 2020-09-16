@@ -284,7 +284,7 @@ class SynonymSerializer(HyperlinkedModelSerializer):
             "The proposed Synonym identifier does not conform to "
             "the regexp for the associated Synonym Type",
             "format",
-        )(data.get("identifier"))
+        )(data.get("identifier", None) or self.instance.identifier)
 
         if synonym_type.is_casrn:
             validate_casrn_checksum(data["identifier"])

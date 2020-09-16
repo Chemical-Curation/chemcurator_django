@@ -708,6 +708,26 @@ def test_synonym_list(client, admin_user, synonym_factory):
 
 
 @pytest.mark.django_db
+def test_synonym_filter(client, admin_user, synonym_factory):
+    client.force_authenticate(user=admin_user)
+    syn = synonym_factory.create()
+    sub = syn.instance.substance
+    resp = client.get(f"/synonyms?filter[substance.id]={sub.id}")
+    assert resp.status_code == 200
+    assert len(resp.data["results"]) == 1
+    # Check that all results contain
+    from django.db.models import Model
+
+    result = resp.data["results"][0]
+    for key in list(result.keys())[:-1]:
+        obj = getattr(syn.instance, key)
+        if issubclass(type(obj), Model):
+            result[key]["id"] = str(obj.id)
+        else:
+            assert obj == result[key]
+
+
+@pytest.mark.django_db
 def test_intermediate_user_access(client, admin_user, synonym_type_factory):
     """Tests that a non-admin user can only perform the allowed
     operations that have been specified in the admin panel
