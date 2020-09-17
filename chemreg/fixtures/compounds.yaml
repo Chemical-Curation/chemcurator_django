@@ -471,9 +471,9 @@
     updated_by: 1
     cid: DTXCID502000024
     structure: "\n  -INDIGO-09142016052D\n\n  0  0  0  0  0  0  0  0  0  0  0 V3000\n\
-      M  V30 BEGIN CTAB\nM  V30 COUNTS 2 1 0 0 0\nM  V30 BEGIN ATOM\n\
-      M  V30 1 O 15.525 -5.625 0.0 0\nM  V30 2 O 14.525 -5.625 0.0 0\nM  V30 END ATOM\n\
-      M  V30 BEGIN BOND\nM  V30 1 1 1 2\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n"
+      M  V30 BEGIN CTAB\nM  V30 COUNTS 2 1 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 O 15.525\
+      \ -5.625 0.0 0\nM  V30 2 O 14.525 -5.625 0.0 0\nM  V30 END ATOM\nM  V30 BEGIN\
+      \ BOND\nM  V30 1 1 1 2\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n"
     replaced_by: null
     qc_note: ''
 - model: compound.definedcompound
@@ -563,8 +563,8 @@
     created_by: 1
     updated_at: 2020-07-28 23:17:03.495963
     updated_by: 1
-    name: different
-    label: different
+    name: markush-enumerable
+    label: Markush Enumerable
     short_description: 'The mention focus amount natural. Loss include center able
       enter national. Send foreign somebody career.
 
@@ -581,69 +581,10 @@
     created_by: null
     updated_at: 2020-08-11 07:15:00.820874
     updated_by: null
-    name: book-world-couple
-    label: book world couple
+    name: markush-query
+    label: Markush Query
     short_description: Environment much offer budget fight leg. Cold population alone
       difficult.
     long_description: Where season section represent anything statement. Friend rise
       half culture none force. Beyond wide mention fire military support drive.
-    deprecated: false
-- model: compound.querystructuretype
-  pk: 4
-  fields:
-    created_at: 2020-08-11 07:15:00.840758
-    created_by: null
-    updated_at: 2020-08-11 07:15:00.840822
-    updated_by: null
-    name: home-yeah-direction
-    label: home yeah direction
-    short_description: Technology oil per probably across role travel specific. Sort
-      news cup race turn. Police commercial particularly area.
-    long_description: Store including successful. Skin capital back after unit.
-    deprecated: false
-- model: compound.querystructuretype
-  pk: 5
-  fields:
-    created_at: 2020-08-11 07:15:00.855914
-    created_by: null
-    updated_at: 2020-08-11 07:15:00.855949
-    updated_by: null
-    name: realize-include
-    label: realize include
-    short_description: 'Again to standard world. Major since develop why plant.
-
-      Thousand provide outside born sort other. Firm particularly serious system part.
-      During work decision believe.'
-    long_description: Laugh training receive boy eye education action. Kid center
-      section trip four. Step among nature leader almost argue look population.
-    deprecated: false
-- model: compound.querystructuretype
-  pk: 6
-  fields:
-    created_at: 2020-08-11 07:15:00.864001
-    created_by: null
-    updated_at: 2020-08-11 07:15:00.864027
-    updated_by: null
-    name: argue-surface
-    label: argue surface
-    short_description: 'None occur must whose. Natural tend quickly above story place
-      ball.
-
-      Power meet onto to similar. Family rule story than doctor hot maintain.'
-    long_description: Travel detail decide board agree first. Hold continue avoid
-      plant usually simply.
-    deprecated: false
-- model: compound.querystructuretype
-  pk: 7
-  fields:
-    created_at: 2020-08-11 07:15:00.870079
-    created_by: null
-    updated_at: 2020-08-11 07:15:00.870100
-    updated_by: null
-    name: even-above-second
-    label: even above second
-    short_description: Both laugh onto also wish simple. Necessary girl issue central
-      federal. Ready many fight federal.
-    long_description: Real responsibility see hotel. Pattern know contain culture.
-      Dinner tax management campaign property inside that.
     deprecated: false
