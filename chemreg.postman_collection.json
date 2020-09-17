@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "164b8b6e-bd5f-49e7-9496-601b22e90452",
+		"_postman_id": "b0c952ff-3d4b-4353-8844-9fd568660106",
 		"name": "chemreg",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -5741,6 +5741,136 @@
 							"path": [
 								"synonyms",
 								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Issue_62",
+			"item": [
+				{
+					"name": "GET by substance ID none",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "specialP@55word",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "karyn",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/synonyms?filter[substance.id]=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"synonyms"
+							],
+							"query": [
+								{
+									"key": "filter[substance.id]",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET by substance ID many",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "specialP@55word",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "karyn",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Accept",
+								"type": "text",
+								"value": "application/vnd.api+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/synonyms?filter[substance.id]=2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"synonyms"
+							],
+							"query": [
+								{
+									"key": "filter[substance.id]",
+									"value": "2"
+								}
 							]
 						}
 					},
