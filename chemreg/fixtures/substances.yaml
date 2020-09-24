@@ -524,7 +524,7 @@
     to_substance: 3
     source: 1
     relationship_type: 1
-    qc_notes: Houston, we have a problem!
+    qc_notes: This goes from substance DTXSID602000001 to substance DTXSID202000002
 - model: substance.substancerelationship
   pk: 2
   fields:
@@ -536,7 +536,19 @@
     to_substance: 2
     source: 1
     relationship_type: 1
-    qc_notes: Houston, we have a problem!
+    qc_notes: This goes from substance DTXSID602000001 to substance DTXSID602000001 (self)
+- model: substance.substancerelationship
+  pk: 3
+  fields:
+    created_at: 2020-08-06 19:13:50.148814
+    created_by: 1
+    updated_at: 2020-08-06 19:13:50.148856
+    updated_by: 1
+    from_substance: 1
+    to_substance: 2
+    source: 1
+    relationship_type: 1
+    qc_notes: This goes from substance DTXSID502000000 to substance DTXSID602000001
 - model: substance.substancetype
   pk: 1
   fields:

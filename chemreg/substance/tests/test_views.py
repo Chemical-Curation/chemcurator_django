@@ -812,6 +812,37 @@ def test_substance_relationship_list(
 
 
 @pytest.mark.django_db
+def test_substance_relationship_substance_id_filter(
+    client, admin_user, substance_relationship_factory, substance_factory
+):
+    client.force_authenticate(user=admin_user)
+
+    # Create Substance
+    substance = substance_factory().instance
+
+    # Create Substance Factories
+    substance_relationship_factory.create(
+        from_substance={"type": "substance", "id": substance.pk}
+    )  # forward
+    substance_relationship_factory.create(
+        to_substance={"type": "substance", "id": substance.pk}
+    )  # backwards
+    substance_relationship_factory.create(
+        from_substance={"type": "substance", "id": substance.pk},
+        to_substance={"type": "substance", "id": substance.pk},
+    )  # mirrored
+
+    # Unrelated relationship (To be filtered)
+    substance_relationship_factory()
+
+    resp = client.get("/substanceRelationships", {"filter[substance.id]": substance.pk})
+
+    assert resp.status_code == 200
+    # Check that only the correct response are returned
+    assert len(resp.data["results"]) == 2
+
+
+@pytest.mark.django_db
 def test_substance_relationship_post(
     client, admin_user, substance_relationship_factory
 ):
