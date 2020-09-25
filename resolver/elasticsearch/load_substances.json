@@ -1,0 +1,43 @@
+PUT /substances/_doc/1 
+{
+    "dtxsid": "DTXSID8021482",
+    "preferred_name": "Acetone",
+    "display_name": "Acetone",
+    "casrn": "67-64-1",
+    "casalts": [
+        {
+            "casalt": "67641",
+            "weight": 0.75
+        },
+        {
+            "casalt": "00067641",
+            "weight": 0.75
+        },
+        {
+            "casalt": "0000067-64-1",
+            "weight": 0.75
+        }
+    ],
+    "synonyms": [
+        {
+            "synonym": "acetone",
+            "weight": 0.75
+        },
+        {
+            "synonym": "2-propanone",
+            "weight": 0.75
+        },
+        {
+            "synonym": "propanone",
+            "weight": 0.75
+        },
+        {
+            "synonym": "Dimethyl ketone",
+            "weight": 0.75
+        },
+        {
+            "synonym": "Dimethylformaldehyde",
+            "weight": 0.75
+        }
+    ]
+}

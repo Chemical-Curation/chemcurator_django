@@ -1,0 +1,48 @@
+PUT /substances/_mapping 
+{
+    "properties": {
+        "dtxsid": {
+            "type": "keyword"
+        },
+        "dtxcid": {
+            "type": "keyword"
+        },
+        "preferred_name": {
+            "type": "keyword"
+        },
+        "preferred_name_text": {
+            "type": "text"
+        },
+        "display_name": {
+            "type": "keyword"
+        },
+        "display_name_text": {
+            "type": "text"
+        },
+        "casrn": {
+            "type": "text"
+        },
+        "casalts": {
+            "type": "nested",
+            "properties": {
+                "casalt": {
+                    "type": "text"
+                },
+                "weight": {
+                    "type": "float"
+                }
+            }
+        },
+        "synonyms": {
+            "type": "nested",
+            "properties": {
+                "synonym": {
+                    "type": "text"
+                },
+                "weight": {
+                    "type": "float"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,39 @@
+GET /substances/_search/ 
+{
+    "_source": [
+        "_score",
+        "preferred_name",
+        "synonyms",
+        "casalts"
+    ],
+    "query": {
+        "query_string": {
+            "query": "Acetone"
+        }
+    }
+}
+
+GET /substances/_search/ 
+{
+    "query": {
+        "nested": {
+            "path": "casalts",
+            "query": {
+                "function_score": {
+                    "query": {
+                        "match": {
+                            "casalts.casalt": "00067641"
+                        }
+                    },
+                    "field_value_factor": {
+                        "field": "casalts.weight"
+                    },
+                    "boost_mode": "replace"
+                }
+            },
+            "inner_hits": {
+                "size": 10
+            }
+        }
+    }
+}
