@@ -323,34 +323,6 @@
     replaced_by: null
     qc_note: ''
 - model: compound.basecompound
-  pk: 17
-  fields:
-    polymorphic_ctype: 7
-    created_at: 2020-07-28 23:30:42.473685
-    created_by: 1
-    updated_at: 2020-07-28 23:30:42.473720
-    updated_by: 1
-    cid: DTXCID002000016
-    structure: "\n  -INDIGO-07282023302D\n\n  0  0  0  0  0  0  0  0  0  0  0 V3000\n\
-      M  V30 BEGIN CTAB\nM  V30 COUNTS 0 0 0 0 0\nM  V30 BEGIN ATOM\nM  V30 END ATOM\n\
-      M  V30 BEGIN BOND\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n"
-    replaced_by: null
-    qc_note: ''
-- model: compound.basecompound
-  pk: 18
-  fields:
-    polymorphic_ctype: 7
-    created_at: 2020-07-28 23:31:08.980210
-    created_by: 1
-    updated_at: 2020-07-28 23:31:08.980290
-    updated_by: 1
-    cid: DTXCID702000017
-    structure: "\n  -INDIGO-07282023312D\n\n  0  0  0  0  0  0  0  0  0  0  0 V3000\n\
-      M  V30 BEGIN CTAB\nM  V30 COUNTS 0 0 0 0 0\nM  V30 BEGIN ATOM\nM  V30 END ATOM\n\
-      M  V30 BEGIN BOND\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n"
-    replaced_by: null
-    qc_note: ''
-- model: compound.basecompound
   pk: 19
   fields:
     polymorphic_ctype: 7
@@ -420,48 +392,6 @@
     replaced_by: null
     qc_note: ''
 - model: compound.basecompound
-  pk: 22
-  fields:
-    polymorphic_ctype: 7
-    created_at: 2020-08-10 19:34:58.289759
-    created_by: 1
-    updated_at: 2020-08-10 19:34:58.289785
-    updated_by: 1
-    cid: DTXCID102000021
-    structure: "\n  -INDIGO-08102019342D\n\n  0  0  0  0  0  0  0  0  0  0  0 V3000\n\
-      M  V30 BEGIN CTAB\nM  V30 COUNTS 0 0 0 0 0\nM  V30 BEGIN ATOM\nM  V30 END ATOM\n\
-      M  V30 BEGIN BOND\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n"
-    replaced_by: null
-    qc_note: ''
-- model: compound.basecompound
-  pk: 23
-  fields:
-    polymorphic_ctype: 7
-    created_at: 2020-08-10 19:45:46.959108
-    created_by: 1
-    updated_at: 2020-08-10 19:45:46.959145
-    updated_by: 1
-    cid: DTXCID802000022
-    structure: "\n  -INDIGO-08102019452D\n\n  0  0  0  0  0  0  0  0  0  0  0 V3000\n\
-      M  V30 BEGIN CTAB\nM  V30 COUNTS 0 0 0 0 0\nM  V30 BEGIN ATOM\nM  V30 END ATOM\n\
-      M  V30 BEGIN BOND\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n"
-    replaced_by: null
-    qc_note: ''
-- model: compound.basecompound
-  pk: 24
-  fields:
-    polymorphic_ctype: 7
-    created_at: 2020-08-10 19:48:02.999317
-    created_by: 1
-    updated_at: 2020-08-10 19:48:02.999350
-    updated_by: 1
-    cid: DTXCID502000023
-    structure: "\n  -INDIGO-08102019482D\n\n  0  0  0  0  0  0  0  0  0  0  0 V3000\n\
-      M  V30 BEGIN CTAB\nM  V30 COUNTS 0 0 0 0 0\nM  V30 BEGIN ATOM\nM  V30 END ATOM\n\
-      M  V30 BEGIN BOND\nM  V30 END BOND\nM  V30 END CTAB\nM  END\n"
-    replaced_by: null
-    qc_note: ''
-- model: compound.basecompound
   pk: 25
   fields:
     polymorphic_ctype: 7
@@ -481,14 +411,6 @@
   fields:
     inchikey: AGAHNABIDCTLHW-UHFFFAOYSA-N
 - model: compound.definedcompound
-  pk: 17
-  fields:
-    inchikey: MOSFIJXAXDLOML-UHFFFAOYSA-N
-- model: compound.definedcompound
-  pk: 18
-  fields:
-    inchikey: MOSFIJXAXDLOML-UHFFFAOYSA-N
-- model: compound.definedcompound
   pk: 19
   fields:
     inchikey: VTWDKFNVVLAELH-UHFFFAOYSA-N
@@ -500,18 +422,6 @@
   pk: 21
   fields:
     inchikey: VTWDKFNVVLAELH-UHFFFAOYSA-N
-- model: compound.definedcompound
-  pk: 22
-  fields:
-    inchikey: MOSFIJXAXDLOML-UHFFFAOYSA-N
-- model: compound.definedcompound
-  pk: 23
-  fields:
-    inchikey: MOSFIJXAXDLOML-UHFFFAOYSA-N
-- model: compound.definedcompound
-  pk: 24
-  fields:
-    inchikey: MOSFIJXAXDLOML-UHFFFAOYSA-N
 - model: compound.definedcompound
   pk: 25
   fields:
