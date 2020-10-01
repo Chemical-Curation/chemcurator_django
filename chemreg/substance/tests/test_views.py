@@ -1,11 +1,13 @@
 import json
 from collections import OrderedDict
+from datetime import datetime
 
 from django.contrib.auth.models import Permission
 
 import pytest
 from rest_framework_json_api.utils import get_included_serializers
 
+from chemreg.common.models import CommonInfo
 from chemreg.substance.serializers import SubstanceSerializer
 from chemreg.substance.views import (
     ModelViewSet,
@@ -51,7 +53,9 @@ def test_qc_levels_type_fetch(client, admin_user, qc_levels_type_factory):
     original_model = qc_levels_type_factory.create().instance
     resp = client.get("/qcLevels/{}".format(original_model.pk))
     assert resp.status_code == 200
-    for key in resp.data.keys() - {"url"}:
+    invalid_keys = {f.name for f in CommonInfo._meta.fields}
+    invalid_keys.add("url")
+    for key in resp.data.keys() - invalid_keys:
         assert resp.data[key] == getattr(original_model, key)
 
 
@@ -71,7 +75,9 @@ def test_qc_levels_type_patch(client, admin_user, qc_levels_type_factory):
         },
     )
     assert resp.status_code == 200
-    for key in resp.data.keys() - {"url"}:
+    invalid_keys = {f.name for f in CommonInfo._meta.fields}
+    invalid_keys.add("url")
+    for key in resp.data.keys() - invalid_keys:
         assert resp.data[key] == model_dict[key]
 
 
@@ -378,7 +384,11 @@ def test_substance_fetch(client, admin_user, substance_factory):
     for key in resp.data.keys() - {"url"}:
         # Verify Attributes
         if isinstance(resp.data[key], str):
-            assert resp.data[key] == getattr(original_model, key)
+            model_value = getattr(original_model, key)
+            if isinstance(model_value, datetime):
+                assert resp.data[key] == model_value.strftime("%Y-%m-%dT%H:%M:%S.%f")
+            else:
+                assert resp.data[key] == model_value
         # Verify Related Resources
         elif type(resp.data[key]) is OrderedDict:
             assert resp.data[key]["id"] == str(getattr(original_model, key).id)
@@ -389,6 +399,9 @@ def test_substance_fetch_includes(client, admin_user, substance_factory):
     client.force_authenticate(user=admin_user)
     model = substance_factory(illdefined=True).instance
     requested_includes = get_included_serializers(SubstanceSerializer)
+    # Pop common info related fields.
+    for field in ["created_by", "updated_by"]:
+        requested_includes.pop(field)
     resp = client.get(
         "/substances/{}".format(model.pk),
         data={"include": ",".join(requested_includes)},
@@ -437,7 +450,9 @@ def test_substance_patch(client, admin_user, substance_factory):
     )
     original_model.refresh_from_db()
     assert resp.status_code == 200
-    for key in resp.data.keys() - {"url"}:
+    invalid_keys = {f.name for f in CommonInfo._meta.fields}
+    invalid_keys.add("url")
+    for key in resp.data.keys() - invalid_keys:
         # Verify Attributes
         if isinstance(resp.data[key], str):
             assert resp.data[key] == model_dict[key]
@@ -526,7 +541,9 @@ def test_relationship_type_fetch(client, admin_user, relationship_type_factory):
     original_model = relationship_type_factory.create().instance
     resp = client.get("/relationshipTypes/{}".format(original_model.pk))
     assert resp.status_code == 200
-    for key in resp.data.keys() - {"url"}:
+    invalid_keys = {f.name for f in CommonInfo._meta.fields}
+    invalid_keys.add("url")
+    for key in resp.data.keys() - invalid_keys:
         # Verify Attributes
         if isinstance(resp.data[key], str):
             assert resp.data[key] == getattr(original_model, key)
@@ -549,7 +566,9 @@ def test_relationship_type_patch(client, admin_user, relationship_type_factory):
         },
     )
     assert resp.status_code == 200
-    for key in resp.data.keys() - {"url"}:
+    invalid_keys = {f.name for f in CommonInfo._meta.fields}
+    invalid_keys.add("url")
+    for key in resp.data.keys() - invalid_keys:
         # Verify Attributes
         if isinstance(resp.data[key], str):
             assert resp.data[key] == model_dict[key]
@@ -723,6 +742,8 @@ def test_synonym_filter(client, admin_user, synonym_factory):
         obj = getattr(syn.instance, key)
         if issubclass(type(obj), Model):
             result[key]["id"] = str(obj.id)
+        elif isinstance(obj, datetime):
+            assert result[key] == obj.strftime("%Y-%m-%dT%H:%M:%S.%f")
         else:
             assert obj == result[key]
 
@@ -839,7 +860,7 @@ def test_substance_relationship_substance_id_filter(
 
     assert resp.status_code == 200
     # Check that only the correct response are returned
-    assert len(resp.data["results"]) == 2
+    assert len(resp.data["results"]) == 3
 
 
 @pytest.mark.django_db

@@ -1,9 +1,9 @@
 import pytest
 from rest_framework_json_api.utils import get_included_serializers
 
+from chemreg.common.serializers import CommonInfoSerializer
 from chemreg.compound.serializers import CompoundSerializer
 from chemreg.substance.serializers import (
-    HyperlinkedModelSerializer,
     QCLevelsTypeSerializer,
     RelationshipTypeSerializer,
     SourceSerializer,
@@ -18,7 +18,7 @@ from chemreg.substance.serializers import (
 
 @pytest.mark.django_db
 def test_qc_levels_type_serializer():
-    assert issubclass(QCLevelsTypeSerializer, HyperlinkedModelSerializer)
+    assert issubclass(QCLevelsTypeSerializer, CommonInfoSerializer)
 
 
 @pytest.mark.django_db
@@ -30,7 +30,7 @@ def test_qc_levels_type(qc_levels_type_factory):
 
 @pytest.mark.django_db
 def test_synonym_type_serializer():
-    assert issubclass(SynonymTypeSerializer, HyperlinkedModelSerializer)
+    assert issubclass(SynonymTypeSerializer, CommonInfoSerializer)
 
 
 @pytest.mark.django_db
@@ -42,7 +42,7 @@ def test_synonym_type(synonym_type_factory):
 
 @pytest.mark.django_db
 def test_source_serializer():
-    assert issubclass(SourceSerializer, HyperlinkedModelSerializer)
+    assert issubclass(SourceSerializer, CommonInfoSerializer)
 
 
 @pytest.mark.django_db
@@ -54,7 +54,7 @@ def test_source(source_factory):
 
 @pytest.mark.django_db
 def test_substance_serializer():
-    assert issubclass(SubstanceSerializer, HyperlinkedModelSerializer)
+    assert issubclass(SubstanceSerializer, CommonInfoSerializer)
 
 
 @pytest.mark.django_db
@@ -143,7 +143,7 @@ def test_substance_ill_defined_compound(substance_factory):
 
 @pytest.mark.django_db
 def test_substance_type_serializer():
-    assert issubclass(SubstanceTypeSerializer, HyperlinkedModelSerializer)
+    assert issubclass(SubstanceTypeSerializer, CommonInfoSerializer)
 
 
 @pytest.mark.django_db
@@ -155,7 +155,7 @@ def test_substance_type(substance_type_factory):
 
 @pytest.mark.django_db
 def test_relationship_type_serializer():
-    assert issubclass(RelationshipTypeSerializer, HyperlinkedModelSerializer)
+    assert issubclass(RelationshipTypeSerializer, CommonInfoSerializer)
 
 
 @pytest.mark.django_db
@@ -166,7 +166,7 @@ def test_relationship_type(relationship_type_factory):
 
 
 def test_synonym_quality_serializer():
-    assert issubclass(SynonymQualitySerializer, HyperlinkedModelSerializer)
+    assert issubclass(SynonymQualitySerializer, CommonInfoSerializer)
 
 
 @pytest.mark.django_db
@@ -186,7 +186,7 @@ def test_synonym_quality_score_weight_validation(synonym_quality_factory):
 
 @pytest.mark.django_db
 def test_synonym_serializer():
-    assert issubclass(SynonymSerializer, HyperlinkedModelSerializer)
+    assert issubclass(SynonymSerializer, CommonInfoSerializer)
 
 
 @pytest.mark.django_db
@@ -414,7 +414,7 @@ def test_synonym_type_validates_is_casrn(synonym_factory, synonym_type_factory):
 
 @pytest.mark.django_db
 def test_substance_relationship_serializer():
-    assert issubclass(SubstanceRelationshipSerializer, HyperlinkedModelSerializer)
+    assert issubclass(SubstanceRelationshipSerializer, CommonInfoSerializer)
 
 
 @pytest.mark.django_db

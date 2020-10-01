@@ -4,6 +4,7 @@ from rest_framework.reverse import reverse as drf_reverse
 
 from rest_framework_json_api.utils import format_value
 
+from chemreg.common.serializers import CommonInfoSerializer, ControlledVocabSerializer
 from chemreg.compound.fields import StructureAliasField
 from chemreg.compound.models import (
     BaseCompound,
@@ -19,26 +20,24 @@ from chemreg.compound.validators import (
 )
 from chemreg.indigo.inchi import get_inchikey
 from chemreg.indigo.molfile import get_molfile_v3000
-from chemreg.jsonapi.serializers import (
-    HyperlinkedModelSerializer,
-    PolymorphicModelSerializer,
-)
+from chemreg.jsonapi.serializers import PolymorphicModelSerializer
 
 
-class BaseCompoundSerializer(HyperlinkedModelSerializer):
+class BaseCompoundSerializer(CommonInfoSerializer):
     """The base serializer for compounds."""
 
     included_serializers = {
-        "substance": "chemreg.substance.serializers.SubstanceSerializer"
+        **CommonInfoSerializer.included_serializers,
+        **{"substance": "chemreg.substance.serializers.SubstanceSerializer"},
     }
 
-    serializer_field_mapping = HyperlinkedModelSerializer.serializer_field_mapping
+    serializer_field_mapping = CommonInfoSerializer.serializer_field_mapping
     serializer_field_mapping.update({StructureAliasField: serializers.CharField})
     replaced_by = "chemreg.compound.serializers.CompoundSerializer"
     substance = "chemreg.substance.serializers.SubstanceSerializer"
 
-    class Meta:
-        fields = ["qc_note", "replaced_by"]
+    class Meta(CommonInfoSerializer.Meta):
+        fields = CommonInfoSerializer.Meta.fields + ["qc_note", "replaced_by"]
         model = BaseCompound
 
     def __init__(self, *args, is_admin=False, **kwargs):
@@ -74,16 +73,14 @@ class DefinedCompoundSerializer(BaseCompoundSerializer):
     )
     alt_structures = ("molfile_v2000", "molfile_v3000", "smiles")
 
-    class Meta:
+    class Meta(BaseCompoundSerializer.Meta):
         model = DefinedCompound
-        fields = [
+        fields = BaseCompoundSerializer.Meta.fields + [
             "cid",
             "inchikey",
             "molfile_v2000",
             "molfile_v3000",
             "smiles",
-            "qc_note",
-            "replaced_by",
             "substance",
         ]
         extra_kwargs = {
@@ -181,18 +178,11 @@ class DefinedCompoundDetailSerializer(DefinedCompoundSerializer):
         return get_inchikey(obj.molfile_v3000)
 
 
-class QueryStructureTypeSerializer(HyperlinkedModelSerializer):
+class QueryStructureTypeSerializer(ControlledVocabSerializer):
     """The serializer for query structure type."""
 
-    class Meta:
+    class Meta(ControlledVocabSerializer.Meta):
         model = QueryStructureType
-        fields = [
-            "name",
-            "label",
-            "short_description",
-            "long_description",
-            "deprecated",
-        ]
 
 
 class IllDefinedCompoundSerializer(BaseCompoundSerializer):
@@ -200,14 +190,12 @@ class IllDefinedCompoundSerializer(BaseCompoundSerializer):
 
     query_structure_type = QueryStructureTypeSerializer
 
-    class Meta:
+    class Meta(BaseCompoundSerializer.Meta):
         model = IllDefinedCompound
-        fields = [
+        fields = BaseCompoundSerializer.Meta.fields + [
             "cid",
             "mrvfile",
             "query_structure_type",
-            "qc_note",
-            "replaced_by",
             "substance",
         ]
         extra_kwargs = {

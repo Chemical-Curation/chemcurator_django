@@ -62,6 +62,10 @@ def test_definedcompound_detail_attrs(
     response = view(request)
     attrs = response.data["results"].pop()
     assert list(attrs.keys()) == [
+        "created_at",
+        "created_by",
+        "updated_at",
+        "updated_by",
         "cid",
         "inchikey",
         "molfile_v3000",
@@ -75,6 +79,10 @@ def test_definedcompound_detail_attrs(
     response = view(request, pk=compound.pk)
     attrs = response.data
     assert list(attrs.keys()) == [
+        "created_at",
+        "created_by",
+        "updated_at",
+        "updated_by",
         "cid",
         "inchikey",
         "molfile_v3000",
@@ -172,6 +180,7 @@ def test_definedcompound_admin_user(admin_user, client, defined_compound_factory
         {"data": {"type": "definedCompound", "attributes": dc.initial_data}},
     )
     assert response.status_code == 201
+    assert response.data["created_by"]["id"] == str(admin_user.pk)
     dc.initial_data.pop("cid")
     response = client.post(
         "/definedCompounds",
@@ -195,6 +204,42 @@ def test_definedcompound_admin_user(admin_user, client, defined_compound_factory
     assert (
         str(response.data[0]["detail"])
         == "You do not have permission to perform this action."
+    )
+
+
+@pytest.mark.django_db
+def test_defined_compound_has_common_info(
+    admin_user, client, defined_compound_factory, user
+):
+    client.force_authenticate(user=admin_user)
+    dc = defined_compound_factory.build()
+    response = client.post(
+        "/definedCompounds",
+        {"data": {"type": "definedCompound", "attributes": dc.initial_data}},
+    )
+
+    assert response.status_code == 201
+    assert response.data.get("created_at")
+    assert response.data.get("updated_at")
+    assert response.data["created_by"]["id"] == str(admin_user.pk)
+    assert response.data["updated_by"]["id"] == str(admin_user.pk)
+
+    # Logout (this prevents errors with is_admin on requests)
+    client.force_authenticate()
+    # Load data for id
+    full_response_data = json.loads(response.content)["data"]
+    # Assert related fields work
+    assert (
+        client.get(
+            full_response_data["relationships"]["createdBy"]["links"]["related"]
+        ).status_code
+        == 200
+    )
+    assert (
+        client.get(
+            full_response_data["relationships"]["updatedBy"]["links"]["related"]
+        ).status_code
+        == 200
     )
 
 

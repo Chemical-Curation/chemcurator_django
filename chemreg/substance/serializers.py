@@ -4,12 +4,11 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.validators import RegexValidator
 from rest_framework.exceptions import ValidationError
 
-from chemreg.common.serializers import ControlledVocabSerializer
+from chemreg.common.serializers import CommonInfoSerializer, ControlledVocabSerializer
 from chemreg.common.validators import validate_casrn_checksum
 from chemreg.compound.models import BaseCompound
 from chemreg.compound.serializers import CompoundSerializer
 from chemreg.jsonapi.relations import PolymorphicResourceRelatedField
-from chemreg.jsonapi.serializers import HyperlinkedModelSerializer
 from chemreg.substance.models import (
     QCLevelsType,
     RelationshipType,
@@ -144,14 +143,17 @@ class SubstanceTypeSerializer(ControlledVocabSerializer):
         model = SubstanceType
 
 
-class SubstanceSerializer(HyperlinkedModelSerializer):
+class SubstanceSerializer(CommonInfoSerializer):
     """The serializer for Substances."""
 
     included_serializers = {
-        "source": "chemreg.substance.serializers.SourceSerializer",
-        "substance_type": "chemreg.substance.serializers.SubstanceTypeSerializer",
-        "qc_level": "chemreg.substance.serializers.QCLevelsTypeSerializer",
-        "associated_compound": "chemreg.compound.serializers.CompoundSerializer",
+        **CommonInfoSerializer.included_serializers,
+        **{
+            "source": "chemreg.substance.serializers.SourceSerializer",
+            "substance_type": "chemreg.substance.serializers.SubstanceTypeSerializer",
+            "qc_level": "chemreg.substance.serializers.QCLevelsTypeSerializer",
+            "associated_compound": "chemreg.compound.serializers.CompoundSerializer",
+        },
     }
 
     source = SourceSerializer
@@ -164,9 +166,9 @@ class SubstanceSerializer(HyperlinkedModelSerializer):
         allow_null=True,
     )
 
-    class Meta:
+    class Meta(CommonInfoSerializer.Meta):
         model = Substance
-        fields = [
+        fields = CommonInfoSerializer.Meta.fields + [
             "sid",
             "preferred_name",
             "display_name",
@@ -248,7 +250,7 @@ class SynonymQualitySerializer(ControlledVocabSerializer):
         return value
 
 
-class SynonymSerializer(HyperlinkedModelSerializer):
+class SynonymSerializer(CommonInfoSerializer):
     """The serializer for Synonyms."""
 
     source = SourceSerializer
@@ -256,9 +258,9 @@ class SynonymSerializer(HyperlinkedModelSerializer):
     synonym_quality = SynonymQualitySerializer
     synonym_type = SynonymTypeSerializer
 
-    class Meta:
+    class Meta(CommonInfoSerializer.Meta):
         model = Synonym
-        fields = [
+        fields = CommonInfoSerializer.Meta.fields + [
             "identifier",
             "qc_notes",
             "source",
@@ -301,7 +303,7 @@ class SynonymSerializer(HyperlinkedModelSerializer):
         return data
 
 
-class SubstanceRelationshipSerializer(HyperlinkedModelSerializer):
+class SubstanceRelationshipSerializer(CommonInfoSerializer):
     """The serializer for Substance Relationships."""
 
     from_substance = SubstanceSerializer
@@ -309,9 +311,9 @@ class SubstanceRelationshipSerializer(HyperlinkedModelSerializer):
     source = SourceSerializer
     relationship_type = RelationshipTypeSerializer
 
-    class Meta:
+    class Meta(CommonInfoSerializer.Meta):
         model = SubstanceRelationship
-        fields = [
+        fields = CommonInfoSerializer.Meta.fields + [
             "from_substance",
             "to_substance",
             "source",
