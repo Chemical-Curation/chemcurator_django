@@ -74,9 +74,13 @@ def test_lists_html_fields(list_factory):
     unsanitized_html = '<script>func</script>Foobar<a href="https://www.google.com/">'
     sanitized_html = 'Foobar<a href="https://www.google.com/"></a>'
 
-    m = list_factory(
+    m = list_factory.build(
         long_description=unsanitized_html, short_description=unsanitized_html
-    ).instance
+    )
 
-    assert m.long_description == sanitized_html
-    assert m.short_description == sanitized_html
+    assert not m.is_valid()
+    assert m.errors
+
+    # 0 is the index of the string in the error detail tuple.
+    assert sanitized_html in m.errors["short_description"][0]
+    assert sanitized_html in m.errors["long_description"][0]

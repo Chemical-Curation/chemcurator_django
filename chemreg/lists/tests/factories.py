@@ -52,8 +52,8 @@ class ListFactory(DjangoSerializerFactory):
 
     name = factory.Sequence(lambda n: f"{factory.Faker('slug').generate()}-{n}")
     label = factory.Faker("text", max_nb_chars=255)
-    short_description = factory.Faker("text", max_nb_chars=1000)
-    long_description = factory.Faker("text")
+    short_description = factory.Faker("sentence")
+    long_description = factory.Faker("sentence")
     source_url = factory.Faker("text", max_nb_chars=500)
     source_reference = factory.Faker("text", max_nb_chars=500)
     source_doi = factory.Faker("text", max_nb_chars=500)

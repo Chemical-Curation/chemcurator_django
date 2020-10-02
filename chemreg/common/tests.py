@@ -1,5 +1,6 @@
 from random import randint
 
+from django.core.exceptions import ValidationError as CoreValidationError
 from django.db import models
 from rest_framework.exceptions import ValidationError
 
@@ -113,31 +114,16 @@ def test_htmltextfield():
     class HTMLTextModel(models.Model):
         field = HTMLTextField(sanitizer_type="default")
 
-        def pre_save(self):
-            """Perform pre_save validations
-
-            pre_save validation is typically called before saving.  As we
-            do not have a migration for this anonymous model it makes more
-            sense to simply call the function responsible for making the
-            data ready to be saved
-
-            Note:
-                This only pre_saves the HTMLTextField"""
-            f = [
-                f
-                for f in self._meta.local_concrete_fields
-                if isinstance(f, HTMLTextField)
-            ][0]
-            f.pre_save(self, False)
-
     m = HTMLTextModel()
     m.field = '<script>evil()</script><b>foo</b><em>bar</em><a href="http://www.google.com/">Link'
-    m.pre_save()
 
-    assert (
-        m.field
-        == '<strong>foo</strong><em>bar</em><a href="http://www.google.com/">Link</a>'
-    )
+    with pytest.raises(CoreValidationError) as excinfo:
+        m.full_clean()
+
+    # Assert that this field is invalid for 1 reason and that the response
+    # contains the string "Invalid HTML"
+    assert len(excinfo.value.message_dict["field"]) == 1
+    assert "Invalid HTML" in excinfo.value.message_dict["field"][0]
 
 
 def controlled_vocabulary_test_helper(model):

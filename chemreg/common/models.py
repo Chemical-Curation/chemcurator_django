@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -76,6 +77,7 @@ class HTMLTextField(models.TextField):
         """
         self.sanitizer_type = sanitizer_type
         self.sanitizer = get_sanitizer(name=sanitizer_type)
+        self.default_validators = [self.validate_html]
         super().__init__(**kwargs)
 
     def deconstruct(self):
@@ -100,12 +102,24 @@ class HTMLTextField(models.TextField):
         """
         return "TextField"
 
-    def pre_save(self, model_instance, add):
-        """Prepares and Sanitizes the inputted HTML for store
+    def validate_html(self, value):
+        """Validates HTML is sanitized.
+
+        Args:
+            value (str): HTML string to be validated
 
         Returns:
-            Sanitized HTML string.
+            Validated HTML
+
+        Raises:
+            ValidationError: Raises if the provided HTML is invalid.
+                The error message contains the assumed "correct" html.
         """
-        value = self.sanitizer.sanitize(getattr(model_instance, self.attname))
-        setattr(model_instance, self.attname, value)
+        sanitized_html = self.sanitizer.sanitize(value)
+
+        if value != sanitized_html:
+            raise ValidationError(
+                f"Invalid HTML.  Perhaps you meant '{sanitized_html}'"
+            )
+
         return value
