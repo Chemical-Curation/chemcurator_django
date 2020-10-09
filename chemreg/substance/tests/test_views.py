@@ -929,3 +929,56 @@ def test_is_restrictive_on_synonyms(
         resp.data[0]["detail"]
         == "Synonyms associated with this SynonymQuality do not meet uniqueness constraints. ['1234567-89-5']"
     )
+
+
+@pytest.mark.django_db
+def test_name_validation_bug_236(
+    client, admin_user, synonym_factory, synonym_quality_factory
+):
+    """ This test verifies that a restrictive synonymQuality can be PATCH'd
+    over another restrictive synonymQuality on the same synonym without an error
+    that was being thrown from the same synonym's identifier being included in
+    the set of restrictive fields. Bug is in issue #236.
+    """
+
+    restricted1 = synonym_quality_factory.create(is_restrictive=True).instance
+    restricted2 = synonym_quality_factory.create(is_restrictive=True).instance
+    synonym = synonym_factory.create(
+        identifier="foobar",
+        synonym_quality={"type": "synonymQuality", "id": restricted1.pk},
+    ).instance
+    client.force_authenticate(user=admin_user)
+
+    # Assert same synonym quality can be patched
+    resp = client.patch(
+        f"/synonyms/{synonym.pk}",
+        {
+            "data": {
+                "id": synonym.pk,
+                "type": "synonym",
+                "relationships": {
+                    "synonymQuality": {
+                        "data": {"id": restricted1.pk, "type": "synonymQuality"}
+                    }
+                },
+            }
+        },
+    )
+    assert resp.status_code == 200
+
+    # Assert different synonym quality can be patched
+    resp = client.patch(
+        f"/synonyms/{synonym.pk}",
+        {
+            "data": {
+                "id": synonym.pk,
+                "type": "synonym",
+                "relationships": {
+                    "synonymQuality": {
+                        "data": {"id": restricted2.pk, "type": "synonymQuality"}
+                    }
+                },
+            }
+        },
+    )
+    assert resp.status_code == 200

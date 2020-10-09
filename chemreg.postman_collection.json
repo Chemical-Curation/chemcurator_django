@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "d6fae536-1588-4916-9a0b-f9be3889dc05",
+		"_postman_id": "d64f5275-b471-42ac-9bfc-37ab264d0412",
 		"name": "chemreg",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -5955,6 +5955,717 @@
 						}
 					},
 					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "145-bug",
+			"item": [
+				{
+					"name": "02 Add resource w/ restricted quality",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "karyn",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "specialP@55word",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"Foobar\",\n            \"qc_notes\": \"qc note\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 3,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 2,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/synonyms",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"synonyms"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Method Not Allowed",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"<string>\",\n            \"qc_notes\": \"<string>\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/synonyms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"synonyms"
+									]
+								}
+							},
+							"status": "Method Not Allowed",
+							"code": 405,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"errors\": [\n  {\n   \"code\": \"method_not_allowed\",\n   \"detail\": \"Method \\\"{method}\\\" not allowed.\",\n   \"status\": \"405\"\n  },\n  {\n   \"code\": \"method_not_allowed\",\n   \"detail\": \"Method \\\"{method}\\\" not allowed.\",\n   \"status\": \"405\"\n  }\n ]\n}"
+						},
+						{
+							"name": "Unsupported Media Type",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"<string>\",\n            \"qc_notes\": \"<string>\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/synonyms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"synonyms"
+									]
+								}
+							},
+							"status": "Unsupported Media Type",
+							"code": 415,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"errors\": [\n  {\n   \"code\": \"unsupported_media_type\",\n   \"detail\": \"Unsupported media type \\\"{media_type}\\\" in request.\",\n   \"status\": \"415\"\n  },\n  {\n   \"code\": \"unsupported_media_type\",\n   \"detail\": \"Unsupported media type \\\"{media_type}\\\" in request.\",\n   \"status\": \"415\"\n  }\n ]\n}"
+						},
+						{
+							"name": "Not Found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"<string>\",\n            \"qc_notes\": \"<string>\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/synonyms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"synonyms"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"errors\": [\n  {\n   \"code\": \"not_found\",\n   \"detail\": \"Not found.\",\n   \"status\": \"404\"\n  },\n  {\n   \"code\": \"not_found\",\n   \"detail\": \"Not found.\",\n   \"status\": \"404\"\n  }\n ]\n}"
+						},
+						{
+							"name": "Forbidden",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"<string>\",\n            \"qc_notes\": \"<string>\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/synonyms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"synonyms"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"errors\": [\n  {\n   \"code\": \"not_authenticated\",\n   \"detail\": \"Authentication credentials were not provided.\",\n   \"status\": \"403\"\n  },\n  {\n   \"code\": \"not_authenticated\",\n   \"detail\": \"Authentication credentials were not provided.\",\n   \"status\": \"403\"\n  }\n ]\n}"
+						},
+						{
+							"name": "Server Error",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"<string>\",\n            \"qc_notes\": \"<string>\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/synonyms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"synonyms"
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"errors\": [\n  {\n   \"code\": \"throttled\",\n   \"detail\": \"Server Error (500)\",\n   \"status\": \"500\"\n  },\n  {\n   \"code\": \"throttled\",\n   \"detail\": \"Server Error (500)\",\n   \"status\": \"500\"\n  }\n ]\n}"
+						},
+						{
+							"name": "Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"<string>\",\n            \"qc_notes\": \"<string>\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/synonyms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"synonyms"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"links\": {\n  \"first\": \"http://127.0.0.1:8000/synonyms?page[number]=1\",\n  \"last\": \"http://127.0.0.1:8000/synonyms?page[number]=5\",\n  \"prev\": \"http://127.0.0.1:8000/synonyms?page[number]=2\",\n  \"next\": \"http://127.0.0.1:8000/synonyms?page[number]=4\"\n },\n \"data\": [\n  {\n   \"type\": \"synonym\",\n   \"id\": \"1\",\n   \"attributes\": {\n    \"identifier\": \"ulla\",\n    \"qc_notes\": \"veli\"\n   },\n   \"links\": {\n    \"self\": \"http://127.0.0.1:8000/synonyms/1\"\n   },\n   \"relationships\": {\n    \"source\": {\n     \"data\": {\n      \"type\": \"source\",\n      \"id\": \"1\"\n     },\n     \"links\": {\n      \"self\": \"http://127.0.0.1:8000/synonyms/1/source\",\n      \"related\": \"http://127.0.0.1:8000/synonyms/1/relationships/source\"\n     }\n    },\n    \"substance\": {\n     \"data\": {\n      \"type\": \"substance\",\n      \"id\": \"1\"\n     },\n     \"links\": {\n      \"self\": \"http://127.0.0.1:8000/synonyms/1/substance\",\n      \"related\": \"http://127.0.0.1:8000/synonyms/1/relationships/substance\"\n     }\n    },\n    \"synonymQuality\": {\n     \"data\": {\n      \"type\": \"synonymQuality\",\n      \"id\": \"1\"\n     },\n     \"links\": {\n      \"self\": \"http://127.0.0.1:8000/synonyms/1/synonymQuality\",\n      \"related\": \"http://127.0.0.1:8000/synonyms/1/relationships/synonymQuality\"\n     }\n    },\n    \"synonymType\": {\n     \"data\": {\n      \"type\": \"synonymType\",\n      \"id\": \"1\"\n     },\n     \"links\": {\n      \"self\": \"http://127.0.0.1:8000/synonyms/1/synonymType\",\n      \"related\": \"http://127.0.0.1:8000/synonyms/1/relationships/synonymType\"\n     }\n    }\n   }\n  },\n  {\n   \"type\": \"synonym\",\n   \"id\": \"1\",\n   \"attributes\": {\n    \"identifier\": \"Duis\",\n    \"qc_notes\": \"aliq\"\n   },\n   \"links\": {\n    \"self\": \"http://127.0.0.1:8000/synonyms/1\"\n   },\n   \"relationships\": {\n    \"source\": {\n     \"data\": {\n      \"type\": \"source\",\n      \"id\": \"1\"\n     },\n     \"links\": {\n      \"self\": \"http://127.0.0.1:8000/synonyms/1/source\",\n      \"related\": \"http://127.0.0.1:8000/synonyms/1/relationships/source\"\n     }\n    },\n    \"substance\": {\n     \"data\": {\n      \"type\": \"substance\",\n      \"id\": \"1\"\n     },\n     \"links\": {\n      \"self\": \"http://127.0.0.1:8000/synonyms/1/substance\",\n      \"related\": \"http://127.0.0.1:8000/synonyms/1/relationships/substance\"\n     }\n    },\n    \"synonymQuality\": {\n     \"data\": {\n      \"type\": \"synonymQuality\",\n      \"id\": \"1\"\n     },\n     \"links\": {\n      \"self\": \"http://127.0.0.1:8000/synonyms/1/synonymQuality\",\n      \"related\": \"http://127.0.0.1:8000/synonyms/1/relationships/synonymQuality\"\n     }\n    },\n    \"synonymType\": {\n     \"data\": {\n      \"type\": \"synonymType\",\n      \"id\": \"1\"\n     },\n     \"links\": {\n      \"self\": \"http://127.0.0.1:8000/synonyms/1/synonymType\",\n      \"related\": \"http://127.0.0.1:8000/synonyms/1/relationships/synonymType\"\n     }\n    }\n   }\n  }\n ],\n \"meta\": {\n  \"apiVersion\": \"1.0.0-beta\",\n  \"pagination\": {\n   \"page\": 3,\n   \"pages\": 5,\n   \"count\": 100\n  }\n },\n \"included\": [\n  \"schema type not provided\",\n  \"schema type not provided\"\n ]\n}"
+						},
+						{
+							"name": "Bad Request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"<string>\",\n            \"qc_notes\": \"<string>\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/synonyms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"synonyms"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"errors\": [\n  {\n   \"detail\": \"Bad Request (400)\",\n   \"status\": \"400\"\n  },\n  {\n   \"detail\": \"Bad Request (400)\",\n   \"status\": \"400\"\n  }\n ]\n}"
+						},
+						{
+							"name": "Unauthorized",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"<string>\",\n            \"qc_notes\": \"<string>\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/synonyms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"synonyms"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"errors\": [\n  {\n   \"code\": \"authentication_failed\",\n   \"detail\": \"Incorrect authentication credentials.\",\n   \"status\": \"401\"\n  },\n  {\n   \"code\": \"authentication_failed\",\n   \"detail\": \"Incorrect authentication credentials.\",\n   \"status\": \"401\"\n  }\n ]\n}"
+						},
+						{
+							"name": "Not Acceptable",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"<string>\",\n            \"qc_notes\": \"<string>\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/synonyms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"synonyms"
+									]
+								}
+							},
+							"status": "Not Acceptable",
+							"code": 406,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"errors\": [\n  {\n   \"code\": \"not_acceptable\",\n   \"detail\": \"Could not satisfy the request Accept header.\",\n   \"status\": \"406\"\n  },\n  {\n   \"code\": \"not_acceptable\",\n   \"detail\": \"Could not satisfy the request Accept header.\",\n   \"status\": \"406\"\n  }\n ]\n}"
+						},
+						{
+							"name": "Too Many Requests",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"<string>\",\n            \"qc_notes\": \"<string>\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/synonyms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"synonyms"
+									]
+								}
+							},
+							"status": "Too Many Requests",
+							"code": 429,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"errors\": [\n  {\n   \"code\": \"throttled\",\n   \"detail\": \"Request was throttled.\",\n   \"status\": \"429\"\n  },\n  {\n   \"code\": \"throttled\",\n   \"detail\": \"Request was throttled.\",\n   \"status\": \"429\"\n  }\n ]\n}"
+						}
+					]
+				},
+				{
+					"name": "03 Patch resource w/ another restricted quality",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "username",
+									"value": "karyn",
+									"type": "string"
+								},
+								{
+									"key": "password",
+									"value": "specialP@55word",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"id\": 11,\n        \"relationships\": {\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 8,\n                    \"type\": \"synonymQuality\"\n                }\n            }\n        }\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/synonyms/11",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"synonyms",
+								"11"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Bad Request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"<string>\",\n            \"qc_notes\": \"<string>\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/synonyms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"synonyms"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"errors\": [\n  {\n   \"detail\": \"Bad Request (400)\",\n   \"status\": \"400\"\n  },\n  {\n   \"detail\": \"Bad Request (400)\",\n   \"status\": \"400\"\n  }\n ]\n}"
+						},
+						{
+							"name": "Unsupported Media Type",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"<string>\",\n            \"qc_notes\": \"<string>\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/synonyms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"synonyms"
+									]
+								}
+							},
+							"status": "Unsupported Media Type",
+							"code": 415,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"errors\": [\n  {\n   \"code\": \"unsupported_media_type\",\n   \"detail\": \"Unsupported media type \\\"{media_type}\\\" in request.\",\n   \"status\": \"415\"\n  },\n  {\n   \"code\": \"unsupported_media_type\",\n   \"detail\": \"Unsupported media type \\\"{media_type}\\\" in request.\",\n   \"status\": \"415\"\n  }\n ]\n}"
+						},
+						{
+							"name": "Forbidden",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"<string>\",\n            \"qc_notes\": \"<string>\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/synonyms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"synonyms"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"errors\": [\n  {\n   \"code\": \"not_authenticated\",\n   \"detail\": \"Authentication credentials were not provided.\",\n   \"status\": \"403\"\n  },\n  {\n   \"code\": \"not_authenticated\",\n   \"detail\": \"Authentication credentials were not provided.\",\n   \"status\": \"403\"\n  }\n ]\n}"
+						},
+						{
+							"name": "Too Many Requests",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"<string>\",\n            \"qc_notes\": \"<string>\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/synonyms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"synonyms"
+									]
+								}
+							},
+							"status": "Too Many Requests",
+							"code": 429,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"errors\": [\n  {\n   \"code\": \"throttled\",\n   \"detail\": \"Request was throttled.\",\n   \"status\": \"429\"\n  },\n  {\n   \"code\": \"throttled\",\n   \"detail\": \"Request was throttled.\",\n   \"status\": \"429\"\n  }\n ]\n}"
+						},
+						{
+							"name": "Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"<string>\",\n            \"qc_notes\": \"<string>\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/synonyms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"synonyms"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"links\": {\n  \"first\": \"http://127.0.0.1:8000/synonyms?page[number]=1\",\n  \"last\": \"http://127.0.0.1:8000/synonyms?page[number]=5\",\n  \"prev\": \"http://127.0.0.1:8000/synonyms?page[number]=2\",\n  \"next\": \"http://127.0.0.1:8000/synonyms?page[number]=4\"\n },\n \"data\": [\n  {\n   \"type\": \"synonym\",\n   \"id\": \"1\",\n   \"attributes\": {\n    \"identifier\": \"ulla\",\n    \"qc_notes\": \"veli\"\n   },\n   \"links\": {\n    \"self\": \"http://127.0.0.1:8000/synonyms/1\"\n   },\n   \"relationships\": {\n    \"source\": {\n     \"data\": {\n      \"type\": \"source\",\n      \"id\": \"1\"\n     },\n     \"links\": {\n      \"self\": \"http://127.0.0.1:8000/synonyms/1/source\",\n      \"related\": \"http://127.0.0.1:8000/synonyms/1/relationships/source\"\n     }\n    },\n    \"substance\": {\n     \"data\": {\n      \"type\": \"substance\",\n      \"id\": \"1\"\n     },\n     \"links\": {\n      \"self\": \"http://127.0.0.1:8000/synonyms/1/substance\",\n      \"related\": \"http://127.0.0.1:8000/synonyms/1/relationships/substance\"\n     }\n    },\n    \"synonymQuality\": {\n     \"data\": {\n      \"type\": \"synonymQuality\",\n      \"id\": \"1\"\n     },\n     \"links\": {\n      \"self\": \"http://127.0.0.1:8000/synonyms/1/synonymQuality\",\n      \"related\": \"http://127.0.0.1:8000/synonyms/1/relationships/synonymQuality\"\n     }\n    },\n    \"synonymType\": {\n     \"data\": {\n      \"type\": \"synonymType\",\n      \"id\": \"1\"\n     },\n     \"links\": {\n      \"self\": \"http://127.0.0.1:8000/synonyms/1/synonymType\",\n      \"related\": \"http://127.0.0.1:8000/synonyms/1/relationships/synonymType\"\n     }\n    }\n   }\n  },\n  {\n   \"type\": \"synonym\",\n   \"id\": \"1\",\n   \"attributes\": {\n    \"identifier\": \"Duis\",\n    \"qc_notes\": \"aliq\"\n   },\n   \"links\": {\n    \"self\": \"http://127.0.0.1:8000/synonyms/1\"\n   },\n   \"relationships\": {\n    \"source\": {\n     \"data\": {\n      \"type\": \"source\",\n      \"id\": \"1\"\n     },\n     \"links\": {\n      \"self\": \"http://127.0.0.1:8000/synonyms/1/source\",\n      \"related\": \"http://127.0.0.1:8000/synonyms/1/relationships/source\"\n     }\n    },\n    \"substance\": {\n     \"data\": {\n      \"type\": \"substance\",\n      \"id\": \"1\"\n     },\n     \"links\": {\n      \"self\": \"http://127.0.0.1:8000/synonyms/1/substance\",\n      \"related\": \"http://127.0.0.1:8000/synonyms/1/relationships/substance\"\n     }\n    },\n    \"synonymQuality\": {\n     \"data\": {\n      \"type\": \"synonymQuality\",\n      \"id\": \"1\"\n     },\n     \"links\": {\n      \"self\": \"http://127.0.0.1:8000/synonyms/1/synonymQuality\",\n      \"related\": \"http://127.0.0.1:8000/synonyms/1/relationships/synonymQuality\"\n     }\n    },\n    \"synonymType\": {\n     \"data\": {\n      \"type\": \"synonymType\",\n      \"id\": \"1\"\n     },\n     \"links\": {\n      \"self\": \"http://127.0.0.1:8000/synonyms/1/synonymType\",\n      \"related\": \"http://127.0.0.1:8000/synonyms/1/relationships/synonymType\"\n     }\n    }\n   }\n  }\n ],\n \"meta\": {\n  \"apiVersion\": \"1.0.0-beta\",\n  \"pagination\": {\n   \"page\": 3,\n   \"pages\": 5,\n   \"count\": 100\n  }\n },\n \"included\": [\n  \"schema type not provided\",\n  \"schema type not provided\"\n ]\n}"
+						},
+						{
+							"name": "Not Found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"<string>\",\n            \"qc_notes\": \"<string>\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/synonyms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"synonyms"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"errors\": [\n  {\n   \"code\": \"not_found\",\n   \"detail\": \"Not found.\",\n   \"status\": \"404\"\n  },\n  {\n   \"code\": \"not_found\",\n   \"detail\": \"Not found.\",\n   \"status\": \"404\"\n  }\n ]\n}"
+						},
+						{
+							"name": "Not Acceptable",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"<string>\",\n            \"qc_notes\": \"<string>\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/synonyms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"synonyms"
+									]
+								}
+							},
+							"status": "Not Acceptable",
+							"code": 406,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"errors\": [\n  {\n   \"code\": \"not_acceptable\",\n   \"detail\": \"Could not satisfy the request Accept header.\",\n   \"status\": \"406\"\n  },\n  {\n   \"code\": \"not_acceptable\",\n   \"detail\": \"Could not satisfy the request Accept header.\",\n   \"status\": \"406\"\n  }\n ]\n}"
+						},
+						{
+							"name": "Method Not Allowed",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"<string>\",\n            \"qc_notes\": \"<string>\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/synonyms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"synonyms"
+									]
+								}
+							},
+							"status": "Method Not Allowed",
+							"code": 405,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"errors\": [\n  {\n   \"code\": \"method_not_allowed\",\n   \"detail\": \"Method \\\"{method}\\\" not allowed.\",\n   \"status\": \"405\"\n  },\n  {\n   \"code\": \"method_not_allowed\",\n   \"detail\": \"Method \\\"{method}\\\" not allowed.\",\n   \"status\": \"405\"\n  }\n ]\n}"
+						},
+						{
+							"name": "Server Error",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"<string>\",\n            \"qc_notes\": \"<string>\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/synonyms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"synonyms"
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"errors\": [\n  {\n   \"code\": \"throttled\",\n   \"detail\": \"Server Error (500)\",\n   \"status\": \"500\"\n  },\n  {\n   \"code\": \"throttled\",\n   \"detail\": \"Server Error (500)\",\n   \"status\": \"500\"\n  }\n ]\n}"
+						},
+						{
+							"name": "Unauthorized",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"data\": {\n        \"type\": \"synonym\",\n        \"attributes\": {\n            \"identifier\": \"<string>\",\n            \"qc_notes\": \"<string>\"\n        },\n        \"relationships\": {\n            \"source\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"source\"\n                }\n            },\n            \"substance\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"substance\"\n                }\n            },\n            \"synonymQuality\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymQuality\"\n                }\n            },\n            \"synonymType\": {\n                \"data\": {\n                    \"id\": 1,\n                    \"type\": \"synonymType\"\n                }\n            }\n        }\n    }\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/synonyms",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"synonyms"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/vnd.api+json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n \"errors\": [\n  {\n   \"code\": \"authentication_failed\",\n   \"detail\": \"Incorrect authentication credentials.\",\n   \"status\": \"401\"\n  },\n  {\n   \"code\": \"authentication_failed\",\n   \"detail\": \"Incorrect authentication credentials.\",\n   \"status\": \"401\"\n  }\n ]\n}"
+						}
+					]
 				}
 			],
 			"protocolProfileBehavior": {}

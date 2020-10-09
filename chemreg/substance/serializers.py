@@ -292,8 +292,9 @@ class SynonymSerializer(CommonInfoSerializer):
             validate_casrn_checksum(data["identifier"])
 
         identifier = data.get("identifier", None) or self.instance.identifier
-        restricted_identifiers = Synonym.objects.restricted().filter(
-            identifier=identifier
+        pk = self.instance.pk if self.instance else None
+        restricted_identifiers = (
+            Synonym.objects.restricted().exclude(id=pk).filter(identifier=identifier)
         )
         restricted_substance_fields = Substance.objects.restrictive_fields(identifier)
         if set(chain(restricted_identifiers, restricted_substance_fields)):
