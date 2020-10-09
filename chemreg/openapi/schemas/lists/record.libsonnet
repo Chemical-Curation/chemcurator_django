@@ -44,5 +44,22 @@ local substance = import 'substance/substance.libsonnet';
       many: false,
       default: 1,
     },
+    {
+      object: {
+        app: 'Lists',
+        type: 'identifiers',
+        description: 'Everything about Record Identifiers.',
+        typePlural: 'identifers',
+        hasRelationships: false,
+        attributes: {
+          none: {
+            type: 'null',
+          }
+        },
+      },
+      many: true,
+      required: false,
+      default: 1,
+    },
   ]
 } 
