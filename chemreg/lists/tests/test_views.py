@@ -273,9 +273,25 @@ def test_record_get(client, admin_user, record_factory):
         assert "external_id" in result
         assert "list" in result
         assert "substance" in result
+        assert "identifiers" in result
         assert "score" in result
         assert "message" in result
         assert "is_validated" in result
+
+
+@pytest.mark.django_db
+def test_record_get_included(
+    client, admin_user, record_factory, record_identifier_factory
+):
+    client.force_authenticate(user=admin_user)
+
+    rec = record_factory().instance
+    record_identifier_factory(record={"type": "record", "id": rec.pk})
+
+    resp = client.get("/records", {"include": "identifiers,list,substance,createdBy"})
+    assert resp.status_code == 200
+    # Check that all results contain
+    assert "included" in resp.json()
 
 
 @pytest.mark.django_db

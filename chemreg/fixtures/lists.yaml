@@ -201,3 +201,25 @@
     is_validated: false
     list: 2
     substance: 2
+- model: lists.recordidentifier
+  pk: 1
+  fields:
+    created_at: 2020-10-08 16:18:50.297711
+    created_by: null
+    updated_at: 2020-10-08 16:18:50.297791
+    updated_by: null
+    record_id: 21
+    identifier: 'This is an identifier'
+    identifier_label: 'This is an identifier'
+    identifier_type_id: null
+- model: lists.recordidentifier
+  pk: 2
+  fields:
+    created_at: 2020-10-08 16:18:50.297711
+    created_by: null
+    updated_at: 2020-10-08 16:18:50.297791
+    updated_by: null
+    record_id: 21
+    identifier: 'This is an extra identifier'
+    identifier_label: 'This is an extra identifier'
+    identifier_type_id: null

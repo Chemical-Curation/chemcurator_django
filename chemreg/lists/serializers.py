@@ -77,8 +77,12 @@ class ListSerializer(CommonInfoSerializer):
 class RecordSerializer(CommonInfoSerializer):
     """The serializer for Records."""
 
-    list = ListSerializer
-    substance = SubstanceSerializer
+    included_serializers = {
+        **CommonInfoSerializer.included_serializers,
+        "identifiers": "chemreg.lists.serializers.RecordIdentifierSerializer",
+        "list": ListSerializer,
+        "substance": SubstanceSerializer,
+    }
 
     class Meta(CommonInfoSerializer.Meta):
         model = Record
@@ -90,6 +94,7 @@ class RecordSerializer(CommonInfoSerializer):
             "is_validated",
             "list",
             "substance",
+            "identifiers",
         ]
         validators = [
             ExternalIdUniqueTogetherValidator(
@@ -101,6 +106,9 @@ class RecordSerializer(CommonInfoSerializer):
                 duplicate_field="rid",
             )
         ]
+        extra_kwargs = {
+            "identifiers": {"required": False},
+        }
 
 
 class RecordIdentifierSerializer(CommonInfoSerializer):
