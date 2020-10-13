@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('substance', '0007_orion_sprint'),
+        ('substance', '0008_quentin_sprint'),
     ]
 
     operations = [

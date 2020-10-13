@@ -91,6 +91,7 @@ class Substance(CommonInfo):
         max_length=255,
         unique=True,
         blank=False,
+        null=True,
         validators=[
             RegexValidator(
                 display_name_regex,

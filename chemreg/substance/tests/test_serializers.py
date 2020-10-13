@@ -466,3 +466,10 @@ def test_is_restrictive_on_synonyms(synonym_factory, synonym_quality_factory):
         syn2.errors["non_field_errors"][0]
         == "The identifier '1234567-89-5' is not unique in restrictive name fields."
     )
+
+
+@pytest.mark.django_db
+def test_substance_display_name_null(substance_factory):
+    serializer = substance_factory.build(display_name=None)
+    assert serializer.is_valid()
+    serializer.save()

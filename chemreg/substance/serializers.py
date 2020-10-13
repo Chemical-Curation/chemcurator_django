@@ -166,6 +166,12 @@ class SubstanceSerializer(CommonInfoSerializer):
         allow_null=True,
     )
 
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if not ret.get("display_name"):
+            ret["display_name"] = ret.get("preferred_name")
+        return ret
+
     class Meta(CommonInfoSerializer.Meta):
         model = Substance
         fields = CommonInfoSerializer.Meta.fields + [
@@ -183,7 +189,11 @@ class SubstanceSerializer(CommonInfoSerializer):
         ]
 
     def validate(self, data):
-        fields = ["preferred_name", "display_name", "casrn"]
+        fields = (
+            ["preferred_name", "display_name", "casrn"]
+            if data.get("display_name")
+            else ["preferred_name", "casrn"]
+        )
         field_data = [
             data.get(f)  # get values in the serializer
             for f in fields

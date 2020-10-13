@@ -982,3 +982,63 @@ def test_name_validation_bug_236(
         },
     )
     assert resp.status_code == 200
+
+
+@pytest.mark.django_db
+def test_substance_display_name_populated(client, admin_user, substance_factory):
+    """ This test verifies that when a Substance is created and the display_name is not set to
+    null, the result should not be modified and should be equal to that of the factory"""
+    client.force_authenticate(user=admin_user)
+    substance = substance_factory.create()
+    resp = client.get(f"/substances/{substance.instance.pk}")
+    assert resp.status_code == 200
+    assert resp.data["display_name"] == substance.instance.display_name
+
+
+@pytest.mark.django_db
+def test_substance_display_name_null(client, admin_user, substance_factory):
+    """ This test verifies that a Substance can be created with a null display_name.
+    display_name should be returned as the value of preferred_name"""
+    client.force_authenticate(user=admin_user)
+    substance = substance_factory.create(display_name=None)
+    resp = client.get(f"/substances/{substance.instance.pk}")
+    assert resp.status_code == 200
+    assert resp.data["display_name"] == substance.instance.preferred_name
+
+
+@pytest.mark.django_db
+def test_substance_display_name_null_post(client, admin_user, substance_factory):
+    """ This test verifies that a Substance can be created without a display_name
+    and that a valid request can be performed """
+    client.force_authenticate(user=admin_user)
+    substance = substance_factory.build(display_name=None, defined=True).initial_data
+    resp = client.post(
+        "/substances",
+        {
+            "data": {
+                "type": "substance",
+                "attributes": substance,
+                "relationships": {
+                    "qcLevel": {
+                        "data": {"id": substance["qc_level"]["id"], "type": "qcLevel"}
+                    },
+                    "source": {
+                        "data": {"id": substance["source"]["id"], "type": "source"}
+                    },
+                    "substanceType": {
+                        "data": {
+                            "id": substance["substance_type"]["id"],
+                            "type": "substanceType",
+                        }
+                    },
+                    "associatedCompound": {
+                        "data": {
+                            "id": substance["associated_compound"]["id"],
+                            "type": "definedCompound",
+                        }
+                    },
+                },
+            }
+        },
+    )
+    assert resp.status_code == 201

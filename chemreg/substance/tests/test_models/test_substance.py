@@ -22,6 +22,7 @@ def test_substance_model():
     assert Substance.display_name.field.max_length == 255
     assert Substance.display_name.field.unique
     assert not Substance.display_name.field.blank
+    assert Substance.display_name.field.null
 
     assert type(Substance.description.field) is models.CharField
     assert Substance.description.field.max_length == 1024
