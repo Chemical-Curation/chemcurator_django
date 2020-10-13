@@ -25,12 +25,15 @@ def test_substance_model():
 
     assert type(Substance.description.field) is models.CharField
     assert Substance.description.field.max_length == 1024
+    assert Substance.description.field.blank
 
     assert type(Substance.public_qc_note.field) is models.CharField
     assert Substance.public_qc_note.field.max_length == 1024
+    assert Substance.public_qc_note.field.blank
 
     assert type(Substance.private_qc_note.field) is models.CharField
     assert Substance.private_qc_note.field.max_length == 1024
+    assert Substance.private_qc_note.field.blank
 
     assert type(Substance.casrn.field) is models.CharField
     assert Substance.casrn.field.max_length == 50

@@ -59,9 +59,9 @@ class Substance(CommonInfo):
         source (foreign key): Controlled vocabulary for Sources
         substance_type (foreign key): Controlled vocabulary for Substances
         qc_level (foreign key): Controlled vocabulary for QCLevels
-        description (str): A description of the substance
-        public_qc_note (str): Note from Quality Control.  Visible to everyone
-        private_qc_note (str): Note from Quality Control.
+        description (str, optional): A description of the substance
+        public_qc_note (str, optional): Note from Quality Control.  Visible to everyone
+        private_qc_note (str, optional): Note from Quality Control.
         associated_compound (foreign key): Polymorphic relationship to Compounds.Compounds.
             Can either be either a DefinedCompound or an IllDefinedCompound
         casrn (str): CAS registry number. It is an identifier from the CAS Registry
@@ -114,9 +114,9 @@ class Substance(CommonInfo):
         null=False,
         validators=[validate_deprecated],
     )
-    description = models.CharField(max_length=1024)
-    public_qc_note = models.CharField(max_length=1024)
-    private_qc_note = models.CharField(max_length=1024)
+    description = models.CharField(max_length=1024, blank=True)
+    public_qc_note = models.CharField(max_length=1024, blank=True)
+    private_qc_note = models.CharField(max_length=1024, blank=True)
     associated_compound = models.OneToOneField(
         "compound.BaseCompound",
         on_delete=models.PROTECT,

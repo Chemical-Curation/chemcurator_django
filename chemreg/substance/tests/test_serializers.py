@@ -58,6 +58,14 @@ def test_substance_serializer():
 
 
 @pytest.mark.django_db
+def test_substance_blankable_fields(substance_factory):
+    substance = substance_factory.build(
+        description="", public_qc_note="", private_qc_note=""
+    )
+    assert substance.is_valid()
+
+
+@pytest.mark.django_db
 def test_substance_serializer_includes():
     serializer = get_included_serializers(SubstanceSerializer)
     assert serializer["source"] is SourceSerializer
