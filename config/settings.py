@@ -11,8 +11,6 @@ env = environ.Env(
     COMPOUND_PREFIX=(str, ""),
     DATABASE_URL=(str, "sqlite:///.sqlite3"),
     DEBUG=(bool, True),
-    RESOLUTION_URL=(str, ""),
-    RESOLUTION_SUBSTANCE_URI=(str, ""),
     SESSION_COOKIE_AGE=(int, 900),
     SECRET_KEY=(str, "secret"),
     URL_CONF=(str, "api"),
@@ -64,7 +62,6 @@ INSTALLED_APPS = [
     "chemreg.compound.apps.CompoundConfig",
     "chemreg.lists.apps.ListsConfig",
     "chemreg.openapi.apps.OpenAPIConfig",
-    "chemreg.resolution.apps.ResolutionConfig",
     "chemreg.substance.apps.SubstanceConfig",
     "chemreg.users.apps.UsersConfig",
     "chemreg.utils.apps.UtilsConfig",
@@ -84,8 +81,6 @@ MIDDLEWARE = [
     "crum.CurrentRequestUserMiddleware",
     "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
-RESOLUTION_URL = env("RESOLUTION_URL")
-RESOLUTION_SUBSTANCE_URI = env("RESOLUTION_SUBSTANCE_URI")
 ROOT_URLCONF = "config.urls." + env("URL_CONF")
 SECRET_KEY = env("SECRET_KEY")
 TEMPLATES = [
