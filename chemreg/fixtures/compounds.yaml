@@ -5,7 +5,7 @@
     created_at: 2020-06-02 23:38:04.578229
     created_by: 1
     updated_at: 2020-06-02 23:38:04.578250
-    updated_by: null
+    updated_by: 1
     cid: DTXCID302000003
     structure: "\n  -INDIGO-06022023382D\n\n  0  0  0  0  0  0  0  0  0  0  0 V3000\n\
       M  V30 BEGIN CTAB\nM  V30 COUNTS 26 28 0 0 0\nM  V30 BEGIN ATOM\nM  V30 1 O\
@@ -38,7 +38,7 @@
     created_at: 2020-06-18 02:41:57.241921
     created_by: 1
     updated_at: 2020-06-18 02:41:57.241957
-    updated_by: null
+    updated_by: 1
     cid: DTXCID502000009
     structure: <cml><MDocument><MChemicalStruct><molecule><atomArray><atom id='a0'
       elementType='C' /><atom id='a1' elementType='H' /><atom id='a2' elementType='H'
@@ -458,9 +458,9 @@
   pk: 1
   fields:
     created_at: 2020-06-02 21:20:33.612984
-    created_by: null
+    created_by: 1
     updated_at: 2020-06-02 21:20:33.612997
-    updated_by: null
+    updated_by: 1
     name: ill-defined
     label: Ill defined
     short_description: Ill defined
@@ -488,9 +488,9 @@
   pk: 3
   fields:
     created_at: 2020-08-11 07:15:00.820810
-    created_by: null
+    created_by: 1
     updated_at: 2020-08-11 07:15:00.820874
-    updated_by: null
+    updated_by: 1
     name: markush-query
     label: Markush Query
     short_description: Environment much offer budget fight leg. Cold population alone
