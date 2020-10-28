@@ -60,7 +60,9 @@ class BaseCompound(PolymorphicModel, CommonInfo):
         qc_note (str): An explanation of why the compound was deleted and replaced
     """
 
-    cid = models.CharField(default=build_cid, max_length=50, unique=True)
+    cid = models.CharField(
+        default=build_cid, primary_key=True, max_length=50, unique=True
+    )
     structure = models.TextField()
     # soft delete functionality
     replaced_by = models.ForeignKey(
