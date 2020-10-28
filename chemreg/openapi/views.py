@@ -3,6 +3,8 @@ import os
 from django.http import HttpResponse
 from django.views.generic.base import TemplateView, View
 
+from config.settings import STATIC_URL
+
 from chemreg.compound.settings import compound_settings
 from chemreg.substance.settings import substance_settings
 
@@ -34,6 +36,7 @@ class OpenAPIView(View):
         base_spec = jsonnet.evaluate_file(
             os.path.join(os.path.dirname(__file__), "schemas", "schema.jsonnet"),
             ext_vars={
+                "STATIC_URL": STATIC_URL,
                 "baseServer": "__BASE_SERVER__",
                 "COMPOUND_PREFIX": compound_settings.PREFIX,
                 "SUBSTANCE_PREFIX": substance_settings.PREFIX,

@@ -1232,7 +1232,7 @@ local buildSpec(objs, description) = {
     title: 'chemreg API',
     version: '1.0.0-beta',
     'x-logo': {
-      url: std.extVar('baseServer') + '/static/openapi/logo.svg',
+      url: std.extVar('STATIC_URL') + 'openapi/logo.svg',
       altText: 'chemreg',
     },
   },
