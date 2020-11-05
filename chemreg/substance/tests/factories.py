@@ -1,3 +1,5 @@
+from django.apps import apps
+
 import factory
 
 from chemreg.common.factory import ControlledVocabularyFactory, DjangoSerializerFactory
@@ -43,6 +45,15 @@ class QCLevelsTypeFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
     """
 
     rank = factory.Sequence(lambda n: n)
+
+    @classmethod
+    def _setup_next_sequence(cls):
+        try:
+            return (
+                apps.get_model("substance.QCLevelsType").objects.latest("rank").rank + 1
+            )
+        except apps.get_model("substance.QCLevelsType").DoesNotExist:
+            return 1
 
     class Meta:
         model = QCLevelsTypeSerializer

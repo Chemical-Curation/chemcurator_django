@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -63,3 +65,12 @@ def is_chemreg_model(model: models.Model) -> bool:
 def chemreg_model(request) -> models.Model:
     """A model from the chemreg application."""
     return request.param
+
+
+# Interrupt all external posts
+patcher = patch("requests.post")
+patcher.start()
+
+# Interrupt all external deletes
+patcher = patch("requests.delete")
+patcher.start()

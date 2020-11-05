@@ -11,6 +11,7 @@ env = environ.Env(
     COMPOUND_PREFIX=(str, ""),
     DATABASE_URL=(str, "sqlite:///.sqlite3"),
     DEBUG=(bool, True),
+    RESOLUTION_URL=(str, ""),
     SESSION_COOKIE_AGE=(int, 900),
     SECRET_KEY=(str, "secret"),
     URL_CONF=(str, "api"),
@@ -62,6 +63,7 @@ INSTALLED_APPS = [
     "chemreg.compound.apps.CompoundConfig",
     "chemreg.lists.apps.ListsConfig",
     "chemreg.openapi.apps.OpenAPIConfig",
+    "chemreg.resolution.apps.ResolutionConfig",
     "chemreg.substance.apps.SubstanceConfig",
     "chemreg.users.apps.UsersConfig",
     "chemreg.utils.apps.UtilsConfig",
@@ -98,6 +100,12 @@ TEMPLATES = [
 TIME_ZONE = "UTC"
 USE_I18N = False
 WSGI_APPLICATION = "config.wsgi.application"
+
+###########################
+#    Resolver Settings    #
+###########################
+RESOLUTION_URL = env("RESOLUTION_URL")
+
 
 #######################
 #    Auth Settings    #
