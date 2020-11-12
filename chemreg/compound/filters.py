@@ -39,4 +39,4 @@ class DefinedCompoundFilter(filters.FilterSet):
 
     class Meta:
         model = DefinedCompound
-        fields = ["cid", "inchikey", "molfile_v3000", "molfile_v2000", "smiles"]
+        fields = ["id", "inchikey", "molfile_v3000", "molfile_v2000", "smiles"]

@@ -6,11 +6,6 @@ local substance = import 'substance/substance.libsonnet';
   type: 'record',
   description: 'Everything about Records.',
   attributes: {
-    rid: {
-      type: 'string',
-      maxLength: 50,
-      unique: true,
-    },
     external_id: {
       type: 'string',
       maxLength: 500,

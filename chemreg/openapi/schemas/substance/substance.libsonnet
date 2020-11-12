@@ -7,15 +7,6 @@ local qc_level = import 'qcLevelsType.libsonnet';
   type: 'substance',
   description: 'Substances.',
   attributes: {
-    sid: {
-      type: 'string',
-      pattern: '^' + std.extVar('SUBSTANCE_PREFIX') + 'SID\\d0\\d+$',
-      maxLength: 50,
-      required: false,
-      description: 'A unique identifier for this compound. It will be created if not provided. \n        \n If included in the body of a request, admin permissions are required.',
-      example: std.extVar('SUBSTANCE_PREFIX') + 'SID702467346',
-      filter: true,
-    },
     preferred_name: {
       type: 'slug',
       maxLength: 255,

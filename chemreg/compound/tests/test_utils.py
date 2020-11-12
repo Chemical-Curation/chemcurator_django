@@ -28,8 +28,8 @@ def test_build_cid():
     cache.delete(compound_settings.SEQUENCE_KEY)
     cache.delete(compound_settings.SEQUENCE_KEY + ".lock")
     test_i = 2345678
-    BaseCompound.objects.create(cid=build_cid(test_i))  # valid CID
-    BaseCompound.objects.create(cid="FOO8")  # legacy CID
+    BaseCompound.objects.create(id=build_cid(test_i))  # valid CID
+    BaseCompound.objects.create(id="FOO8")  # legacy CID
     cid = build_cid()
     assert cid_re.match(cid)
     assert extract_int(cid) == test_i + 1

@@ -362,7 +362,6 @@ def test_substance_list(client, admin_user, substance_factory):
     assert resp.status_code == 200
     # Check that all results contain
     for result in resp.data["results"]:
-        assert "sid" in result
         assert "preferred_name" in result
         assert "display_name" in result
         assert "description" in result
@@ -415,9 +414,13 @@ def test_substance_fetch_includes(client, admin_user, substance_factory):
 @pytest.mark.django_db
 def test_substance_patch(client, admin_user, substance_factory):
     client.force_authenticate(user=admin_user)
+    print("hello")
     original_model = substance_factory.create(defined=True).instance
+    print("yooo")
     model_dict = substance_factory.build(illdefined=True).initial_data
-    model_dict.update(sid="DTXSID205000001")
+    print("bye")
+    model_dict.update(id="DTXSID205000001")
+    print(model_dict)
     resp = client.patch(
         "/substances/{}".format(original_model.pk),
         {
@@ -554,7 +557,7 @@ def test_relationship_type_patch(client, admin_user, relationship_type_factory):
     client.force_authenticate(user=admin_user)
     original_model = relationship_type_factory.create().instance
     model_dict = relationship_type_factory.build().initial_data
-    model_dict.update(sid="DTXSID205000001")
+    model_dict.update(id="DTXSID205000001")
     resp = client.patch(
         "/relationshipTypes/{}".format(original_model.pk),
         {
@@ -857,7 +860,7 @@ def test_substance_relationship_substance_id_filter(
     substance_relationship_factory()
 
     resp = client.get("/substanceRelationships", {"filter[substance.id]": substance.pk})
-
+    print(resp.json())
     assert resp.status_code == 200
     # Check that only the correct response are returned
     assert len(resp.data["results"]) == 3

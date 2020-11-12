@@ -160,13 +160,12 @@
     long_description: this will always be the first
     deprecated: false
 - model: lists.record
-  pk: 21
+  pk: DTXRID202000000
   fields:
     created_at: 2020-08-22 16:18:50.297711
     created_by: 1
     updated_at: 2020-08-22 16:18:50.297791
     updated_by: 1
-    rid: DTXRID202000000
     external_id: '47'
     message: ''
     score: null
@@ -174,33 +173,31 @@
     list: 2
     substance: null
 - model: lists.record
-  pk: 35
+  pk: DTXRID602000002
   fields:
     created_at: 2020-08-25 21:15:09.544749
     created_by: 1
     updated_at: 2020-08-25 21:15:09.544791
     updated_by: 1
-    rid: DTXRID602000002
     external_id: '48'
-    message: I made a record
+    message: mapped to a substance
     score: 4.7
     is_validated: false
     list: 2
-    substance: 2
+    substance: DTXSID602000001
 - model: lists.record
-  pk: 37
+  pk: DTXRID002000004
   fields:
     created_at: 2020-08-25 21:17:00.740984
     created_by: 1
     updated_at: 2020-08-25 21:17:00.741035
     updated_by: 1
-    rid: DTXRID002000004
     external_id: '49'
-    message: I made a record
+    message: mapped to the same substance
     score: 4.7
     is_validated: false
     list: 2
-    substance: 2
+    substance: DTXSID602000001
 - model: lists.recordidentifier
   pk: 1
   fields:
@@ -208,7 +205,7 @@
     created_by: 1
     updated_at: 2020-10-08 16:18:50.297791
     updated_by: 1
-    record_id: 21
+    record_id: DTXRID002000004
     identifier: 'This is an identifier'
     identifier_label: 'This is an identifier'
     identifier_type_id: null
@@ -219,7 +216,7 @@
     created_by: 1
     updated_at: 2020-10-08 16:18:50.297791
     updated_by: 1
-    record_id: 21
+    record_id: DTXRID002000004
     identifier: 'This is an extra identifier'
     identifier_label: 'This is an extra identifier'
     identifier_type_id: null

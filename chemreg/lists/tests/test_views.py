@@ -218,7 +218,7 @@ def test_record_post(client, admin_user, record_factory):
     )
     assert resp.status_code == 201
     # user can't POST the same external_id and list relationship
-    minted_rid = resp.data["rid"]
+    minted_rid = resp.data["id"]
     resp = client.post(
         "/records",
         {
@@ -269,7 +269,7 @@ def test_record_get(client, admin_user, record_factory):
     assert resp.status_code == 200
     # Check that all results contain
     for result in resp.data["results"]:
-        assert "rid" in result
+        assert "id" in result
         assert "external_id" in result
         assert "list" in result
         assert "substance" in result

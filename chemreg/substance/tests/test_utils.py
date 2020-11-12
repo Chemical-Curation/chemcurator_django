@@ -28,8 +28,8 @@ def test_build_sid():
     cache.delete(substance_settings.SEQUENCE_KEY)
     cache.delete(substance_settings.SEQUENCE_KEY + ".lock")
     test_i = 2345678
-    SubstanceFactory(sid=build_sid(test_i),)  # valid SID
-    SubstanceFactory(sid="FOO8")  # legacy SID
+    SubstanceFactory(id=build_sid(test_i),)  # valid SID
+    SubstanceFactory(id="FOO8")  # legacy SID
     sid = build_sid()
     assert sid_re.match(sid)
     assert extract_int(sid) == test_i + 1

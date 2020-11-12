@@ -441,16 +441,15 @@
       No total experience pretty as.'
     deprecated: false
 - model: substance.substance
-  pk: 1
+  pk: DTXSID502000000
   fields:
-    sid: DTXSID502000000
     preferred_name: Sample Substance
     display_name: Display Sample Substance
     description: This is the description for the test substance
     casrn: 1234567-89-5
     public_qc_note: Public QC notes
     private_qc_note: Private QC notes
-    associated_compound: 4
+    associated_compound: DTXCID302000003
     qc_level: 1
     substance_type: 1
     source: 1
@@ -459,9 +458,8 @@
     updated_at: 2020-06-18 02:41:57.241957
     updated_by: 1
 - model: substance.substance
-  pk: 2
+  pk: DTXSID602000001
   fields:
-    sid: DTXSID602000001
     preferred_name: Sample Substance 2
     display_name: Display Sample Substance 2
     source: 2
@@ -470,34 +468,15 @@
     description: area professor home
     public_qc_note: this may be acceptable.
     private_qc_note: Houston, we have a problem!
-    associated_compound: 10
+    associated_compound: DTXCID502000009
     casrn: 9876543-21-5
     created_at: 2020-08-06 16:50:03.781903
     created_by: 1
     updated_at: 2020-08-20 19:07:43.844757
     updated_by: 1
 - model: substance.substance
-  pk: 3
+  pk: DTXSID202000002
   fields:
-    sid: DTXSID202000002
-    preferred_name: Sample Substance 3
-    display_name: Display Sample Substance 3
-    source: 2
-    substance_type: 1
-    qc_level: 1
-    description: area professor home
-    public_qc_note: this may be acceptable.
-    private_qc_note: Houston, we have a problem!
-    associated_compound: null
-    casrn: 47-47-8
-    created_at: 2020-08-06 18:02:45.470694
-    created_by: 1
-    updated_at: 2020-08-06 18:02:45.470722
-    updated_by: 1
-- model: substance.substance
-  pk: 3
-  fields:
-    sid: DTXSID202000002
     preferred_name: Hydrogen Peroxide
     display_name: Hydrogen Peroxide
     source: 2
@@ -507,7 +486,7 @@
       to prevent infection of minor cuts, scrapes, and burns.
     public_qc_note: Public QC
     private_qc_note: Private QC
-    associated_compound: 25
+    associated_compound: DTXCID502000024
     casrn: 7722-84-1
     created_at: 2020-08-06 18:02:45.470694
     created_by: 1
@@ -520,8 +499,8 @@
     created_by: 1
     updated_at: 2020-08-06 18:03:48.552143
     updated_by: 1
-    from_substance: 2
-    to_substance: 3
+    from_substance: DTXSID602000001
+    to_substance: DTXSID202000002
     source: 1
     relationship_type: 1
     qc_notes: This goes from substance DTXSID602000001 to substance DTXSID202000002
@@ -532,8 +511,8 @@
     created_by: 1
     updated_at: 2020-08-06 19:13:50.148856
     updated_by: 1
-    from_substance: 2
-    to_substance: 2
+    from_substance: DTXSID602000001
+    to_substance: DTXSID602000001
     source: 1
     relationship_type: 1
     qc_notes: This goes from substance DTXSID602000001 to substance DTXSID602000001 (self)
@@ -544,8 +523,8 @@
     created_by: 1
     updated_at: 2020-08-06 19:13:50.148856
     updated_by: 1
-    from_substance: 1
-    to_substance: 2
+    from_substance: DTXSID502000000
+    to_substance: DTXSID602000001
     source: 1
     relationship_type: 1
     qc_notes: This goes from substance DTXSID502000000 to substance DTXSID602000001
@@ -1065,7 +1044,7 @@
     updated_by: 1
     identifier: this is a synonym
     qc_notes: somebody QC me!
-    substance: 2
+    substance: DTXSID602000001
     source: 2
     synonym_quality: 1
     synonym_type: 1
@@ -1078,7 +1057,7 @@
     updated_by: 1
     identifier: this is a synonym
     qc_notes: this is a note
-    substance: 2
+    substance: DTXSID602000001
     source: 1
     synonym_quality: 1
     synonym_type: 2
@@ -1091,7 +1070,7 @@
     updated_by: 1
     identifier: plow
     qc_notes: this is a note
-    substance: 2
+    substance: DTXSID602000001
     source: 1
     synonym_quality: 1
     synonym_type: 1
@@ -1104,7 +1083,7 @@
     updated_by: 1
     identifier: plow
     qc_notes: this is a note
-    substance: 2
+    substance: DTXSID602000001
     source: 1
     synonym_quality: 1
     synonym_type: 1
@@ -1117,7 +1096,7 @@
     updated_by: 1
     identifier: plow
     qc_notes: this is a note
-    substance: 2
+    substance: DTXSID602000001
     source: 1
     synonym_quality: 1
     synonym_type: 1
@@ -1130,7 +1109,7 @@
     updated_by: 1
     identifier: plow
     qc_notes: this is a note
-    substance: 2
+    substance: DTXSID602000001
     source: 1
     synonym_quality: 1
     synonym_type: 1
@@ -1143,7 +1122,7 @@
     updated_by: 1
     identifier: this is a synonym
     qc_notes: somebody QC me!
-    substance: 2
+    substance: DTXSID602000001
     source: 2
     synonym_quality: 1
     synonym_type: 1
@@ -1156,7 +1135,7 @@
     updated_by: 1
     identifier: this is a synonym
     qc_notes: somebody QC me!
-    substance: 2
+    substance: DTXSID602000001
     source: 2
     synonym_quality: 1
     synonym_type: 1
@@ -1169,7 +1148,7 @@
     updated_by: 1
     identifier: Chem-5ical
     qc_notes: somebody QC me!
-    substance: 2
+    substance: DTXSID602000001
     source: 2
     synonym_quality: 8
     synonym_type: 1

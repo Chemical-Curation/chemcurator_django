@@ -30,7 +30,7 @@ def test_defined_compound_filters(
     # Test the filter with valid molfile
     response = client.get("/definedCompounds?", {f"filter[{field}]": mol})
     assert len(response.data["results"]) == 1
-    assert response.data["results"][0]["cid"] == obj.cid
+    assert obj.id in response.data["results"][0]["url"]
 
     # Test with invalid molfile
     response = client.get(f"/definedCompounds?filter[{field}]=foo")

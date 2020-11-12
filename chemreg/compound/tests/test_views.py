@@ -22,7 +22,7 @@ def build_destroy_data(compound_json_type, compound1, compound2):
             "type": compound_json_type,
             "id": compound1.id,
             "attributes": {
-                "replacementCid": compound2.cid,
+                "replacementCid": compound2.id,
                 "qcNote": f"replacing compound {compound1.id} with compound {compound2.id}",
             },
         }
@@ -66,7 +66,7 @@ def test_definedcompound_detail_attrs(
         "created_by",
         "updated_at",
         "updated_by",
-        "cid",
+        "id",
         "inchikey",
         "molfile_v3000",
         "substance",
@@ -83,7 +83,7 @@ def test_definedcompound_detail_attrs(
         "created_by",
         "updated_at",
         "updated_by",
-        "cid",
+        "id",
         "inchikey",
         "molfile_v3000",
         "smiles",
@@ -103,7 +103,7 @@ def test_ill_defined_compound_admin_user(
     User both with and without ADMIN permissions"""
     client.force_authenticate(user=admin_user)
     idc = ill_defined_compound_factory.build()
-    idc.initial_data.update(cid="CID")
+    idc.initial_data.update(id="CID")
     response = client.post(
         "/illDefinedCompounds",
         {"data": {"type": "illDefinedCompound", "attributes": idc.initial_data}},
@@ -111,7 +111,7 @@ def test_ill_defined_compound_admin_user(
     assert response.status_code == 201
     client.force_authenticate(user=user)
     idc = ill_defined_compound_factory.build()
-    idc.initial_data.update(cid="XXX")
+    idc.initial_data.update(id="XXX")
     response = client.post(
         "/illDefinedCompounds",
         {"data": {"type": "illDefinedCompound", "attributes": idc.initial_data}},
@@ -122,7 +122,7 @@ def test_ill_defined_compound_admin_user(
 def test_defined_compound_view():
     """Tests that the Defined Compound View Set includes cid and InChIKey as filterset fields."""
     assert DefinedCompoundViewSet.filterset_class.Meta.fields == [
-        "cid",
+        "id",
         "inchikey",
         "molfile_v3000",
         "molfile_v2000",
@@ -133,7 +133,7 @@ def test_defined_compound_view():
 def test_compound_view():
     """Tests that the Compound View Set, is ReadOnly and has the inclusion of cid as a filterset field."""
     assert issubclass(CompoundViewSet, ReadOnlyModelViewSet)
-    assert CompoundViewSet.filterset_fields == ["cid"]
+    assert CompoundViewSet.filterset_fields == ["id"]
 
 
 @pytest.mark.parametrize(
@@ -163,10 +163,15 @@ def test_definedcompound_admin_user(admin_user, client, defined_compound_factory
     User both with and without ADMIN permissions"""
     client.force_authenticate(user=admin_user)
     dc = defined_compound_factory.build()
-    dc.initial_data.update(cid="CID")
     response = client.post(
         "/definedCompounds",
-        {"data": {"type": "definedCompound", "attributes": dc.initial_data}},
+        {
+            "data": {
+                "type": "definedCompound",
+                "id": "cid",
+                "attributes": dc.initial_data,
+            }
+        },
     )
     assert response.status_code == 400
     assert response.exception is True
@@ -177,11 +182,16 @@ def test_definedcompound_admin_user(admin_user, client, defined_compound_factory
     dc.initial_data.update(inchikey="INCHI")
     response = client.post(
         "/definedCompounds",
-        {"data": {"type": "definedCompound", "attributes": dc.initial_data}},
+        {
+            "data": {
+                "type": "definedCompound",
+                "id": "cid",
+                "attributes": dc.initial_data,
+            }
+        },
     )
     assert response.status_code == 201
     assert response.data["created_by"]["id"] == str(admin_user.pk)
-    dc.initial_data.pop("cid")
     response = client.post(
         "/definedCompounds",
         {"data": {"type": "definedCompound", "attributes": dc.initial_data}},
@@ -194,7 +204,7 @@ def test_definedcompound_admin_user(admin_user, client, defined_compound_factory
     )
     client.force_authenticate(user=user)
     dc = defined_compound_factory.build()
-    dc.initial_data.update(cid="XXX", inchikey="XXX")
+    dc.initial_data.update(id="XXX", inchikey="XXX")
     response = client.post(
         "/definedCompounds",
         {"data": {"type": "definedCompound", "attributes": dc.initial_data}},
@@ -335,6 +345,7 @@ def test_patch_nonexistent_qst_in_illdefined(
         }
     }
     response = client.patch(f"/illDefinedCompounds/{idc.instance.pk}", post_data)
+    print(response)
     assert response.status_code == 400
     assert (
         str(response.data[0]["detail"])
@@ -377,15 +388,15 @@ def test_compound_soft_delete(user, admin_user, compound_factory, client):
     for endpoint in [f"{compound_json_type}s", "compounds"]:
         client.force_authenticate(user=admin_user)
         resp = client.get(f"/{endpoint}")
-        cid_set = set(c["cid"] for c in resp.data["results"])
+        cid_set = set(c["id"] for c in resp.data["results"])
         assert len(cid_set) == 3
         # it should NOT be visible to non-admin user
         client.force_authenticate(user=user)
         resp = client.get(f"/{endpoint}")
-        cid_set = set(c["cid"] for c in resp.data["results"])
+        cid_set = set(c["id"] for c in resp.data["results"])
         assert len(cid_set) == 1
-        assert compounds[1].cid not in cid_set
-        assert compounds[2].cid not in cid_set
+        assert compounds[1].id not in cid_set
+        assert compounds[2].id not in cid_set
 
 
 @pytest.mark.parametrize(
@@ -439,10 +450,10 @@ def test_compound_redirect(user, admin_user, compound_factory, client):
         client.force_authenticate(user=user)
         resp = client.get(f"/{endpoint}/{compound_3.id}")
         assert resp.status_code == 301
-        assert compound_2.id == int(resp.url.split("/")[-1])
+        assert compound_2.id == (resp.url.split("/")[-1])
         resp = client.get(f"/{endpoint}/{compound_2.id}")
         assert resp.status_code == 301
-        assert compound_1.id == int(resp.url.split("/")[-1])
+        assert compound_1.id == (resp.url.split("/")[-1])
 
         # Admin should be able to retrieve it
         client.force_authenticate(user=admin_user)

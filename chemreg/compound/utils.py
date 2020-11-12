@@ -36,11 +36,11 @@ def build_cid(i=None) -> str:
                 try:
                     BaseCompound = apps.get_model("compound", "BaseCompound")
                     last_id = BaseCompound.objects.with_deleted().filter(
-                        cid__regex=fr"^{prefix}CID\d0([2-9]\d{{6}}|[1-9]\d{{7,}})$"
+                        id__regex=fr"^{prefix}CID\d0([2-9]\d{{6}}|[1-9]\d{{7,}})$"
                     ).aggregate(
                         max_cid=Max(
                             Cast(
-                                Substr("cid", len(prefix) + 5),
+                                Substr("id", len(prefix) + 5),
                                 output_field=IntegerField(),
                             )
                         )

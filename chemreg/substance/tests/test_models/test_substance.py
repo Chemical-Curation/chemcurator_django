@@ -9,9 +9,9 @@ from chemreg.substance.models import Substance
 def test_substance_model():
     """Tests the validity of the Substance Model's attributes"""
     # Verify CharField attributes
-    assert type(Substance.sid.field) is models.CharField
-    assert Substance.sid.field.max_length == 50
-    assert Substance.sid.field.unique
+    assert type(Substance.id.field) is models.CharField
+    assert Substance.id.field.max_length == 50
+    assert Substance.id.field.unique
 
     assert type(Substance.preferred_name.field) is models.CharField
     assert Substance.preferred_name.field.max_length == 255

@@ -83,7 +83,7 @@ def test_record_serializer(record_factory, list_factory):
     assert rec2.errors["non_field_errors"][0].code == "unique"
     assert (
         rec2.errors["non_field_errors"][0]
-        == f"External IDs must be unique within a list. The External ID submitted is already associated with '{rec1.rid}'"
+        == f"External IDs must be unique within a list. The External ID submitted is already associated with '{rec1.id}'"
     )
 
 

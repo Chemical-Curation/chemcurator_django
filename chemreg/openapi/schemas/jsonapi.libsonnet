@@ -258,7 +258,7 @@ local buildParameters(obj) = {
     description: '[list of fields to sort by](https://jsonapi.org/format/#fetching-sorting)',
     required: false,
     style: 'form',
-    example: [obj.commonAttributes(detail=false)[0]],
+    example: [obj.commonAttributes(detail=false)],
     schema: {
       type: 'array',
       items: {
@@ -662,6 +662,10 @@ local getAttributes = {
 local buildResourceIdentifier(obj, required=false) = {
   type: 'object',
   title: obj.type,
+  local exampleId = if obj.type == "definedCompound" then "DTXCID302000003" 
+    else if obj.type == "illDefinedCompound" then "DTXCID302000003"
+    else if obj.type == "substance" then "DTXSID702467346"
+    else if obj.type == "record" then "DTXRID202000000" else "1",
   properties: {
     type: {
       type: 'string',
@@ -671,7 +675,7 @@ local buildResourceIdentifier(obj, required=false) = {
     },
     id: {
       type: 'string',
-      example: '1',
+      example: exampleId,
       pattern: '\\d+',
       description: "The resource object's unique [identify](https://jsonapi.org/format/#document-resource-object-identification). It must locate a single, unique resource.",
     },

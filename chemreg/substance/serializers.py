@@ -175,7 +175,7 @@ class SubstanceSerializer(CommonInfoSerializer):
     class Meta(CommonInfoSerializer.Meta):
         model = Substance
         fields = CommonInfoSerializer.Meta.fields + [
-            "sid",
+            "id",
             "preferred_name",
             "display_name",
             "description",

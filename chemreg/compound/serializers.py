@@ -37,7 +37,7 @@ class BaseCompoundSerializer(CommonInfoSerializer):
     substance = "chemreg.substance.serializers.SubstanceSerializer"
 
     class Meta(CommonInfoSerializer.Meta):
-        fields = CommonInfoSerializer.Meta.fields + ["qc_note", "replaced_by"]
+        fields = CommonInfoSerializer.Meta.fields + ["id", "qc_note", "replaced_by"]
         model = BaseCompound
 
     def __init__(self, *args, is_admin=False, **kwargs):
@@ -76,7 +76,6 @@ class DefinedCompoundSerializer(BaseCompoundSerializer):
     class Meta(BaseCompoundSerializer.Meta):
         model = DefinedCompound
         fields = BaseCompoundSerializer.Meta.fields + [
-            "cid",
             "inchikey",
             "molfile_v2000",
             "molfile_v3000",
@@ -92,13 +91,13 @@ class DefinedCompoundSerializer(BaseCompoundSerializer):
         self.admin_override = admin_override
         super().__init__(*args, **kwargs)
 
-    def validate_cid(self, value):
+    def validate_id(self, value):
         if "inchikey" not in self.initial_data:
             raise ValidationError("InchIKey must be included when CID is defined.")
         return value
 
     def validate_inchikey(self, value):
-        if "cid" not in self.initial_data:
+        if "id" not in self.initial_data:
             raise ValidationError("CID must be included when InchIKey is defined.")
         return value
 
@@ -116,7 +115,7 @@ class DefinedCompoundSerializer(BaseCompoundSerializer):
             raise ValidationError(
                 {
                     "detail": {
-                        "detail": f"Inchikey conflicts with {[x.cid for x in qs]}",
+                        "detail": f"Inchikey conflicts with {[x.id for x in qs]}",
                         "links": matched,
                         "status": "400",
                         "source": {"pointer": "/data/attributes/inchikey"},
@@ -193,7 +192,6 @@ class IllDefinedCompoundSerializer(BaseCompoundSerializer):
     class Meta(BaseCompoundSerializer.Meta):
         model = IllDefinedCompound
         fields = BaseCompoundSerializer.Meta.fields + [
-            "cid",
             "mrvfile",
             "query_structure_type",
             "substance",
@@ -220,7 +218,7 @@ class CompoundDeleteSerializer(serializers.Serializer):
     """Serializes data required for the soft delete of compounds."""
 
     replacement_cid = serializers.SlugRelatedField(
-        slug_field="cid", queryset=BaseCompound.objects.all()
+        slug_field="id", queryset=BaseCompound.objects.all()
     )
     qc_note = serializers.CharField()
 

@@ -17,11 +17,11 @@ from chemreg.compound.validators import validate_inchikey_computable
 def test_basecompound():
     assert issubclass(BaseCompound, PolymorphicModel)
     # cid
-    cid = BaseCompound._meta.get_field("cid")
-    assert isinstance(cid, models.CharField)
-    assert cid.default == build_cid
-    assert cid.max_length == 50
-    assert cid.unique
+    id = BaseCompound._meta.get_field("id")
+    assert isinstance(id, models.CharField)
+    assert id.default == build_cid
+    assert id.max_length == 50
+    assert id.unique
     # structure
     structure = BaseCompound._meta.get_field("structure")
     assert isinstance(structure, models.TextField)

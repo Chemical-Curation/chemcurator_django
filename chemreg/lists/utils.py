@@ -33,11 +33,11 @@ def build_rid(i=None) -> str:
                 try:
                     Record = apps.get_model("lists", "Record")
                     last_id = Record.objects.filter(
-                        rid__regex=fr"^{prefix}RID\d0([2-9]\d{{6}}|[1-9]\d{{7,}})$"
+                        id__regex=fr"^{prefix}RID\d0([2-9]\d{{6}}|[1-9]\d{{7,}})$"
                     ).aggregate(
                         max_rid=Max(
                             Cast(
-                                Substr("rid", len(prefix) + 5),
+                                Substr("id", len(prefix) + 5),
                                 output_field=IntegerField(),
                             )
                         )

@@ -87,7 +87,7 @@ class RecordSerializer(CommonInfoSerializer):
     class Meta(CommonInfoSerializer.Meta):
         model = Record
         fields = CommonInfoSerializer.Meta.fields + [
-            "rid",
+            "id",
             "external_id",
             "message",
             "score",
@@ -103,7 +103,7 @@ class RecordSerializer(CommonInfoSerializer):
                 message=_(
                     "External IDs must be unique within a list. The External ID submitted is already associated with '{duplicate_field}'"
                 ),
-                duplicate_field="rid",
+                duplicate_field="id",
             )
         ]
         extra_kwargs = {

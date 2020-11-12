@@ -98,7 +98,7 @@ class Record(CommonInfo):
     """Store all the identifiers associated with a member of a List
 
     Attributes:
-        rid (str): Generated ID starting with DTXRID.  Contains a checksum
+        id (str): Generated ID starting with DTXRID.  Contains a checksum
         external_id (str): ID for external use
         list (foreign key): Foreign Key reference to a List (one to many)
         substance (foreign key, optional): Foreign Key reference to a Substance (one to many)
@@ -107,7 +107,9 @@ class Record(CommonInfo):
         is_validated (bool): Boolean of this Record's validity
     """
 
-    rid = models.CharField(default=build_rid, max_length=50, unique=True)
+    id = models.CharField(
+        default=build_rid, primary_key=True, max_length=50, unique=True
+    )
     external_id = models.CharField(max_length=500, blank=False)
     message = models.CharField(max_length=500, blank=True)
     score = models.FloatField(null=True)

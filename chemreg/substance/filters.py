@@ -14,7 +14,7 @@ class SubstanceRelationshipFilter(filters.FilterSet):
             to this substance id
     """
 
-    substance__id = filters.NumberFilter(method="filter_substance")
+    substance__id = filters.CharFilter(method="filter_substance")
 
     def filter_substance(self, queryset, name, value):
         """Filters for any SubstanceRelationships containing the substance id in `value`

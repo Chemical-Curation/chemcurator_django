@@ -53,7 +53,7 @@ class Substance(CommonInfo):
     """Substances document chemical concepts
 
     Attributes:
-        sid (str): Generated SID for external use
+        id (str): Generated SID for external use
         preferred_name (str): Name of the substance
         display_name (str): User friendly name of the substance
         source (foreign key): Controlled vocabulary for Sources
@@ -74,7 +74,9 @@ class Substance(CommonInfo):
     display_name_regex = "^[a-zA-Z0-9 =<>\\-:.,^%&/{}[\\]()+?=]{3,}$"
     casrn_regex = "^[0-9]{2,7}-[0-9]{2}-[0-9]$"
 
-    sid = models.CharField(default=build_sid, max_length=50, unique=True)
+    id = models.CharField(
+        default=build_sid, primary_key=True, max_length=50, unique=True
+    )
     preferred_name = models.CharField(
         max_length=255,
         unique=True,

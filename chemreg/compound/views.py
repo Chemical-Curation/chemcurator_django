@@ -30,7 +30,7 @@ class CIDPermissionsMixin:
 
     def get_permissions(self):
         # return permission_classes depending on `action`
-        if "cid" in self.request.data:
+        if "id" in self.request.data:
             return [
                 permission()
                 for permission in self.permission_classes_by_action[self.action]
@@ -131,9 +131,10 @@ class IllDefinedCompoundViewSet(
 
     queryset = IllDefinedCompound.objects.with_deleted().all()
     serializer_class = IllDefinedCompoundSerializer
-    filterset_fields = ["cid"]
+    filterset_fields = ["id"]
     permission_classes_by_action = {
         "create": [IsAdminUser],
+        "partial_update": [IsAdminUser],
     }
 
 
@@ -147,4 +148,4 @@ class CompoundViewSet(SoftDeleteCompoundMixin, ReadOnlyModelViewSet):
 
     queryset = BaseCompound.objects.with_deleted().all()
     serializer_class = CompoundSerializer
-    filterset_fields = ["cid"]
+    filterset_fields = ["id"]
