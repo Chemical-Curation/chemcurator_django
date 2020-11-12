@@ -73,12 +73,12 @@ class Index:
 class SubstanceIndex(Index):
     index_url = f"{RESOLUTION_URL}/api/v1/substances/_index"
     delete_url = f"{RESOLUTION_URL}/api/v1/substances/"
-    delete_pk = "sid"
+    delete_pk = "pk"
 
     def get_model_document(self, instance):
         return {
             "data": {
-                "id": instance.sid,
+                "id": instance.pk,
                 "type": "substance",
                 "attributes": {
                     "identifiers": {

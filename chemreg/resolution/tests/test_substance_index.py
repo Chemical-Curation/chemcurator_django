@@ -19,7 +19,7 @@ def test_substance_index_substance_list_add(substance_factory):
         assert mocked_post.call_count == len(substances)
         # Assert a post request was sent corresponding to each sid
         for substance in substances:
-            assert substance.sid in [
+            assert substance.pk in [
                 json.loads(call.args[1])["data"]["id"]
                 for call in mocked_post.mock_calls
             ]
@@ -36,7 +36,7 @@ def test_substance_index_single_substance_add(substance_factory):
         mocked_post.assert_called_once()
         # Assert a post request was sent corresponding to the sid
         assert (
-            json.loads(mocked_post.mock_calls[0].args[1])["data"]["id"] == substance.sid
+            json.loads(mocked_post.mock_calls[0].args[1])["data"]["id"] == substance.pk
         )
 
 
@@ -56,7 +56,7 @@ def test_substance_index_substance_list_delete(substance_factory):
         mock_urls = [call.args[0] for call in mocked_delete.mock_calls]
         for substance in substances:
             # See if this sid occurs in any of the urls from the mocked_delete
-            assert any(substance.sid in url for url in mock_urls)
+            assert any(substance.pk in url for url in mock_urls)
 
 
 @pytest.mark.django_db
@@ -71,7 +71,7 @@ def test_substance_index_single_substance_delete(substance_factory):
 
         # See if this sid occurs in the url from the mocked_delete
         mock_url = mocked_delete.mock_calls[0].args[0]
-        assert substance.sid in mock_url
+        assert substance.pk in mock_url
 
 
 def test_substance_index_delete_all():
