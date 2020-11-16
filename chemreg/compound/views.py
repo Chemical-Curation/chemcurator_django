@@ -14,6 +14,7 @@ from chemreg.compound.models import (
 )
 from chemreg.compound.serializers import (
     CompoundDeleteSerializer,
+    CompoundDetailSerializer,
     CompoundSerializer,
     DefinedCompoundDetailSerializer,
     DefinedCompoundSerializer,
@@ -149,3 +150,9 @@ class CompoundViewSet(SoftDeleteCompoundMixin, ReadOnlyModelViewSet):
     queryset = BaseCompound.objects.with_deleted().all()
     serializer_class = CompoundSerializer
     filterset_fields = ["id"]
+
+    def get_serializer(self, *args, **kwargs):
+        """Adds a lightweight workaround to our different DefinedCompound detail and list serializers"""
+        if not kwargs.get("many"):
+            self.serializer_class = CompoundDetailSerializer
+        return super().get_serializer(*args, **kwargs)

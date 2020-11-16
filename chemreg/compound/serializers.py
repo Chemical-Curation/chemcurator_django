@@ -214,6 +214,22 @@ class CompoundSerializer(PolymorphicModelSerializer):
         model = BaseCompound
 
 
+class CompoundDetailSerializer(PolymorphicModelSerializer):
+    """The serializer for both ill-defined and defined compounds."""
+
+    polymorphic_serializers = [
+        DefinedCompoundDetailSerializer,
+        IllDefinedCompoundSerializer,
+    ]
+    serializer_kwargs = {
+        DefinedCompoundDetailSerializer: ["override", "is_admin"],
+        IllDefinedCompoundSerializer: ["is_admin"],
+    }
+
+    class Meta:
+        model = BaseCompound
+
+
 class CompoundDeleteSerializer(serializers.Serializer):
     """Serializes data required for the soft delete of compounds."""
 

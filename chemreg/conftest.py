@@ -67,6 +67,10 @@ def chemreg_model(request) -> models.Model:
     return request.param
 
 
+# Interrupt all external gets
+patcher = patch("requests.get")
+patcher.start()
+
 # Interrupt all external posts
 patcher = patch("requests.post")
 patcher.start()

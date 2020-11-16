@@ -1,13 +1,16 @@
 import json
 from collections import OrderedDict
 from datetime import datetime
+from unittest.mock import patch
 
 from django.contrib.auth.models import Permission
+from rest_framework.reverse import reverse
 
 import pytest
 from rest_framework_json_api.utils import get_included_serializers
 
 from chemreg.common.models import CommonInfo
+from chemreg.resolution.indices import SubstanceIndex
 from chemreg.substance.serializers import SubstanceSerializer
 from chemreg.substance.views import (
     ModelViewSet,
@@ -372,6 +375,21 @@ def test_substance_list(client, admin_user, substance_factory):
         assert "substance_type" in result
         assert "qc_level" in result
         assert "associated_compound" in result
+
+
+@pytest.mark.django_db
+def test_substance_search(client, admin_user, substance_factory):
+    substance = substance_factory().instance
+    # Create result to be filtered out
+    substance_factory()
+    url = reverse("substance-list")
+
+    with patch.object(SubstanceIndex, "search") as mock_search:
+        mock_search.return_value = {"data": [{"id": substance.pk}]}
+
+        resp = client.get(url, {"filter[search]": substance.preferred_name})
+        assert resp.status_code == 200
+        assert len(resp.json()["data"]) == 1
 
 
 @pytest.mark.django_db

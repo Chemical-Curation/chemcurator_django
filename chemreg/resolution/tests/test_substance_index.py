@@ -1,9 +1,52 @@
 import json
-from unittest.mock import patch
+from unittest.mock import Mock, patch
+
+from rest_framework.exceptions import APIException
 
 import pytest
+import requests
 
 from chemreg.resolution.indices import SubstanceIndex
+
+
+def test_substance_index_substance_search():
+    sample_response = {
+        "data": [
+            {"id": "DTXSID", "type": "substance", "attributes": {"identifiers": {}}}
+        ]
+    }
+    identifier = "foobar"
+    with patch("requests.get") as mocked_get:
+        # Mock the requests.response
+        mocked_response = Mock()
+        # return our dict as .json()
+        mocked_response.json.return_value = sample_response
+        # calls to requests.get returns our mocked response automatically
+        mocked_get.return_value = mocked_response
+
+        search_url = SubstanceIndex().search_url
+        json = SubstanceIndex().search(identifier)
+
+        # Assert a get request was sent
+        mocked_get.assert_called_once()
+        # Assert url was requested [call_number][request_args_tuple][tuple_portion]
+        assert mocked_get.mock_calls[0][1][0] == search_url
+        assert mocked_get.mock_calls[0][2]["params"]["identifier"] == identifier
+        # Assert the response was processed into the proper json object
+        assert json == sample_response
+
+
+def test_substance_index_substance_search_connection_error():
+    def mocked_function():
+        raise requests.exceptions.ConnectionError()
+
+    with patch("requests.get") as mocked_get:
+        mocked_get.return_value = mocked_function
+
+        with pytest.raises(APIException) as exception:
+            SubstanceIndex().search("foobar")
+            assert exception
+            assert str(exception) == "The Resolver service is not available right now"
 
 
 @pytest.mark.django_db

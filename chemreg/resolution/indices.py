@@ -1,5 +1,7 @@
 import json
 
+from rest_framework.exceptions import APIException
+
 import requests
 from config.settings import RESOLUTION_URL
 
@@ -13,7 +15,7 @@ class Index:
     def __init__(self, fail_silently=True):
         self.fail_silently = fail_silently
 
-        for attr in ["index_url", "delete_url", "delete_pk"]:
+        for attr in ["index_url", "search_url", "delete_url", "delete_pk"]:
             assert getattr(
                 self, attr
             ), "Class {index_class} missing {attr} attribute".format(
@@ -66,11 +68,23 @@ class Index:
             if not self.fail_silently:
                 raise conn_err
 
+    def search(self, term):
+        try:
+            resp = requests.get(
+                self.search_url, params={"identifier": term}, headers=self.HEADERS
+            )
+            return resp.json()
+        except requests.exceptions.ConnectionError:
+            raise APIException("The Resolver service is not available right now")
+        except Exception as e:
+            raise APIException(detail=str(e))
+
     def get_model_document(self, instance):
         raise NotImplementedError("`get_model_document()` must be implemented.")
 
 
 class SubstanceIndex(Index):
+    search_url = f"{RESOLUTION_URL}/api/v1/resolver"
     index_url = f"{RESOLUTION_URL}/api/v1/substances/_index"
     delete_url = f"{RESOLUTION_URL}/api/v1/substances/"
     delete_pk = "pk"

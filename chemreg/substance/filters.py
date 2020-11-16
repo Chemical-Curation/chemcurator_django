@@ -3,6 +3,24 @@ from django.db.models import Q
 
 from django_filters import rest_framework as filters
 
+from chemreg.resolution.indices import SubstanceIndex
+
+
+class SubstanceFilter(filters.FilterSet):
+
+    search = filters.CharFilter(method="search_resolver")
+
+    def search_resolver(self, queryset, name, value):
+        """Search resolver for the search value"""
+        resp_json = SubstanceIndex().search(value)
+        ids = [row["id"] for row in resp_json["data"]]
+        # todo: This will need some reason + score annotating
+        return queryset.filter(pk__in=ids)
+
+    class Meta:
+        model = apps.get_model("substance", "Substance")
+        fields = ["search"]
+
 
 class SubstanceRelationshipFilter(filters.FilterSet):
     """FilterSet handling substance relationships

@@ -4,6 +4,7 @@ from django.apps import apps
 from django.db.models import Max
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAdminUser
+from rest_framework.reverse import reverse
 from rest_framework.test import force_authenticate
 
 import pytest
@@ -251,6 +252,24 @@ def test_defined_compound_has_common_info(
         ).status_code
         == 200
     )
+
+
+@pytest.mark.django_db
+def test_compound_retrieves_defined_compound_details(
+    admin_user, client, defined_compound_factory, user
+):
+    keys = [
+        "molecularWeight",
+        "molecularFormula",
+        "smiles",
+        "calculatedInchikey",
+    ]
+    client.force_authenticate(user=admin_user)
+    dc = defined_compound_factory().instance
+    url = reverse("basecompound-detail", [dc.pk])
+    resp = client.get(url).json()["data"]["attributes"]
+    for key in keys:
+        assert resp.get(key), f'{key} not found in response attributes using "{url}"'
 
 
 @pytest.mark.django_db
