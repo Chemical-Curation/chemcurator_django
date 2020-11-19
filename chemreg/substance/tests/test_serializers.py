@@ -247,28 +247,38 @@ def test_synonym_identifier_unique(
     """
     substance = substance_factory.create().instance
     synonym_quality = synonym_quality_factory.create(is_restrictive=True).instance
+    quality_data = {"type": "synonymQuality", "id": synonym_quality.pk}
     syn1 = synonym_factory.create(
         synonym_quality={"type": "synonymQuality", "id": synonym_quality.pk},
     ).instance
 
     err_msg = "The identifier '{}' is not unique in restrictive name fields."
 
-    syn2 = synonym_factory.build(identifier=substance.preferred_name)
+    syn2 = synonym_factory.build(
+        identifier=substance.preferred_name, synonym_quality=quality_data,
+    )
     assert not syn2.is_valid()
     assert (
         err_msg.format(substance.preferred_name)[:47]
         in syn2.errors["non_field_errors"][0]
     )
-    syn2 = synonym_factory.build(identifier=substance.display_name)
+    syn2 = synonym_factory.build(
+        identifier=substance.display_name, synonym_quality=quality_data,
+    )
     assert not syn2.is_valid()
     assert (
         err_msg.format(substance.display_name)[:47]
         in syn2.errors["non_field_errors"][0]
     )
-    syn2 = synonym_factory.build(identifier=substance.casrn)
+    syn2 = synonym_factory.build(
+        identifier=substance.casrn, synonym_quality=quality_data,
+    )
     assert not syn2.is_valid()
     assert err_msg.format(substance.casrn)[:47] in syn2.errors["non_field_errors"][0]
     syn2 = synonym_factory.build(identifier=syn1.identifier)
+    syn2 = synonym_factory.build(
+        identifier=syn1.identifier, synonym_quality=quality_data,
+    )
     assert not syn2.is_valid()
     assert err_msg.format(syn1.identifier)[:47] in syn2.errors["non_field_errors"][0]
 
@@ -473,3 +483,22 @@ def test_substance_display_name_null(substance_factory):
     serializer = substance_factory.build(display_name=None)
     assert serializer.is_valid()
     serializer.save()
+
+
+@pytest.mark.django_db
+def test_bug_263(substance_factory, synonym_factory, synonym_quality_factory):
+    """ If I create the synonym "water" and associated it with a restrictive
+    synonym quality, I should still be able to create the synonym "water" as a
+    synonym associated with a non-restrictive synonym.
+    """
+    restricted_quality = synonym_quality_factory.create(is_restrictive=True).instance
+    unrestricted_quality = synonym_quality_factory.create(is_restrictive=False).instance
+    synonym = synonym_factory.create(
+        identifier="water",  # has to be valid for CASRN
+        synonym_quality={"type": "synonymQuality", "id": restricted_quality.pk},
+    ).instance
+    synonym2 = synonym_factory.create(
+        identifier="water",  # same identifier, but unrestricted
+        synonym_quality={"type": "synonymQuality", "id": unrestricted_quality.pk},
+    ).instance
+    assert synonym.identifier == synonym2.identifier

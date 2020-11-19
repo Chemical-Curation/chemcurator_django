@@ -289,6 +289,9 @@ class SynonymSerializer(CommonInfoSerializer):
             Validated data dictionary.
         """
         synonym_type = data.get("synonym_type", None) or self.instance.synonym_type
+        synonym_quality = (
+            data.get("synonym_quality", None) or self.instance.synonym_quality
+        )
 
         # Validate data.identifier is a valid synonym_type.validation_regular_expression
         RegexValidator(
@@ -300,6 +303,9 @@ class SynonymSerializer(CommonInfoSerializer):
 
         if synonym_type.is_casrn:
             validate_casrn_checksum(data["identifier"])
+        if not synonym_quality.is_restrictive:
+            # if not restricted, no need to check identifier uniqueness #263
+            return data
 
         identifier = data.get("identifier", None) or self.instance.identifier
         pk = self.instance.pk if self.instance else None
