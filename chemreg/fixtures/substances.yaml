@@ -286,6 +286,19 @@
     long_description: Myself I industry write. Ready low understand staff well boy.
     deprecated: false
     rank: 10
+- model: substance.qclevelstype
+  pk: 12
+  fields:
+    created_at: 2020-08-11 07:19:19.695550
+    created_by: 1
+    updated_at: 2020-08-11 07:19:19.695585
+    updated_by: 1
+    name: deprecated-qc-levels
+    label: Deprecated QC Levels
+    short_description: 'This is a deprecated QC Level'
+    long_description: This is a deprecated QC Level.
+    deprecated: True
+    rank: 11
 - model: substance.source
   pk: 1
   fields:
@@ -466,6 +479,18 @@
 
       No total experience pretty as."
     deprecated: false
+- model: substance.source
+  pk: 9
+  fields:
+    created_at: 2020-08-11 07:14:18.880768
+    created_by: 1
+    updated_at: 2020-08-11 07:14:18.880788
+    updated_by: 1
+    name: deprecated-source
+    label: Deprecated Source
+    short_description: This is a deprecated Source.
+    long_description: This is a deprecated Source.
+    deprecated: true
 - model: substance.substance
   pk: DTXSID502000000
   fields:
@@ -514,6 +539,23 @@
     private_qc_note: Private QC
     associated_compound: DTXCID502000024
     casrn: 7722-84-1
+    created_at: 2020-08-06 18:02:45.470694
+    created_by: 1
+    updated_at: 2020-08-06 18:02:45.470722
+    updated_by: 1
+- model: substance.substance
+  pk: DTXSID502000555
+  fields:
+    preferred_name: Deprecated Substance
+    display_name: null
+    source: 9
+    substance_type: 8
+    qc_level: 12
+    description: Deprecated Substance
+    public_qc_note: This substance has deprecated dropdown options
+    private_qc_note: This substance has deprecated dropdown options
+    associated_compound: DTXCID502000555
+    casrn: 5555555-55-5
     created_at: 2020-08-06 18:02:45.470694
     created_by: 1
     updated_at: 2020-08-06 18:02:45.470722
@@ -729,6 +771,18 @@
       they just well. Defense out put several necessary return before. Dinner perform
       magazine society.
     deprecated: false
+- model: substance.substancetype
+  pk: 8
+  fields:
+    created_at: 2020-08-11 07:14:18.880768
+    created_by: 1
+    updated_at: 2020-08-11 07:14:18.880788
+    updated_by: 1
+    name: deprecated-substance-type
+    label: Deprecated Substance Type
+    short_description: This is a deprecated Substance Type.
+    long_description: This is a deprecated Substance Type.
+    deprecated: true
 - model: substance.synonymtype
   pk: 1
   fields:
@@ -906,6 +960,21 @@
     deprecated: false
     validation_regular_expression: .*
     score_modifier: -950230027283.1
+    is_casrn: false
+- model: substance.synonymtype
+  pk: 7
+  fields:
+    created_at: 2020-08-11 07:14:37.616434
+    created_by: 1
+    updated_at: 2020-08-11 07:14:37.616460
+    updated_by: 1
+    name: deprecated-synonym-type
+    label: Deprecated Synonym Type
+    short_description: This is a deprecated Synonym Type.
+    long_description: This is a deprecated Synonym Type.
+    deprecated: true
+    validation_regular_expression: .*
+    score_modifier: -950230027281.1
     is_casrn: false
 - model: substance.synonymquality
   pk: 1
@@ -1111,6 +1180,20 @@
       Within material receive another push race across.
     deprecated: false
     score_weight: 51.99
+    is_restrictive: true
+- model: substance.synonymquality
+  pk: 9
+  fields:
+    created_at: 2020-08-11 07:14:37.616434
+    created_by: 1
+    updated_at: 2020-08-11 07:14:37.616460
+    updated_by: 1
+    name: deprecated-synonym-quality
+    label: Deprecated Synonym Quality
+    short_description: This is a deprecated Synonym Quality.
+    long_description: This is a deprecated Synonym Quality.
+    deprecated: true
+    score_weight: 50.99
     is_restrictive: true
 - model: substance.synonym
   pk: 2
