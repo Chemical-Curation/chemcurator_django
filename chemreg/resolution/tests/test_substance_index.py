@@ -84,6 +84,45 @@ def test_substance_index_single_substance_add(substance_factory):
 
 
 @pytest.mark.django_db
+def test_substance_index_identifiers(substance_factory):
+    expected_identifier_keys = [
+        "compound_id",
+        "preferred_name",
+        "display_name",
+        "casrn",
+        "synonyms",
+    ]
+
+    substance = substance_factory().instance
+    identifiers = SubstanceIndex().get_model_document(substance).get("data")
+
+    assert identifiers
+    assert identifiers["id"] == substance.pk
+    assert (
+        list(identifiers["attributes"]["identifiers"].keys())
+        == expected_identifier_keys
+    )
+
+
+@pytest.mark.django_db
+def test_substance_index_identifiers_cid(substance_factory):
+    sub = substance_factory().instance
+    def_sub = substance_factory(defined=True).instance
+
+    idents = SubstanceIndex().get_model_document(sub)["data"]["attributes"][
+        "identifiers"
+    ]
+    def_idents = SubstanceIndex().get_model_document(def_sub)["data"]["attributes"][
+        "identifiers"
+    ]
+
+    # No Compound
+    assert idents["compound_id"] is None
+    # With Compound
+    assert def_idents["compound_id"] == def_sub.associated_compound.pk
+
+
+@pytest.mark.django_db
 def test_substance_index_substance_list_delete(substance_factory):
     with patch("requests.delete") as mocked_delete:
         substances = [

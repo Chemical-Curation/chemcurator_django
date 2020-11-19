@@ -96,6 +96,7 @@ class SubstanceIndex(Index):
                 "type": "substance",
                 "attributes": {
                     "identifiers": {
+                        "compound_id": instance.associated_compound_id,
                         "preferred_name": instance.preferred_name,
                         "display_name": instance.display_name,
                         "casrn": instance.casrn,

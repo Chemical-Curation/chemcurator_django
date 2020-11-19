@@ -44,7 +44,7 @@ class QCLevelsTypeFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
     methods from DjangoSerializerFactory
     """
 
-    rank = factory.Faker("pyint")
+    rank = factory.Sequence(lambda n: n)
 
     @classmethod
     def _setup_next_sequence(cls):
