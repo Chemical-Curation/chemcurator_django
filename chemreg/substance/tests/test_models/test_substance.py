@@ -73,6 +73,7 @@ def test_substance_model():
     "preferred_name,validity,code",
     [
         ("Valid String?", True, None),
+        ("Valid String'?", True, None),  # 277 ' is now a valid character
         ("Invalid String!", False, "invalid"),  # '!' is an invalid character
     ],
 )
@@ -88,6 +89,7 @@ def test_validate_preferred_name(substance_factory, preferred_name, validity, co
     "display_name,validity,code",
     [
         ("Valid String?", True, None),
+        ("Valid String'?", True, None),  # 277 ' is now a valid character
         ("Invalid String!", False, "invalid"),  # '!' is an invalid character
     ],
 )
