@@ -1,10 +1,10 @@
 - model: substance.qclevelstype
   pk: 1
   fields:
-    name: qc-level-1
-    label: QC Level 1
-    short_description: This is the first QC Level
-    long_description: This is the long description for the first QC Level
+    name: dsstox-high
+    label: DSSTox High
+    short_description: hi
+    long_description: hi2
     created_at: 2020-06-18 02:41:57.241921
     created_by: 1
     updated_at: 2020-06-18 02:41:57.241957
@@ -17,19 +17,12 @@
     created_by: 1
     updated_at: 2020-08-06 18:47:13.526654
     updated_by: 1
-    name: ive-had-it-up-to-here
-    label: ive had it up to here
-    short_description:
-      "Serious final new three ago. Nice these voice effort accept
-      new.
-
-      Most wear so agreement yes. Benefit mean eat care develop shake learn. Whole
-      north amount relate here."
-    long_description:
-      Nature least information east throughout fear performance. Close
-      smile possible use. Suggest red kid lead force. Draw beyond green figure site.
+    name: dsstox-low
+    label: DSSTox Low
+    short_description: hi
+    long_description: hi2
     deprecated: false
-    rank: 3
+    rank: 2
 - model: substance.qclevelstype
   pk: 3
   fields:
@@ -37,29 +30,12 @@
     created_by: 1
     updated_at: 2020-08-11 07:12:21.652590
     updated_by: 1
-    name: explain-bring-0
-    label: explain bring 0
-    short_description: "Teacher loss something sort.
-
-      Degree member hard camera serious. Cell be name others entire. Theory trip hit
-      century as.
-
-      Star population company probably. Room reduce couple line billion yes.
-
-      Agreement hundred wear mother single. Without side buy reduce carry. Side sport
-      three choice.
-
-      Eat final staff painting. Pm ready state there nearly.
-
-      Name eight phone guess loss open least. Ask ability town write analysis. Piece
-      black ask improve generation huge decade."
-    long_description:
-      "Green pretty although last whatever call yet with. Test various
-      follow save paper. Garden machine might live give society himself.
-
-      Who southern seat again about note term."
+    name: public-high
+    label: Public High
+    short_description: hi
+    long_description: hi2
     deprecated: false
-    rank: 0
+    rank: 3
 - model: substance.qclevelstype
   pk: 4
   fields:
@@ -67,28 +43,12 @@
     created_by: 1
     updated_at: 2020-08-11 07:12:21.661255
     updated_by: 1
-    name: material-firm-keep-1
-    label: material firm keep 1
-    short_description:
-      "Mouth age cold population dog simple. Level individual if
-      spend. Wear late note edge fund.
-
-      Decade list next able board scientist will.
-
-      Special everybody friend. Camera off set gun a specific.
-
-      Within half us nation. Hour understand activity majority.
-
-      Would weight wear stand take write near. Table customer third also government
-      six support.
-
-      Partner bring question stock group around. If term information adult across
-      through. Despite drive goal travel learn off get."
-    long_description:
-      Leg need though send. Necessary from impact cup tree reason.
-      Say someone follow beautiful.
+    name: public-med
+    label: Public Medium
+    short_description: hi
+    long_description: hi2
     deprecated: false
-    rank: 47
+    rank: 4
 - model: substance.qclevelstype
   pk: 5
   fields:
@@ -96,32 +56,12 @@
     created_by: 1
     updated_at: 2020-08-11 07:12:21.668137
     updated_by: 1
-    name: there-week-win-2
-    label: there week win 2
-    short_description:
-      "Adult leg night great line democratic. Agency camera remember
-      agree yeah continue finish film.
-
-      Rest doctor worker friend role admit his. Build season country citizen strong.
-      Draw training sound church.
-
-      Rise effect back choice hair letter inside. To teacher sense number.
-
-      Pressure position policy another. Student success brother.
-
-      Your alone off. Line name star something last will.
-
-      Hit animal recognize ground happy. Position north usually member art.
-
-      Be item baby theory kitchen detail."
-    long_description:
-      "Nice image including street public method. Phone not issue
-      book bit above early.
-
-      Already field stop court future hair maintain. Thought citizen probably yet
-      wind region daughter dark."
+    name: public-low
+    label: Public Low
+    short_description: hi
+    long_description: hi2
     deprecated: false
-    rank: 2
+    rank: 5
 - model: substance.qclevelstype
   pk: 6
   fields:
@@ -129,25 +69,12 @@
     created_by: 1
     updated_at: 2020-08-11 07:19:14.559253
     updated_by: 1
-    name: condition-season-5
-    label: condition season 5
-    short_description: "Impact response old spring. Shake big other.
-
-      Seat high prepare agreement television paper. Despite thus less rest institution
-      represent including. Defense sound hour direction evening job first prove.
-
-      There everybody expect here. Wall or dog system.
-
-      Follow fund tonight cut without former. Result rich natural herself far true
-      check same. Page water seek art never same tough land.
-
-      Enough position floor bank simply approach article myself. Time whom language
-      reduce kitchen. Join sing society job."
-    long_description:
-      Her personal culture during. Happy draw community care head
-      decide. Paper debate thank hope.
+    name: public-untrusted
+    label: Public Untrusted
+    short_description: hi
+    long_description: hi2
     deprecated: false
-    rank: 5
+    rank: 6
 - model: substance.qclevelstype
   pk: 7
   fields:
@@ -155,155 +82,17 @@
     created_by: 1
     updated_at: 2020-08-11 07:19:16.393151
     updated_by: 1
-    name: miss-fall-however-6
-    label: miss fall however 6
-    short_description:
-      "Down source candidate main feel news in. Find off candidate
-      affect pressure lead.
-
-      Himself city daughter line. Teacher charge future book run.
-
-      Study guy loss else create either wrong tonight. Loss similar audience same
-      different. Finish her eight apply.
-
-      Feeling information by. Simply special art rate.
-
-      Man computer apply. Take social get number young no ground left. Season use
-      check lose white.
-
-      Serve trouble whatever authority out tonight. Fish decision black structure
-      per."
-    long_description: "President half serious name. Expect capital lot.
-
-      Room talk hope should political. Else play church call scientist figure."
-    deprecated: false
-    rank: 6
-- model: substance.qclevelstype
-  pk: 8
-  fields:
-    created_at: 2020-08-11 07:19:17.216094
-    created_by: 1
-    updated_at: 2020-08-11 07:19:17.216197
-    updated_by: 1
-    name: four-say-democratic-7
-    label: four say democratic 7
-    short_description:
-      "Decision ready great bit. Buy campaign increase half ask medical
-      dark.
-
-      Ability difficult nothing town. Wear politics say sport major rich. Matter election
-      experience.
-
-      Level book process director require machine computer. Prepare research stay
-      pick physical manage. Technology soon west owner. Fact rate total probably.
-
-      Seek get pattern. Drive apply evidence support happy out also. High begin nature
-      thank feeling three.
-
-      Early understand study drop high commercial. Make learn ago."
-    long_description:
-      Professional sign sea people. Short protect outside industry
-      research dog boy. Collection play occur animal garden.
+    name: incomplete
+    label: Incomplete
+    short_description: hi
+    long_description: hi2
     deprecated: false
     rank: 7
-- model: substance.qclevelstype
-  pk: 9
-  fields:
-    created_at: 2020-08-11 07:19:17.925822
-    created_by: 1
-    updated_at: 2020-08-11 07:19:17.925854
-    updated_by: 1
-    name: already-each-world-8
-    label: already each world 8
-    short_description:
-      "My camera factor me chance Mr girl. Structure ready tell possible
-      police. Management open last form data.
-
-      Account describe leave will sign last yourself. Important wait million director
-      among. Fund support agency energy. Make point rate smile help.
-
-      Rather reason fund pay where. Mission catch director avoid.
-
-      Boy who describe indeed interview Congress.
-
-      Class miss important. Charge off city him world.
-
-      Section sing treat special yet vote month one."
-    long_description:
-      "Over if poor wind. Marriage include society quality shoulder
-      senior reality give. Film have organization decide girl phone.
-
-      Call gas great small use when example. Western cut all force set."
-    deprecated: false
-    rank: 8
-- model: substance.qclevelstype
-  pk: 10
-  fields:
-    created_at: 2020-08-11 07:19:18.705665
-    created_by: 1
-    updated_at: 2020-08-11 07:19:18.705695
-    updated_by: 1
-    name: develop-left-just-9
-    label: develop left just 9
-    short_description:
-      "Region more real same. Local improve would special. Top actually
-      bring summer store.
-
-      Economy his hold collection likely rate herself. General owner down property
-      foot law.
-
-      Hear reach bad. Couple go guy middle. Brother home affect customer possible
-      serve. Bill bit chance several use game attack.
-
-      Exactly half operation if. Who group unit source imagine cup administration
-      debate. Street politics administration laugh always family building. Particular
-      activity international station chance."
-    long_description:
-      Real sense make seem national. Region ever relate relate. Capital
-      degree door news picture value.
-    deprecated: false
-    rank: 9
-- model: substance.qclevelstype
-  pk: 11
-  fields:
-    created_at: 2020-08-11 07:19:19.695550
-    created_by: 1
-    updated_at: 2020-08-11 07:19:19.695585
-    updated_by: 1
-    name: minute-dark-true-10
-    label: minute dark true 10
-    short_description:
-      "After floor your record white his certainly. Collection spend
-      top alone economic what politics prove.
-
-      Build candidate phone hope participant. Order as everyone which serious edge.
-
-      Account oil significant should while natural game price. Pressure standard radio
-      among near near while. It college poor nation side commercial effort. Theory
-      few especially interview these series surface.
-
-      Similar continue talk table simply. Buy especially close clearly gas."
-    long_description: Myself I industry write. Ready low understand staff well boy.
-    deprecated: false
-    rank: 10
-- model: substance.qclevelstype
-  pk: 12
-  fields:
-    created_at: 2020-08-11 07:19:19.695550
-    created_by: 1
-    updated_at: 2020-08-11 07:19:19.695585
-    updated_by: 1
-    name: deprecated-qc-levels
-    label: Deprecated QC Levels
-    short_description: 'This is a deprecated QC Level'
-    long_description: This is a deprecated QC Level.
-    deprecated: True
-    rank: 11
 - model: substance.source
   pk: 1
   fields:
-    name: source-1
-    label: Source 1
+    name: public
+    label: Public
     short_description: This is the first source
     long_description: This is the long description for the first source
     created_at: 2020-06-18 02:41:57.241921
@@ -317,8 +106,8 @@
     created_by: 1
     updated_at: 2020-07-28 22:43:41.224603
     updated_by: 1
-    name: Source-Two
-    label: Another single source label
+    name: stn-dsstox
+    label: STN(DSSTox)
     short_description: This is the second source to have been made
     long_description:
       this is the long description for a source that will be tested
@@ -331,9 +120,9 @@
     created_by: 1
     updated_at: 2020-07-29 17:11:06.489959
     updated_by: 1
-    name: Source-Three
-    label: A single source label11
-    short_description: This is the first source to have been made
+    name: chemid
+    label: ChemIDPlus
+    short_description: hi
     long_description:
       this is the long description for a source that will be tested
       for arriving on a GET request when it is deprecated.
@@ -550,7 +339,7 @@
     display_name: null
     source: 9
     substance_type: 8
-    qc_level: 12
+    qc_level: 6
     description: Deprecated Substance
     public_qc_note: This substance has deprecated dropdown options
     private_qc_note: This substance has deprecated dropdown options
@@ -576,6 +365,23 @@
     created_at: 2020-08-06 18:02:45.470694
     created_by: 1
     updated_at: 2020-08-06 18:02:45.470722
+    updated_by: 1
+- model: substance.substance
+  pk: DTXSID2024246
+  fields:
+    preferred_name: Pentabromodiphenyl ether
+    display_name: 2,2',4,4',5,5'-Hexabromo-1,1'-biphenyl
+    description: This is the description for the test substance
+    casrn: 67774-32-7
+    public_qc_note: Public QC notes
+    private_qc_note: Private QC notes
+    associated_compound:
+    qc_level: 1
+    substance_type: 1
+    source: 1
+    created_at: 2020-06-18 02:41:57.241921
+    created_by: 1
+    updated_at: 2020-06-18 02:41:57.241957
     updated_by: 1
 - model: substance.substancerelationship
   pk: 1
