@@ -70,8 +70,8 @@ class Substance(CommonInfo):
         substance_histories (QuerySet): One to Many Substance history resources (not implemented yet)
     """
 
-    preferred_name_regex = "^[a-zA-Z0-9 =<>\\-:.,^%&/{}[\\]()+?=]{3,}$"
-    display_name_regex = "^[a-zA-Z0-9 =<>\\-:.,^%&/{}[\\]()+?=]{3,}$"
+    preferred_name_regex = "^[a-zA-Z0-9 =<>\\-':.,^%&/{}[\\]()+?=]{3,}$"
+    display_name_regex = "^[a-zA-Z0-9 =<>\\-':.,^%&/{}[\\]()+?=]{3,}$"
     casrn_regex = "^[0-9]{2,7}-[0-9]{2}-[0-9]$"
 
     id = models.CharField(
