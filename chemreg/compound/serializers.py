@@ -92,7 +92,8 @@ class DefinedCompoundSerializer(BaseCompoundSerializer):
         super().__init__(*args, **kwargs)
 
     def validate_id(self, value):
-        if "inchikey" not in self.initial_data:
+        # if there is no inchikey on POST (patch id's are not editable)
+        if "inchikey" not in self.initial_data and not self.instance:
             raise ValidationError("InchIKey must be included when CID is defined.")
         return value
 
@@ -103,6 +104,8 @@ class DefinedCompoundSerializer(BaseCompoundSerializer):
 
     def validate(self, data):
         qs = self.Meta.model.objects.filter(inchikey=data["inchikey"])
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
         if qs.exists() and not self.admin_override:
             matched = []
             req = self.context.get("request", None)

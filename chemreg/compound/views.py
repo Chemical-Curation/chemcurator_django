@@ -104,6 +104,7 @@ class DefinedCompoundViewSet(
     filterset_class = DefinedCompoundFilter
     permission_classes_by_action = {
         "create": [IsAdminUser],
+        "partial_update": [IsAdminUser],
     }
 
     def get_serializer_class(self, *args, **kwargs):
