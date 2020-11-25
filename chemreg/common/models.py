@@ -44,7 +44,7 @@ class CommonInfo(models.Model):
 
 class ControlledVocabulary(CommonInfo):
 
-    name = models.SlugField(max_length=49, unique=True)
+    name = models.SlugField(primary_key=True, max_length=49, unique=True)
     label = models.CharField(max_length=99, unique=True)
     short_description = models.CharField(max_length=499)
     long_description = models.TextField()

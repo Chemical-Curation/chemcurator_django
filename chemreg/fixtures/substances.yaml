@@ -1,7 +1,6 @@
 - model: substance.qclevelstype
-  pk: 1
+  pk: qc-level-1
   fields:
-    name: qc-level-1
     label: QC Level 1
     short_description: This is the first QC Level
     long_description: This is the long description for the first QC Level
@@ -11,13 +10,12 @@
     updated_by: 1
     rank: 1
 - model: substance.qclevelstype
-  pk: 2
+  pk: ive-had-it-up-to-here
   fields:
     created_at: 2020-08-06 18:47:13.526600
     created_by: 1
     updated_at: 2020-08-06 18:47:13.526654
     updated_by: 1
-    name: ive-had-it-up-to-here
     label: ive had it up to here
     short_description:
       "Serious final new three ago. Nice these voice effort accept
@@ -31,13 +29,12 @@
     deprecated: false
     rank: 3
 - model: substance.qclevelstype
-  pk: 3
+  pk: explain-bring-0
   fields:
     created_at: 2020-08-11 07:12:21.652545
     created_by: 1
     updated_at: 2020-08-11 07:12:21.652590
     updated_by: 1
-    name: explain-bring-0
     label: explain bring 0
     short_description: "Teacher loss something sort.
 
@@ -61,13 +58,12 @@
     deprecated: false
     rank: 0
 - model: substance.qclevelstype
-  pk: 4
+  pk: material-firm-keep-1
   fields:
     created_at: 2020-08-11 07:12:21.661234
     created_by: 1
     updated_at: 2020-08-11 07:12:21.661255
     updated_by: 1
-    name: material-firm-keep-1
     label: material firm keep 1
     short_description:
       "Mouth age cold population dog simple. Level individual if
@@ -90,13 +86,12 @@
     deprecated: false
     rank: 47
 - model: substance.qclevelstype
-  pk: 5
+  pk: there-week-win-2
   fields:
     created_at: 2020-08-11 07:12:21.668109
     created_by: 1
     updated_at: 2020-08-11 07:12:21.668137
     updated_by: 1
-    name: there-week-win-2
     label: there week win 2
     short_description:
       "Adult leg night great line democratic. Agency camera remember
@@ -123,13 +118,12 @@
     deprecated: false
     rank: 2
 - model: substance.qclevelstype
-  pk: 6
+  pk: condition-season-5
   fields:
     created_at: 2020-08-11 07:19:14.559211
     created_by: 1
     updated_at: 2020-08-11 07:19:14.559253
     updated_by: 1
-    name: condition-season-5
     label: condition season 5
     short_description: "Impact response old spring. Shake big other.
 
@@ -149,13 +143,12 @@
     deprecated: false
     rank: 5
 - model: substance.qclevelstype
-  pk: 7
+  pk: miss-fall-however-6
   fields:
     created_at: 2020-08-11 07:19:16.393116
     created_by: 1
     updated_at: 2020-08-11 07:19:16.393151
     updated_by: 1
-    name: miss-fall-however-6
     label: miss fall however 6
     short_description:
       "Down source candidate main feel news in. Find off candidate
@@ -179,13 +172,12 @@
     deprecated: false
     rank: 6
 - model: substance.qclevelstype
-  pk: 8
+  pk: four-say-democratic-7
   fields:
     created_at: 2020-08-11 07:19:17.216094
     created_by: 1
     updated_at: 2020-08-11 07:19:17.216197
     updated_by: 1
-    name: four-say-democratic-7
     label: four say democratic 7
     short_description:
       "Decision ready great bit. Buy campaign increase half ask medical
@@ -207,13 +199,12 @@
     deprecated: false
     rank: 7
 - model: substance.qclevelstype
-  pk: 9
+  pk: already-each-world-8
   fields:
     created_at: 2020-08-11 07:19:17.925822
     created_by: 1
     updated_at: 2020-08-11 07:19:17.925854
     updated_by: 1
-    name: already-each-world-8
     label: already each world 8
     short_description:
       "My camera factor me chance Mr girl. Structure ready tell possible
@@ -237,13 +228,12 @@
     deprecated: false
     rank: 8
 - model: substance.qclevelstype
-  pk: 10
+  pk: develop-left-just-9
   fields:
     created_at: 2020-08-11 07:19:18.705665
     created_by: 1
     updated_at: 2020-08-11 07:19:18.705695
     updated_by: 1
-    name: develop-left-just-9
     label: develop left just 9
     short_description:
       "Region more real same. Local improve would special. Top actually
@@ -264,13 +254,12 @@
     deprecated: false
     rank: 9
 - model: substance.qclevelstype
-  pk: 11
+  pk: minute-dark-true-10
   fields:
     created_at: 2020-08-11 07:19:19.695550
     created_by: 1
     updated_at: 2020-08-11 07:19:19.695585
     updated_by: 1
-    name: minute-dark-true-10
     label: minute dark true 10
     short_description:
       "After floor your record white his certainly. Collection spend
@@ -287,22 +276,20 @@
     deprecated: false
     rank: 10
 - model: substance.qclevelstype
-  pk: 12
+  pk: deprecated-qc-levels
   fields:
     created_at: 2020-08-11 07:19:19.695550
     created_by: 1
     updated_at: 2020-08-11 07:19:19.695585
     updated_by: 1
-    name: deprecated-qc-levels
     label: Deprecated QC Levels
     short_description: 'This is a deprecated QC Level'
     long_description: This is a deprecated QC Level.
     deprecated: True
     rank: 11
 - model: substance.source
-  pk: 1
+  pk: source-1
   fields:
-    name: source-1
     label: Source 1
     short_description: This is the first source
     long_description: This is the long description for the first source
@@ -311,13 +298,12 @@
     updated_at: 2020-06-18 02:41:57.241957
     updated_by: 1
 - model: substance.source
-  pk: 2
+  pk: Source-Two
   fields:
     created_at: 2020-07-28 22:43:41.224572
     created_by: 1
     updated_at: 2020-07-28 22:43:41.224603
     updated_by: 1
-    name: Source-Two
     label: Another single source label
     short_description: This is the second source to have been made
     long_description:
@@ -325,13 +311,12 @@
       for arriving on a GET request when it is deprecated.
     deprecated: false
 - model: substance.source
-  pk: 3
+  pk: Source-Three
   fields:
     created_at: 2020-07-28 22:50:04.336758
     created_by: 1
     updated_at: 2020-07-29 17:11:06.489959
     updated_by: 1
-    name: Source-Three
     label: A single source label11
     short_description: This is the first source to have been made
     long_description:
@@ -339,13 +324,12 @@
       for arriving on a GET request when it is deprecated.
     deprecated: false
 - model: substance.source
-  pk: 4
+  pk: involve-charge-trip-0
   fields:
     created_at: 2020-08-11 07:14:18.842016
     created_by: 1
     updated_at: 2020-08-11 07:14:18.842049
     updated_by: 1
-    name: involve-charge-trip-0
     label: involve charge trip 0
     short_description: "Truth civil dinner radio city raise collection evening.
 
@@ -369,13 +353,12 @@
       parent."
     deprecated: false
 - model: substance.source
-  pk: 5
+  pk: finally-wear-kid-1
   fields:
     created_at: 2020-08-11 07:14:18.855605
     created_by: 1
     updated_at: 2020-08-11 07:14:18.855638
     updated_by: 1
-    name: finally-wear-kid-1
     label: finally wear kid 1
     short_description:
       "Religious find car themselves PM. Mission subject ready themselves
@@ -399,13 +382,12 @@
       unit."
     deprecated: false
 - model: substance.source
-  pk: 6
+  pk: focus-town-other-2
   fields:
     created_at: 2020-08-11 07:14:18.866100
     created_by: 1
     updated_at: 2020-08-11 07:14:18.866126
     updated_by: 1
-    name: focus-town-other-2
     label: focus town other 2
     short_description:
       "Red free him agency cup. Resource low plan remain interesting
@@ -426,13 +408,12 @@
       Side we happy happy serve hope sound. Get whom worry morning notice can."
     deprecated: false
 - model: substance.source
-  pk: 7
+  pk: popular-general-3
   fields:
     created_at: 2020-08-11 07:14:18.874367
     created_by: 1
     updated_at: 2020-08-11 07:14:18.874392
     updated_by: 1
-    name: popular-general-3
     label: popular general 3
     short_description: "Hope opportunity buy company indicate major join.
 
@@ -454,13 +435,12 @@
       alone you pretty few. Sure though management relationship.
     deprecated: false
 - model: substance.source
-  pk: 8
+  pk: down-indeed-other-4
   fields:
     created_at: 2020-08-11 07:14:18.880768
     created_by: 1
     updated_at: 2020-08-11 07:14:18.880788
     updated_by: 1
-    name: down-indeed-other-4
     label: down indeed other 4
     short_description:
       "Bring car bar sometimes free church. Far finish pressure each
@@ -501,9 +481,9 @@
     public_qc_note: Public QC notes
     private_qc_note: Private QC notes
     associated_compound: DTXCID302000003
-    qc_level: 1
-    substance_type: 1
-    source: 1
+    qc_level: qc-level-1
+    substance_type: substance-type-1
+    source: source-1
     created_at: 2020-06-18 02:41:57.241921
     created_by: 1
     updated_at: 2020-06-18 02:41:57.241957
@@ -513,9 +493,9 @@
   fields:
     preferred_name: Sample Substance 2
     display_name: Display Sample Substance 2
-    source: 2
-    substance_type: 2
-    qc_level: 1
+    source: Source-Two
+    substance_type: area-professor-home47
+    qc_level: qc-level-1
     description: area professor home
     public_qc_note: this may be acceptable.
     private_qc_note: Houston, we have a problem!
@@ -530,9 +510,9 @@
   fields:
     preferred_name: Hydrogen Peroxide
     display_name: Hydrogen Peroxide
-    source: 2
-    substance_type: 1
-    qc_level: 1
+    source: Source-Two
+    substance_type: substance-type-1
+    qc_level: qc-level-1
     description: Hydrogen peroxide is a mild antiseptic used on the skin
       to prevent infection of minor cuts, scrapes, and burns.
     public_qc_note: Public QC
@@ -548,9 +528,9 @@
   fields:
     preferred_name: Deprecated Substance
     display_name: null
-    source: 9
-    substance_type: 8
-    qc_level: 12
+    source: deprecated-source
+    substance_type: deprecated-substance-type
+    qc_level: deprecated-qc-levels
     description: Deprecated Substance
     public_qc_note: This substance has deprecated dropdown options
     private_qc_note: This substance has deprecated dropdown options
@@ -565,9 +545,9 @@
   fields:
     preferred_name: Solo Substance
     display_name: Solo Substance
-    source: 2
-    substance_type: 1
-    qc_level: 1
+    source: source-1
+    substance_type: substance-type-1
+    qc_level: qc-level-1
     description: This is a substance that is not associated with any compound.
     public_qc_note: Public QC
     private_qc_note: Private QC
@@ -586,8 +566,8 @@
     updated_by: 1
     from_substance: DTXSID602000001
     to_substance: DTXSID202000002
-    source: 1
-    relationship_type: 1
+    source: source-1
+    relationship_type: area-professor-home
     qc_notes: This goes from substance DTXSID602000001 to substance DTXSID202000002
 - model: substance.substancerelationship
   pk: 2
@@ -598,8 +578,8 @@
     updated_by: 1
     from_substance: DTXSID602000001
     to_substance: DTXSID602000001
-    source: 1
-    relationship_type: 1
+    source: source-1
+    relationship_type: area-professor-home
     qc_notes: This goes from substance DTXSID602000001 to substance DTXSID602000001 (self)
 - model: substance.substancerelationship
   pk: 3
@@ -610,13 +590,12 @@
     updated_by: 1
     from_substance: DTXSID502000000
     to_substance: DTXSID602000001
-    source: 1
-    relationship_type: 1
+    source: source-1
+    relationship_type: area-professor-home
     qc_notes: This goes from substance DTXSID502000000 to substance DTXSID602000001
 - model: substance.substancetype
-  pk: 1
+  pk: substance-type-1
   fields:
-    name: substance-type-1
     label: Substance Type 1
     short_description: This is the first substance type
     long_description: This is the long description for the first substance type
@@ -625,13 +604,12 @@
     updated_at: 2020-06-18 02:41:57.241957
     updated_by: 1
 - model: substance.substancetype
-  pk: 2
+  pk: area-professor-home47
   fields:
     created_at: 2020-07-28 22:39:57.877982
     created_by: 1
     updated_at: 2020-08-06 18:29:53.153013
     updated_by: 1
-    name: area-professor-home47
     label: area professor home47
     short_description:
       "Serious final new three ago. Nice these voice effort accept
@@ -644,13 +622,12 @@
       smile possible use. Suggest red kid lead force. Draw beyond green figure site.
     deprecated: true
 - model: substance.substancetype
-  pk: 3
+  pk: region-box-like-0
   fields:
     created_at: 2020-08-11 07:14:28.625314
     created_by: 1
     updated_at: 2020-08-11 07:14:28.625341
     updated_by: 1
-    name: region-box-like-0
     label: region box like 0
     short_description:
       "Yourself public weight. Court red protect her later. Such
@@ -666,13 +643,12 @@
       until recent. Oil although show nor collection represent old.
     deprecated: false
 - model: substance.substancetype
-  pk: 4
+  pk: to-house-admit-1
   fields:
     created_at: 2020-08-11 07:14:28.634796
     created_by: 1
     updated_at: 2020-08-11 07:14:28.634824
     updated_by: 1
-    name: to-house-admit-1
     label: to house admit 1
     short_description: "Voice force house alone. Charge between site care laugh.
 
@@ -691,13 +667,12 @@
       view Mr big month. Over hotel memory usually their similar few.
     deprecated: false
 - model: substance.substancetype
-  pk: 5
+  pk: and-letter-mind-2
   fields:
     created_at: 2020-08-11 07:14:28.643307
     created_by: 1
     updated_at: 2020-08-11 07:14:28.643356
     updated_by: 1
-    name: and-letter-mind-2
     label: and letter mind 2
     short_description:
       "Away more soon upon. Congress grow early finally police bed
@@ -717,13 +692,12 @@
       a themselves."
     deprecated: false
 - model: substance.substancetype
-  pk: 6
+  pk: audience-better-3
   fields:
     created_at: 2020-08-11 07:14:28.651124
     created_by: 1
     updated_at: 2020-08-11 07:14:28.651147
     updated_by: 1
-    name: audience-better-3
     label: audience better 3
     short_description:
       "Professor international force experience continue society.
@@ -746,13 +720,12 @@
       employee."
     deprecated: false
 - model: substance.substancetype
-  pk: 7
+  pk: finally-strategy-4
   fields:
     created_at: 2020-08-11 07:14:28.658652
     created_by: 1
     updated_at: 2020-08-11 07:14:28.658675
     updated_by: 1
-    name: finally-strategy-4
     label: finally strategy 4
     short_description: "Product second pattern.
 
@@ -772,25 +745,23 @@
       magazine society.
     deprecated: false
 - model: substance.substancetype
-  pk: 8
+  pk: deprecated-substance-type
   fields:
     created_at: 2020-08-11 07:14:18.880768
     created_by: 1
     updated_at: 2020-08-11 07:14:18.880788
     updated_by: 1
-    name: deprecated-substance-type
     label: Deprecated Substance Type
     short_description: This is a deprecated Substance Type.
     long_description: This is a deprecated Substance Type.
     deprecated: true
 - model: substance.synonymtype
-  pk: 1
+  pk: area-professor-home
   fields:
     created_at: 2020-08-06 17:24:37.325172
     created_by: 1
     updated_at: 2020-08-06 19:16:46.463786
     updated_by: 1
-    name: area-professor-home
     label: area professor home
     short_description:
       "Serious final new three ago. Nice these voice effort accept
@@ -806,13 +777,12 @@
     score_modifier: 4.7
     is_casrn: false
 - model: substance.synonymtype
-  pk: 2
+  pk: their-mean-attack-0
   fields:
     created_at: 2020-08-11 07:14:37.582900
     created_by: 1
     updated_at: 2020-08-11 07:14:37.582927
     updated_by: 1
-    name: their-mean-attack-0
     label: their mean attack 0
     short_description:
       "Wrong full follow view. Talk course letter senior enter as.
@@ -837,13 +807,12 @@
     score_modifier: 810.4796
     is_casrn: false
 - model: substance.synonymtype
-  pk: 3
+  pk: three-black-play-1
   fields:
     created_at: 2020-08-11 07:14:37.592448
     created_by: 1
     updated_at: 2020-08-20 19:34:02.912394
     updated_by: 1
-    name: three-black-play-1
     label: three black play 1
     short_description:
       "Price important billion population evidence right. Feeling
@@ -872,13 +841,12 @@
     score_modifier: 4106.0
     is_casrn: false
 - model: substance.synonymtype
-  pk: 4
+  pk: less-news-prevent-2
   fields:
     created_at: 2020-08-11 07:14:37.600907
     created_by: 1
     updated_at: 2020-08-11 07:14:37.600948
     updated_by: 1
-    name: less-news-prevent-2
     label: less news prevent 2
     short_description: "Task situation board Mr food front mission.
 
@@ -902,13 +870,12 @@
     score_modifier: -288817532.6506
     is_casrn: false
 - model: substance.synonymtype
-  pk: 5
+  pk: stand-brother-3
   fields:
     created_at: 2020-08-11 07:14:37.608634
     created_by: 1
     updated_at: 2020-08-11 07:14:37.608656
     updated_by: 1
-    name: stand-brother-3
     label: stand brother 3
     short_description:
       "Government however science five music discuss general. Effort
@@ -932,13 +899,12 @@
     score_modifier: -43286193.54414
     is_casrn: false
 - model: substance.synonymtype
-  pk: 6
+  pk: capital-performance-4
   fields:
     created_at: 2020-08-11 07:14:37.616434
     created_by: 1
     updated_at: 2020-08-11 07:14:37.616460
     updated_by: 1
-    name: capital-performance-4
     label: capital performance 4
     short_description:
       "Sit how share than try protect. Her return leave next close
@@ -977,13 +943,12 @@
     score_modifier: -950230027281.1
     is_casrn: false
 - model: substance.synonymquality
-  pk: 1
+  pk: area-professor-home
   fields:
     created_at: 2020-08-06 16:59:44.868651
     created_by: 1
     updated_at: 2020-08-06 17:10:16.547800
     updated_by: 1
-    name: area-professor-home
     label: area professor home
     short_description:
       "Serious final new three ago. Nice these voice effort accept
@@ -998,13 +963,12 @@
     score_weight: 5.0
     is_restrictive: false
 - model: substance.synonymquality
-  pk: 2
+  pk: area-professor-homage
   fields:
     created_at: 2020-08-06 17:29:00.491910
     created_by: 1
     updated_at: 2020-08-13 09:31:08.264241
     updated_by: 1
-    name: area-professor-homage
     label: area professor homage
     short_description:
       "Serious final new three ago. Nice these voice effort accept
@@ -1019,13 +983,12 @@
     score_weight: 4.7
     is_restrictive: false
 - model: substance.synonymquality
-  pk: 3
+  pk: area-professor-fromage
   fields:
     created_at: 2020-08-06 17:37:14.798968
     created_by: 1
     updated_at: 2020-08-20 19:22:03.412287
     updated_by: 1
-    name: area-professor-fromage
     label: area professor fromage
     short_description:
       "Serious final new three ago. Nice these voice effort accept
@@ -1040,13 +1003,12 @@
     score_weight: 4.7
     is_restrictive: true
 - model: substance.synonymquality
-  pk: 4
+  pk: cost-imagine-0
   fields:
     created_at: 2020-08-11 07:14:47.364609
     created_by: 1
     updated_at: 2020-08-11 07:14:47.364637
     updated_by: 1
-    name: cost-imagine-0
     label: cost imagine 0
     short_description:
       "Able likely whom explain account. But popular practice newspaper
@@ -1068,13 +1030,12 @@
     score_weight: 71.79822
     is_restrictive: true
 - model: substance.synonymquality
-  pk: 5
+  pk: source-become-1
   fields:
     created_at: 2020-08-11 07:14:47.374443
     created_by: 1
     updated_at: 2020-08-11 07:14:47.374481
     updated_by: 1
-    name: source-become-1
     label: source become 1
     short_description:
       "Stay travel suffer wish information good behind option. Character
@@ -1095,13 +1056,12 @@
     score_weight: 44595827981839.0
     is_restrictive: false
 - model: substance.synonymquality
-  pk: 6
+  pk: line-chance-wind-2
   fields:
     created_at: 2020-08-11 07:14:47.381609
     created_by: 1
     updated_at: 2020-08-11 07:14:47.381632
     updated_by: 1
-    name: line-chance-wind-2
     label: line chance wind 2
     short_description:
       "Occur fear into happen everybody. Question finally young old
@@ -1125,13 +1085,12 @@
     score_weight: 33.117
     is_restrictive: true
 - model: substance.synonymquality
-  pk: 7
+  pk: opportunity-floor-3
   fields:
     created_at: 2020-08-11 07:14:47.388612
     created_by: 1
     updated_at: 2020-08-11 07:14:47.388637
     updated_by: 1
-    name: opportunity-floor-3
     label: opportunity floor 3
     short_description:
       "Yes manager something. College sport traditional everything
@@ -1151,13 +1110,12 @@
     score_weight: 8662.93088207
     is_restrictive: true
 - model: substance.synonymquality
-  pk: 8
+  pk: talk-society-hand-4
   fields:
     created_at: 2020-08-11 07:14:47.396801
     created_by: 1
     updated_at: 2020-08-11 07:14:47.396832
     updated_by: 1
-    name: talk-society-hand-4
     label: talk society hand 4
     short_description:
       "Professor even along home. Across agency but walk film yeah
@@ -1205,9 +1163,9 @@
     identifier: this is a synonym
     qc_notes: somebody QC me!
     substance: DTXSID602000001
-    source: 2
-    synonym_quality: 1
-    synonym_type: 1
+    source: Source-Two
+    synonym_quality: area-professor-home
+    synonym_type: area-professor-home
 - model: substance.synonym
   pk: 3
   fields:
@@ -1218,9 +1176,9 @@
     identifier: this is a synonym
     qc_notes: this is a note
     substance: DTXSID602000001
-    source: 1
-    synonym_quality: 1
-    synonym_type: 2
+    source: source-1
+    synonym_quality: area-professor-home
+    synonym_type: their-mean-attack-0
 - model: substance.synonym
   pk: 4
   fields:
@@ -1231,9 +1189,9 @@
     identifier: plow
     qc_notes: this is a note
     substance: DTXSID602000001
-    source: 1
-    synonym_quality: 1
-    synonym_type: 1
+    source: source-1
+    synonym_quality: area-professor-home
+    synonym_type: area-professor-home
 - model: substance.synonym
   pk: 5
   fields:
@@ -1244,9 +1202,9 @@
     identifier: plow
     qc_notes: this is a note
     substance: DTXSID602000001
-    source: 1
-    synonym_quality: 1
-    synonym_type: 1
+    source: source-1
+    synonym_quality: area-professor-home
+    synonym_type: area-professor-home
 - model: substance.synonym
   pk: 6
   fields:
@@ -1257,9 +1215,9 @@
     identifier: plow
     qc_notes: this is a note
     substance: DTXSID602000001
-    source: 1
-    synonym_quality: 1
-    synonym_type: 1
+    source: source-1
+    synonym_quality: area-professor-home
+    synonym_type: area-professor-home
 - model: substance.synonym
   pk: 7
   fields:
@@ -1270,9 +1228,9 @@
     identifier: plow
     qc_notes: this is a note
     substance: DTXSID602000001
-    source: 1
-    synonym_quality: 1
-    synonym_type: 1
+    source: source-1
+    synonym_quality: area-professor-home
+    synonym_type: area-professor-home
 - model: substance.synonym
   pk: 8
   fields:
@@ -1283,9 +1241,9 @@
     identifier: this is a synonym
     qc_notes: somebody QC me!
     substance: DTXSID602000001
-    source: 2
-    synonym_quality: 1
-    synonym_type: 1
+    source: Source-Two
+    synonym_quality: area-professor-home
+    synonym_type: area-professor-home
 - model: substance.synonym
   pk: 9
   fields:
@@ -1296,9 +1254,9 @@
     identifier: this is a synonym
     qc_notes: somebody QC me!
     substance: DTXSID602000001
-    source: 2
-    synonym_quality: 1
-    synonym_type: 1
+    source: Source-Two
+    synonym_quality: area-professor-home
+    synonym_type: area-professor-home
 - model: substance.synonym
   pk: 10
   fields:
@@ -1309,17 +1267,16 @@
     identifier: Chem-5ical
     qc_notes: somebody QC me!
     substance: DTXSID602000001
-    source: 2
-    synonym_quality: 8
-    synonym_type: 1
+    source: Source-Two
+    synonym_quality: talk-society-hand-4
+    synonym_type: area-professor-home
 - model: substance.relationshiptype
-  pk: 1
+  pk: area-professor-home
   fields:
     created_at: 2020-08-06 17:54:15.435007
     created_by: 1
     updated_at: 2020-08-06 17:54:15.435498
     updated_by: 1
-    name: area-professor-home
     label: area professor home
     short_description:
       "Serious final new three ago. Nice these voice effort accept
@@ -1334,13 +1291,12 @@
     corrolary_label: get it together
     corrolary_short_description: stop making noise
 - model: substance.relationshiptype
-  pk: 2
+  pk: ive-had-it-up-to-here
   fields:
     created_at: 2020-08-06 18:44:34.278615
     created_by: 1
     updated_at: 2020-08-06 18:44:34.278646
     updated_by: 1
-    name: ive-had-it-up-to-here
     label: ive had it up to here
     short_description:
       "Serious final new three ago. Nice these voice effort accept
@@ -1355,13 +1311,12 @@
     corrolary_label: get it together
     corrolary_short_description: stop making noise
 - model: substance.relationshiptype
-  pk: 3
+  pk: home-computer-0
   fields:
     created_at: 2020-08-11 07:14:07.340771
     created_by: 1
     updated_at: 2020-08-11 07:14:07.340808
     updated_by: 1
-    name: home-computer-0
     label: home computer 0
     short_description:
       "Improve professor decade its success bring pull. Easy bill
@@ -1402,13 +1357,12 @@
 
       Success article worry just. Determine change easy religious go."
 - model: substance.relationshiptype
-  pk: 4
+  pk: onto-answer-effect-1
   fields:
     created_at: 2020-08-11 07:14:07.354294
     created_by: 1
     updated_at: 2020-08-11 07:14:07.354320
     updated_by: 1
-    name: onto-answer-effect-1
     label: onto answer effect 1
     short_description:
       "Gas sing building tell place choose improve. Me generation
@@ -1446,13 +1400,12 @@
       Player the well woman analysis word everything. Bad trouble court page respond
       full there. Forget we over especially them thank social sign."
 - model: substance.relationshiptype
-  pk: 5
+  pk: form-down-society-2
   fields:
     created_at: 2020-08-11 07:14:07.364257
     created_by: 1
     updated_at: 2020-08-11 07:14:07.364282
     updated_by: 1
-    name: form-down-society-2
     label: form down society 2
     short_description:
       "Throughout sort space crime. Sell one a hour later team which.
@@ -1490,13 +1443,12 @@
       affect he. Catch make newspaper partner style lot identify. However energy pull
       agreement own what discuss."
 - model: substance.relationshiptype
-  pk: 6
+  pk: central-many-throw-3
   fields:
     created_at: 2020-08-11 07:14:07.372800
     created_by: 1
     updated_at: 2020-08-11 07:14:07.372821
     updated_by: 1
-    name: central-many-throw-3
     label: central many throw 3
     short_description:
       "Heart method recently child. Including country significant
@@ -1534,13 +1486,12 @@
       Task together myself far free inside. Finish throw laugh. Quickly dog notice
       paper claim."
 - model: substance.relationshiptype
-  pk: 7
+  pk: than-how-half-stage-4
   fields:
     created_at: 2020-08-11 07:14:07.381383
     created_by: 1
     updated_at: 2020-08-11 07:14:07.381403
     updated_by: 1
-    name: than-how-half-stage-4
     label: than how half stage 4
     short_description:
       "Hospital smile tell always its institution reveal. Partner

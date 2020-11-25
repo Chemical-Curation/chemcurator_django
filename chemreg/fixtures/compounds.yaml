@@ -454,55 +454,53 @@
 - model: compound.illdefinedcompound
   pk: DTXCID502000009
   fields:
-    query_structure_type: 1
+    query_structure_type: ill-defined
 - model: compound.illdefinedcompound
   pk: DTXCID802000010
   fields:
-    query_structure_type: 1
+    query_structure_type: ill-defined
 - model: compound.illdefinedcompound
   pk: DTXCID502000011
   fields:
-    query_structure_type: 1
+    query_structure_type: ill-defined
 - model: compound.illdefinedcompound
   pk: DTXCID202000012
   fields:
-    query_structure_type: 1
+    query_structure_type: ill-defined
 - model: compound.illdefinedcompound
   pk: DTXCID902000013
   fields:
-    query_structure_type: 1
+    query_structure_type: ill-defined
 - model: compound.illdefinedcompound
   pk: DTXCID602000014
   fields:
-    query_structure_type: 1
+    query_structure_type: ill-defined
 - model: compound.illdefinedcompound
   pk: DTXCID302000015
   fields:
-    query_structure_type: 1
+    query_structure_type: ill-defined
 - model: compound.illdefinedcompound
   pk: DTXCID502000555
   fields:
-    query_structure_type: 4
+    query_structure_type: deprecated
 - model: compound.querystructuretype
-  pk: 1
+  pk: ill-defined
   fields:
     created_at: 2020-06-02 21:20:33.612984
     created_by: 1
     updated_at: 2020-06-02 21:20:33.612997
     updated_by: 1
-    name: ill-defined
     label: Ill defined
     short_description: Ill defined
     long_description: Ill defined
     deprecated: false
 - model: compound.querystructuretype
-  pk: 2
+  pk: markush-enumerable
   fields:
     created_at: 2020-07-28 23:17:03.495911
     created_by: 1
     updated_at: 2020-07-28 23:17:03.495963
     updated_by: 1
-    name: markush-enumerable
     label: Markush Enumerable
     short_description: 'The mention focus amount natural. Loss include center able
       enter national. Send foreign somebody career.
@@ -514,13 +512,12 @@
       Cell friend for other idea. General upon three voice plan.'
     deprecated: false
 - model: compound.querystructuretype
-  pk: 3
+  pk: markush-query
   fields:
     created_at: 2020-08-11 07:15:00.820810
     created_by: 1
     updated_at: 2020-08-11 07:15:00.820874
     updated_by: 1
-    name: markush-query
     label: Markush Query
     short_description: Environment much offer budget fight leg. Cold population alone
       difficult.
@@ -528,13 +525,12 @@
       half culture none force. Beyond wide mention fire military support drive.
     deprecated: false
 - model: compound.querystructuretype
-  pk: 4
+  pk: deprecated
   fields:
     created_at: 2020-08-11 07:19:19.695550
     created_by: 1
     updated_at: 2020-08-11 07:19:19.695585
     updated_by: 1
-    name: deprecated
     label: Deprecated
     short_description: 'This is a deprecated QST'
     long_description: This is a deprecated Query Structure Type.

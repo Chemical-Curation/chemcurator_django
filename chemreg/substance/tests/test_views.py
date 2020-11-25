@@ -176,13 +176,13 @@ def test_source_patch(client, admin_user, source_factory):
     client.force_authenticate(user=admin_user)
     source = source_factory.create()
     pk = source.instance.pk
-    new_name = {"name": "a-new-name"}
+    new_label = {"label": "new-label"}
     resp = client.patch(
         f"/sources/{pk}",
-        {"data": {"id": pk, "type": "source", "attributes": new_name}},
+        {"data": {"id": pk, "type": "source", "attributes": new_label}},
     )
     assert resp.status_code == 200
-    assert resp.data["name"] == "a-new-name"
+    assert resp.data["label"] == "new-label"
 
 
 @pytest.mark.django_db
@@ -408,7 +408,7 @@ def test_substance_fetch(client, admin_user, substance_factory):
                 assert resp.data[key] == model_value
         # Verify Related Resources
         elif type(resp.data[key]) is OrderedDict:
-            assert resp.data[key]["id"] == str(getattr(original_model, key).id)
+            assert resp.data[key]["id"] == str(getattr(original_model, key).pk)
 
 
 @pytest.mark.django_db
@@ -432,13 +432,9 @@ def test_substance_fetch_includes(client, admin_user, substance_factory):
 @pytest.mark.django_db
 def test_substance_patch(client, admin_user, substance_factory):
     client.force_authenticate(user=admin_user)
-    print("hello")
     original_model = substance_factory.create(defined=True).instance
-    print("yooo")
     model_dict = substance_factory.build(illdefined=True).initial_data
-    print("bye")
     model_dict.update(id="DTXSID205000001")
-    print(model_dict)
     resp = client.patch(
         "/substances/{}".format(original_model.pk),
         {
@@ -762,7 +758,7 @@ def test_synonym_filter(client, admin_user, synonym_factory):
     for key in list(result.keys())[:-1]:
         obj = getattr(syn.instance, key)
         if issubclass(type(obj), Model):
-            result[key]["id"] = str(obj.id)
+            result[key]["id"] = str(obj.pk)
         elif isinstance(obj, datetime):
             assert result[key] == obj.strftime("%Y-%m-%dT%H:%M:%S.%f")
         else:

@@ -38,13 +38,13 @@ def test_list_type_patch(client, admin_user, list_type_factory):
     client.force_authenticate(user=admin_user)
     listType = list_type_factory.create()
     pk = listType.instance.pk
-    new_name = {"name": "new-name"}
+    new_label = {"label": "new-label"}
     resp = client.patch(
         f"/listTypes/{pk}",
-        {"data": {"id": pk, "type": "listType", "attributes": new_name}},
+        {"data": {"id": pk, "type": "listType", "attributes": new_label}},
     )
     assert resp.status_code == 200
-    assert resp.data["name"] == "new-name"
+    assert resp.data["label"] == "new-label"
 
 
 def test_accessibility_type_view():
@@ -87,13 +87,13 @@ def test_accessibility_type_patch(client, admin_user, accessibility_type_factory
     client.force_authenticate(user=admin_user)
     accessibilityType = accessibility_type_factory.create()
     pk = accessibilityType.instance.pk
-    new_name = {"name": "new-name"}
+    new_label = {"label": "new-label"}
     resp = client.patch(
         f"/accessibilityTypes/{pk}",
-        {"data": {"id": pk, "type": "accessibilityType", "attributes": new_name}},
+        {"data": {"id": pk, "type": "accessibilityType", "attributes": new_label}},
     )
     assert resp.status_code == 200
-    assert resp.data["name"] == "new-name"
+    assert resp.data["label"] == "new-label"
 
 
 def test_identifier_type_view():
@@ -130,13 +130,13 @@ def test_identifier_type_patch(client, admin_user, identifier_type_factory):
     client.force_authenticate(user=admin_user)
     identifierType = identifier_type_factory.create()
     pk = identifierType.instance.pk
-    new_name = {"name": "new-name"}
+    new_label = {"label": "new-label"}
     resp = client.patch(
         f"/identifierTypes/{pk}",
-        {"data": {"id": pk, "type": "identifierType", "attributes": new_name}},
+        {"data": {"id": pk, "type": "identifierType", "attributes": new_label}},
     )
     assert resp.status_code == 200
-    assert resp.data["name"] == "new-name"
+    assert resp.data["label"] == "new-label"
 
 
 @pytest.mark.django_db

@@ -1,7 +1,5 @@
 import json
 
-from django.apps import apps
-from django.db.models import Max
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAdminUser
 from rest_framework.reverse import reverse
@@ -322,8 +320,6 @@ def test_nonexistent_qst_in_illdefined(
     admin_user, client, ill_defined_compound_factory, query_structure_type_factory
 ):
     client.force_authenticate(user=admin_user)
-    qst = apps.get_model("compound", "QueryStructureType")
-    nonexistent_pk = qst.objects.aggregate(Max("pk"))["pk__max"] + 1
     idc = ill_defined_compound_factory.build()
     post_data = {
         "data": {
@@ -331,7 +327,7 @@ def test_nonexistent_qst_in_illdefined(
             "attributes": idc.initial_data,  # mrvfile
             "relationships": {
                 "query_structure_type": {
-                    "data": {"type": "queryStructureType", "id": nonexistent_pk}
+                    "data": {"type": "queryStructureType", "id": "qst"}
                 },
             },
         }
@@ -339,8 +335,7 @@ def test_nonexistent_qst_in_illdefined(
     response = client.post("/illDefinedCompounds", post_data)
     assert response.status_code == 400
     assert (
-        str(response.data[0]["detail"])
-        == f'Invalid pk "{nonexistent_pk}" - object does not exist.'
+        str(response.data[0]["detail"]) == 'Invalid pk "qst" - object does not exist.'
     )
 
 
@@ -349,8 +344,6 @@ def test_patch_nonexistent_qst_in_illdefined(
     admin_user, client, ill_defined_compound_factory, query_structure_type_factory
 ):
     client.force_authenticate(user=admin_user)
-    qst = apps.get_model("compound", "QueryStructureType")
-    nonexistent_pk = qst.objects.aggregate(Max("pk"))["pk__max"] + 1
     idc = ill_defined_compound_factory.create()
     post_data = {
         "data": {
@@ -358,7 +351,7 @@ def test_patch_nonexistent_qst_in_illdefined(
             "id": idc.instance.pk,
             "relationships": {
                 "query_structure_type": {
-                    "data": {"type": "queryStructureType", "id": nonexistent_pk}
+                    "data": {"type": "queryStructureType", "id": "qst"}
                 },
             },
         }
@@ -367,8 +360,7 @@ def test_patch_nonexistent_qst_in_illdefined(
     print(response)
     assert response.status_code == 400
     assert (
-        str(response.data[0]["detail"])
-        == f'Invalid pk "{nonexistent_pk}" - object does not exist.'
+        str(response.data[0]["detail"]) == 'Invalid pk "qst" - object does not exist.'
     )
     assert (
         response.data[0]["source"]["pointer"] == "/data/attributes/queryStructureType"

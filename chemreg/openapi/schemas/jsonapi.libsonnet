@@ -665,7 +665,17 @@ local buildResourceIdentifier(obj, required=false) = {
   local exampleId = if obj.type == "definedCompound" then "DTXCID302000003" 
     else if obj.type == "illDefinedCompound" then "DTXCID302000003"
     else if obj.type == "substance" then "DTXSID702467346"
-    else if obj.type == "record" then "DTXRID202000000" else "1",
+    else if obj.type == "record" then "DTXRID202000000" 
+    else if obj.type == "accessibilityType" then "name"
+    else if obj.type == "identifierType" then "name"
+    else if obj.type == "listType" then "name" 
+    else if obj.type == "source" then "name"
+    else if obj.type == "substanceRelationship" then "name"
+    else if obj.type == "synonymQuality" then "name" 
+    else if obj.type == "synonymType" then "name"
+    else if obj.type == "substanceType" then "name"
+    else if obj.type == "qcLevel" then "name" 
+    else "1",
   properties: {
     type: {
       type: 'string',
