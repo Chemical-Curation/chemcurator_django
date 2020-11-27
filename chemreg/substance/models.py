@@ -129,6 +129,7 @@ class Substance(CommonInfo):
     casrn = models.CharField(
         max_length=50,
         unique=True,
+        null=True,
         validators=[
             RegexValidator(
                 casrn_regex,

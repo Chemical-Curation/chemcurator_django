@@ -87,7 +87,7 @@ class Migration(migrations.Migration):
                 ('description', models.CharField(blank=True, max_length=1024)),
                 ('public_qc_note', models.CharField(blank=True, max_length=1024)),
                 ('private_qc_note', models.CharField(blank=True, max_length=1024)),
-                ('casrn', models.CharField(max_length=50, unique=True, validators=[django.core.validators.RegexValidator('^[0-9]{2,7}-[0-9]{2}-[0-9]$', message='The proposed CASRN does not conform to the regular expression ^[0-9]{2,7}-[0-9]{2}-[0-9]$'), chemreg.common.validators.validate_casrn_checksum])),
+                ('casrn', models.CharField(max_length=50, null=True, unique=True, validators=[django.core.validators.RegexValidator('^[0-9]{2,7}-[0-9]{2}-[0-9]$', message='The proposed CASRN does not conform to the regular expression ^[0-9]{2,7}-[0-9]{2}-[0-9]$'), chemreg.common.validators.validate_casrn_checksum])),
                 ('associated_compound', models.OneToOneField(null=True, on_delete=django.db.models.deletion.PROTECT, related_name='substance', to='compound.BaseCompound')),
                 ('created_by', models.ForeignKey(default=chemreg.common.utils.get_current_user_pk, editable=False, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='substance_created_by_set', to=settings.AUTH_USER_MODEL)),
                 ('qc_level', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='substance.QCLevelsType', validators=[chemreg.common.validators.validate_deprecated])),

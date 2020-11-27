@@ -486,6 +486,13 @@ def test_substance_display_name_null(substance_factory):
 
 
 @pytest.mark.django_db
+def test_substance_casrn_null(substance_factory):
+    serializer = substance_factory.build(casrn=None)
+    assert serializer.is_valid()
+    serializer.save()
+
+
+@pytest.mark.django_db
 def test_bug_263(substance_factory, synonym_factory, synonym_quality_factory):
     """ If I create the synonym "water" and associated it with a restrictive
     synonym quality, I should still be able to create the synonym "water" as a
