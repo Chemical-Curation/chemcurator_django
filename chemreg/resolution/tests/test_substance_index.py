@@ -105,6 +105,31 @@ def test_substance_index_identifiers(substance_factory):
 
 
 @pytest.mark.django_db
+def test_synonym_indexing(
+    substance_factory, synonym_factory, synonym_quality_factory, synonym_type_factory
+):
+    synonym_quality = synonym_quality_factory.create(is_restrictive=False).instance
+
+    synonym_type = synonym_type_factory().instance
+
+    substance = substance_factory.create(preferred_name="Moon Pie",).instance
+
+    synonym = synonym_factory.create(
+        substance={"type": "substance", "id": substance.pk},
+        identifier="marshmallow sandwich",
+        synonym_type={"type": "synonymType", "id": synonym_type.pk},
+        synonym_quality={"type": "synonymQuality", "id": synonym_quality.pk},
+    ).instance
+
+    identifiers = SubstanceIndex().get_model_document(substance)["data"]["attributes"][
+        "identifiers"
+    ]
+    weight = synonym_quality.score_weight + synonym_type.score_modifier
+    assert identifiers["synonyms"][0]["identifier"] == synonym.identifier
+    assert identifiers["synonyms"][0]["weight"] == weight
+
+
+@pytest.mark.django_db
 def test_substance_index_identifiers_cid(substance_factory):
     sub = substance_factory().instance
     def_sub = substance_factory(defined=True).instance

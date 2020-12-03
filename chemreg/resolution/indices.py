@@ -7,8 +7,7 @@ from config.settings import RESOLUTION_URL
 
 
 class Index:
-    """ChemCurator to interface with the resolver app.
-    """
+    """ChemCurator to interface with the resolver app."""
 
     HEADERS = {"Content-Type": "application/vnd.api+json"}
 
@@ -90,6 +89,8 @@ class SubstanceIndex(Index):
     delete_pk = "pk"
 
     def get_model_document(self, instance):
+        SYNONYM_DEFAULT_WEIGHT = 1
+        SYNONYM_DEFAULT_SCORE_MODIFIER = 0
         return {
             "data": {
                 "id": instance.pk,
@@ -101,7 +102,20 @@ class SubstanceIndex(Index):
                         "display_name": instance.display_name,
                         "casrn": instance.casrn,
                         "synonyms": [
-                            {"identifier": synonym.identifier}
+                            {
+                                "identifier": synonym.identifier,
+                                "weight": (
+                                    synonym.synonym_quality.score_weight
+                                    if synonym.synonym_quality
+                                    else SYNONYM_DEFAULT_WEIGHT
+                                )
+                                + (
+                                    synonym.synonym_type.score_modifier
+                                    if synonym.synonym_type
+                                    else SYNONYM_DEFAULT_SCORE_MODIFIER
+                                ),
+                                "synonymtype": synonym.synonym_type.label,
+                            }
                             for synonym in instance.synonym_set.all()
                         ],
                     },
