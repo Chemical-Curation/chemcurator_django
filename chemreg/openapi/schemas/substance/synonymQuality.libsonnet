@@ -4,11 +4,6 @@
   typePlural: 'synonymQualities',
   description: 'A controlled vocabulary for recording synonym quality.',
   attributes: {
-    name: {
-      type: 'string',
-      maxLength: 49,
-      pattern: '^[a-z0-9-]+$',
-    },
     label: {
       type: 'string',
       maxLength: 99,

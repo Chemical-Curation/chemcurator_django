@@ -4,6 +4,7 @@ from rest_framework.reverse import reverse as drf_reverse
 
 from rest_framework_json_api.utils import format_value
 
+from chemreg.common.serializers import CommonInfoSerializer, ControlledVocabSerializer
 from chemreg.compound.fields import StructureAliasField
 from chemreg.compound.models import (
     BaseCompound,
@@ -19,21 +20,24 @@ from chemreg.compound.validators import (
 )
 from chemreg.indigo.inchi import get_inchikey
 from chemreg.indigo.molfile import get_molfile_v3000
-from chemreg.jsonapi.serializers import (
-    HyperlinkedModelSerializer,
-    PolymorphicModelSerializer,
-)
+from chemreg.jsonapi.serializers import PolymorphicModelSerializer
 
 
-class BaseCompoundSerializer(HyperlinkedModelSerializer):
+class BaseCompoundSerializer(CommonInfoSerializer):
     """The base serializer for compounds."""
 
-    serializer_field_mapping = HyperlinkedModelSerializer.serializer_field_mapping
+    included_serializers = {
+        **CommonInfoSerializer.included_serializers,
+        **{"substance": "chemreg.substance.serializers.SubstanceSerializer"},
+    }
+
+    serializer_field_mapping = CommonInfoSerializer.serializer_field_mapping
     serializer_field_mapping.update({StructureAliasField: serializers.CharField})
     replaced_by = "chemreg.compound.serializers.CompoundSerializer"
+    substance = "chemreg.substance.serializers.SubstanceSerializer"
 
-    class Meta:
-        fields = ["qc_note", "replaced_by"]
+    class Meta(CommonInfoSerializer.Meta):
+        fields = CommonInfoSerializer.Meta.fields + ["id", "qc_note", "replaced_by"]
         model = BaseCompound
 
     def __init__(self, *args, is_admin=False, **kwargs):
@@ -69,35 +73,39 @@ class DefinedCompoundSerializer(BaseCompoundSerializer):
     )
     alt_structures = ("molfile_v2000", "molfile_v3000", "smiles")
 
-    class Meta:
+    class Meta(BaseCompoundSerializer.Meta):
         model = DefinedCompound
-        fields = [
-            "cid",
+        fields = BaseCompoundSerializer.Meta.fields + [
             "inchikey",
             "molfile_v2000",
             "molfile_v3000",
             "smiles",
-            "qc_note",
-            "replaced_by",
+            "substance",
         ]
-        extra_kwargs = {"molfile_v3000": {"required": False, "trim_whitespace": False}}
+        extra_kwargs = {
+            "molfile_v3000": {"required": False, "trim_whitespace": False},
+            "substance": {"required": False},
+        }
 
     def __init__(self, *args, admin_override=False, **kwargs):
         self.admin_override = admin_override
         super().__init__(*args, **kwargs)
 
-    def validate_cid(self, value):
-        if "inchikey" not in self.initial_data:
+    def validate_id(self, value):
+        # if there is no inchikey on POST (patch id's are not editable)
+        if "inchikey" not in self.initial_data and not self.instance:
             raise ValidationError("InchIKey must be included when CID is defined.")
         return value
 
     def validate_inchikey(self, value):
-        if "cid" not in self.initial_data:
+        if "id" not in self.initial_data:
             raise ValidationError("CID must be included when InchIKey is defined.")
         return value
 
     def validate(self, data):
         qs = self.Meta.model.objects.filter(inchikey=data["inchikey"])
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
         if qs.exists() and not self.admin_override:
             matched = []
             req = self.context.get("request", None)
@@ -110,7 +118,7 @@ class DefinedCompoundSerializer(BaseCompoundSerializer):
             raise ValidationError(
                 {
                     "detail": {
-                        "detail": f"Inchikey conflicts with {[x.cid for x in qs]}",
+                        "detail": f"Inchikey conflicts with {[x.id for x in qs]}",
                         "links": matched,
                         "status": "400",
                         "source": {"pointer": "/data/attributes/inchikey"},
@@ -172,18 +180,11 @@ class DefinedCompoundDetailSerializer(DefinedCompoundSerializer):
         return get_inchikey(obj.molfile_v3000)
 
 
-class QueryStructureTypeSerializer(HyperlinkedModelSerializer):
+class QueryStructureTypeSerializer(ControlledVocabSerializer):
     """The serializer for query structure type."""
 
-    class Meta:
+    class Meta(ControlledVocabSerializer.Meta):
         model = QueryStructureType
-        fields = [
-            "name",
-            "label",
-            "short_description",
-            "long_description",
-            "deprecated",
-        ]
 
 
 class IllDefinedCompoundSerializer(BaseCompoundSerializer):
@@ -191,9 +192,16 @@ class IllDefinedCompoundSerializer(BaseCompoundSerializer):
 
     query_structure_type = QueryStructureTypeSerializer
 
-    class Meta:
+    class Meta(BaseCompoundSerializer.Meta):
         model = IllDefinedCompound
-        fields = ["cid", "mrvfile", "query_structure_type", "qc_note", "replaced_by"]
+        fields = BaseCompoundSerializer.Meta.fields + [
+            "mrvfile",
+            "query_structure_type",
+            "substance",
+        ]
+        extra_kwargs = {
+            "substance": {"required": False},
+        }
 
 
 class CompoundSerializer(PolymorphicModelSerializer):
@@ -209,11 +217,27 @@ class CompoundSerializer(PolymorphicModelSerializer):
         model = BaseCompound
 
 
+class CompoundDetailSerializer(PolymorphicModelSerializer):
+    """The serializer for both ill-defined and defined compounds."""
+
+    polymorphic_serializers = [
+        DefinedCompoundDetailSerializer,
+        IllDefinedCompoundSerializer,
+    ]
+    serializer_kwargs = {
+        DefinedCompoundDetailSerializer: ["override", "is_admin"],
+        IllDefinedCompoundSerializer: ["is_admin"],
+    }
+
+    class Meta:
+        model = BaseCompound
+
+
 class CompoundDeleteSerializer(serializers.Serializer):
     """Serializes data required for the soft delete of compounds."""
 
     replacement_cid = serializers.SlugRelatedField(
-        slug_field="cid", queryset=BaseCompound.objects.all()
+        slug_field="id", queryset=BaseCompound.objects.all()
     )
     qc_note = serializers.CharField()
 

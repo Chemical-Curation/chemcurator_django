@@ -9,9 +9,9 @@ from chemreg.substance.models import Substance
 def test_substance_model():
     """Tests the validity of the Substance Model's attributes"""
     # Verify CharField attributes
-    assert type(Substance.sid.field) is models.CharField
-    assert Substance.sid.field.max_length == 50
-    assert Substance.sid.field.unique
+    assert type(Substance.id.field) is models.CharField
+    assert Substance.id.field.max_length == 50
+    assert Substance.id.field.unique
 
     assert type(Substance.preferred_name.field) is models.CharField
     assert Substance.preferred_name.field.max_length == 255
@@ -22,15 +22,19 @@ def test_substance_model():
     assert Substance.display_name.field.max_length == 255
     assert Substance.display_name.field.unique
     assert not Substance.display_name.field.blank
+    assert Substance.display_name.field.null
 
     assert type(Substance.description.field) is models.CharField
     assert Substance.description.field.max_length == 1024
+    assert Substance.description.field.blank
 
     assert type(Substance.public_qc_note.field) is models.CharField
     assert Substance.public_qc_note.field.max_length == 1024
+    assert Substance.public_qc_note.field.blank
 
     assert type(Substance.private_qc_note.field) is models.CharField
     assert Substance.private_qc_note.field.max_length == 1024
+    assert Substance.private_qc_note.field.blank
 
     assert type(Substance.casrn.field) is models.CharField
     assert Substance.casrn.field.max_length == 50
@@ -50,7 +54,7 @@ def test_substance_model():
         "substance", "QCLevelsType"
     )
 
-    assert type(Substance.associated_compound.field) is models.ForeignKey
+    assert type(Substance.associated_compound.field) is models.OneToOneField
     assert Substance.associated_compound.field.related_model is apps.get_model(
         "compound", "BaseCompound"
     )
@@ -69,6 +73,7 @@ def test_substance_model():
     "preferred_name,validity,code",
     [
         ("Valid String?", True, None),
+        ("Valid String'?", True, None),  # 277 ' is now a valid character
         ("Invalid String!", False, "invalid"),  # '!' is an invalid character
     ],
 )
@@ -84,6 +89,7 @@ def test_validate_preferred_name(substance_factory, preferred_name, validity, co
     "display_name,validity,code",
     [
         ("Valid String?", True, None),
+        ("Valid String'?", True, None),  # 277 ' is now a valid character
         ("Invalid String!", False, "invalid"),  # '!' is an invalid character
     ],
 )

@@ -1,5 +1,6 @@
 from django.core.validators import RegexValidator
 from django.db import models
+from django.db.models import Q
 
 from chemreg.common.models import CommonInfo, ControlledVocabulary
 from chemreg.common.validators import (
@@ -40,19 +41,27 @@ class Source(ControlledVocabulary):
     pass
 
 
+class SubstanceQuerySet(models.QuerySet):
+    def restrictive_fields(self, value):
+        qs = self.filter(
+            Q(preferred_name=value) | Q(display_name=value) | Q(casrn=value)
+        )
+        return qs
+
+
 class Substance(CommonInfo):
     """Substances document chemical concepts
 
     Attributes:
-        sid (str): Generated SID for external use
+        id (str): Generated SID for external use
         preferred_name (str): Name of the substance
         display_name (str): User friendly name of the substance
         source (foreign key): Controlled vocabulary for Sources
         substance_type (foreign key): Controlled vocabulary for Substances
         qc_level (foreign key): Controlled vocabulary for QCLevels
-        description (str): A description of the substance
-        public_qc_note (str): Note from Quality Control.  Visible to everyone
-        private_qc_note (str): Note from Quality Control.
+        description (str, optional): A description of the substance
+        public_qc_note (str, optional): Note from Quality Control.  Visible to everyone
+        private_qc_note (str, optional): Note from Quality Control.
         associated_compound (foreign key): Polymorphic relationship to Compounds.Compounds.
             Can either be either a DefinedCompound or an IllDefinedCompound
         casrn (str): CAS registry number. It is an identifier from the CAS Registry
@@ -61,11 +70,13 @@ class Substance(CommonInfo):
         substance_histories (QuerySet): One to Many Substance history resources (not implemented yet)
     """
 
-    preferred_name_regex = "^[a-zA-Z0-9 =<>\\-:.,^%&/{}[\\]()+?=]{3,}$"
-    display_name_regex = "^[a-zA-Z0-9 =<>\\-:.,^%&/{}[\\]()+?=]{3,}$"
+    preferred_name_regex = "^[a-zA-Z0-9 =<>\\-':.,^%&/{}[\\]()+?=]{3,}$"
+    display_name_regex = "^[a-zA-Z0-9 =<>\\-':.,^%&/{}[\\]()+?=]{3,}$"
     casrn_regex = "^[0-9]{2,7}-[0-9]{2}-[0-9]$"
 
-    sid = models.CharField(default=build_sid, max_length=50, unique=True)
+    id = models.CharField(
+        default=build_sid, primary_key=True, max_length=50, unique=True
+    )
     preferred_name = models.CharField(
         max_length=255,
         unique=True,
@@ -82,6 +93,7 @@ class Substance(CommonInfo):
         max_length=255,
         unique=True,
         blank=False,
+        null=True,
         validators=[
             RegexValidator(
                 display_name_regex,
@@ -105,15 +117,19 @@ class Substance(CommonInfo):
         null=False,
         validators=[validate_deprecated],
     )
-    description = models.CharField(max_length=1024)
-    public_qc_note = models.CharField(max_length=1024)
-    private_qc_note = models.CharField(max_length=1024)
-    associated_compound = models.ForeignKey(
-        "compound.BaseCompound", on_delete=models.PROTECT, null=True
+    description = models.CharField(max_length=1024, blank=True)
+    public_qc_note = models.CharField(max_length=1024, blank=True)
+    private_qc_note = models.CharField(max_length=1024, blank=True)
+    associated_compound = models.OneToOneField(
+        "compound.BaseCompound",
+        on_delete=models.PROTECT,
+        null=True,
+        related_name="substance",
     )
     casrn = models.CharField(
         max_length=50,
         unique=True,
+        null=True,
         validators=[
             RegexValidator(
                 casrn_regex,
@@ -123,6 +139,8 @@ class Substance(CommonInfo):
             validate_casrn_checksum,
         ],
     )
+
+    objects = SubstanceQuerySet.as_manager()
 
 
 class SubstanceRelationship(CommonInfo):
@@ -208,6 +226,11 @@ class SynonymQuality(ControlledVocabulary):
     is_restrictive = models.BooleanField(default=False)
 
 
+class RestrictiveQuerySet(models.QuerySet):
+    def restricted(self):
+        return self.filter(synonym_quality__is_restrictive=True)
+
+
 class Synonym(CommonInfo):
     """Information to be shared across Synonyms
 
@@ -226,6 +249,8 @@ class Synonym(CommonInfo):
     source = models.ForeignKey("Source", on_delete=models.PROTECT)
     synonym_quality = models.ForeignKey("SynonymQuality", on_delete=models.PROTECT)
     synonym_type = models.ForeignKey("SynonymType", null=True, on_delete=models.PROTECT)
+
+    objects = RestrictiveQuerySet.as_manager()
 
 
 class RelationshipType(ControlledVocabulary):

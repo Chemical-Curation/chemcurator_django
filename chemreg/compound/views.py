@@ -14,6 +14,7 @@ from chemreg.compound.models import (
 )
 from chemreg.compound.serializers import (
     CompoundDeleteSerializer,
+    CompoundDetailSerializer,
     CompoundSerializer,
     DefinedCompoundDetailSerializer,
     DefinedCompoundSerializer,
@@ -30,7 +31,7 @@ class CIDPermissionsMixin:
 
     def get_permissions(self):
         # return permission_classes depending on `action`
-        if "cid" in self.request.data:
+        if "id" in self.request.data:
             return [
                 permission()
                 for permission in self.permission_classes_by_action[self.action]
@@ -103,6 +104,7 @@ class DefinedCompoundViewSet(
     filterset_class = DefinedCompoundFilter
     permission_classes_by_action = {
         "create": [IsAdminUser],
+        "partial_update": [IsAdminUser],
     }
 
     def get_serializer_class(self, *args, **kwargs):
@@ -131,9 +133,10 @@ class IllDefinedCompoundViewSet(
 
     queryset = IllDefinedCompound.objects.with_deleted().all()
     serializer_class = IllDefinedCompoundSerializer
-    filterset_fields = ["cid"]
+    filterset_fields = ["id"]
     permission_classes_by_action = {
         "create": [IsAdminUser],
+        "partial_update": [IsAdminUser],
     }
 
 
@@ -147,4 +150,10 @@ class CompoundViewSet(SoftDeleteCompoundMixin, ReadOnlyModelViewSet):
 
     queryset = BaseCompound.objects.with_deleted().all()
     serializer_class = CompoundSerializer
-    filterset_fields = ["cid"]
+    filterset_fields = ["id"]
+
+    def get_serializer(self, *args, **kwargs):
+        """Adds a lightweight workaround to our different DefinedCompound detail and list serializers"""
+        if not kwargs.get("many"):
+            self.serializer_class = CompoundDetailSerializer
+        return super().get_serializer(*args, **kwargs)

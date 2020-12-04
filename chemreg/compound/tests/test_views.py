@@ -1,12 +1,12 @@
-from django.apps import apps
-from django.db.models import Max
+import json
+
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAdminUser
+from rest_framework.reverse import reverse
 from rest_framework.test import force_authenticate
 
 import pytest
 
-from chemreg.compound.models import DefinedCompound, IllDefinedCompound
 from chemreg.compound.tests.factories import (
     DefinedCompoundFactory,
     IllDefinedCompoundFactory,
@@ -21,7 +21,7 @@ def build_destroy_data(compound_json_type, compound1, compound2):
             "type": compound_json_type,
             "id": compound1.id,
             "attributes": {
-                "replacementCid": compound2.cid,
+                "replacementCid": compound2.id,
                 "qcNote": f"replacing compound {compound1.id} with compound {compound2.id}",
             },
         }
@@ -61,9 +61,14 @@ def test_definedcompound_detail_attrs(
     response = view(request)
     attrs = response.data["results"].pop()
     assert list(attrs.keys()) == [
-        "cid",
+        "created_at",
+        "created_by",
+        "updated_at",
+        "updated_by",
+        "id",
         "inchikey",
         "molfile_v3000",
+        "substance",
         "url",
     ]
 
@@ -73,10 +78,15 @@ def test_definedcompound_detail_attrs(
     response = view(request, pk=compound.pk)
     attrs = response.data
     assert list(attrs.keys()) == [
-        "cid",
+        "created_at",
+        "created_by",
+        "updated_at",
+        "updated_by",
+        "id",
         "inchikey",
         "molfile_v3000",
         "smiles",
+        "substance",
         "molecular_weight",
         "molecular_formula",
         "calculated_inchikey",
@@ -92,7 +102,7 @@ def test_ill_defined_compound_admin_user(
     User both with and without ADMIN permissions"""
     client.force_authenticate(user=admin_user)
     idc = ill_defined_compound_factory.build()
-    idc.initial_data.update(cid="CID")
+    idc.initial_data.update(id="CID")
     response = client.post(
         "/illDefinedCompounds",
         {"data": {"type": "illDefinedCompound", "attributes": idc.initial_data}},
@@ -100,7 +110,7 @@ def test_ill_defined_compound_admin_user(
     assert response.status_code == 201
     client.force_authenticate(user=user)
     idc = ill_defined_compound_factory.build()
-    idc.initial_data.update(cid="XXX")
+    idc.initial_data.update(id="XXX")
     response = client.post(
         "/illDefinedCompounds",
         {"data": {"type": "illDefinedCompound", "attributes": idc.initial_data}},
@@ -111,7 +121,7 @@ def test_ill_defined_compound_admin_user(
 def test_defined_compound_view():
     """Tests that the Defined Compound View Set includes cid and InChIKey as filterset fields."""
     assert DefinedCompoundViewSet.filterset_class.Meta.fields == [
-        "cid",
+        "id",
         "inchikey",
         "molfile_v3000",
         "molfile_v2000",
@@ -122,7 +132,28 @@ def test_defined_compound_view():
 def test_compound_view():
     """Tests that the Compound View Set, is ReadOnly and has the inclusion of cid as a filterset field."""
     assert issubclass(CompoundViewSet, ReadOnlyModelViewSet)
-    assert CompoundViewSet.filterset_fields == ["cid"]
+    assert CompoundViewSet.filterset_fields == ["id"]
+
+
+@pytest.mark.parametrize(
+    "compound_factory,endpoint",
+    [
+        (DefinedCompoundFactory, "/compounds"),
+        (IllDefinedCompoundFactory, "/compounds"),
+        (DefinedCompoundFactory, "/definedCompounds"),
+        (IllDefinedCompoundFactory, "/illDefinedCompounds"),
+    ],
+)
+@pytest.mark.django_db
+def test_compound_includes(client, compound_factory, endpoint, substance_factory):
+    """Tests that /compound endpoints can be provided an include parameter"""
+    compound = compound_factory().instance
+    substance_factory(
+        associated_compound={"type": compound.serializer_name, "id": compound.pk}
+    )
+
+    response = json.loads(client.get(endpoint, {"include": "substance"}).content)
+    assert response["included"] is not None
 
 
 @pytest.mark.django_db
@@ -131,10 +162,15 @@ def test_definedcompound_admin_user(admin_user, client, defined_compound_factory
     User both with and without ADMIN permissions"""
     client.force_authenticate(user=admin_user)
     dc = defined_compound_factory.build()
-    dc.initial_data.update(cid="CID")
     response = client.post(
         "/definedCompounds",
-        {"data": {"type": "definedCompound", "attributes": dc.initial_data}},
+        {
+            "data": {
+                "type": "definedCompound",
+                "id": "cid",
+                "attributes": dc.initial_data,
+            }
+        },
     )
     assert response.status_code == 400
     assert response.exception is True
@@ -145,10 +181,16 @@ def test_definedcompound_admin_user(admin_user, client, defined_compound_factory
     dc.initial_data.update(inchikey="INCHI")
     response = client.post(
         "/definedCompounds",
-        {"data": {"type": "definedCompound", "attributes": dc.initial_data}},
+        {
+            "data": {
+                "type": "definedCompound",
+                "id": "cid",
+                "attributes": dc.initial_data,
+            }
+        },
     )
     assert response.status_code == 201
-    dc.initial_data.pop("cid")
+    assert response.data["created_by"]["id"] == str(admin_user.pk)
     response = client.post(
         "/definedCompounds",
         {"data": {"type": "definedCompound", "attributes": dc.initial_data}},
@@ -161,7 +203,7 @@ def test_definedcompound_admin_user(admin_user, client, defined_compound_factory
     )
     client.force_authenticate(user=user)
     dc = defined_compound_factory.build()
-    dc.initial_data.update(cid="XXX", inchikey="XXX")
+    dc.initial_data.update(id="XXX", inchikey="XXX")
     response = client.post(
         "/definedCompounds",
         {"data": {"type": "definedCompound", "attributes": dc.initial_data}},
@@ -172,6 +214,60 @@ def test_definedcompound_admin_user(admin_user, client, defined_compound_factory
         str(response.data[0]["detail"])
         == "You do not have permission to perform this action."
     )
+
+
+@pytest.mark.django_db
+def test_defined_compound_has_common_info(
+    admin_user, client, defined_compound_factory, user
+):
+    client.force_authenticate(user=admin_user)
+    dc = defined_compound_factory.build()
+    response = client.post(
+        "/definedCompounds",
+        {"data": {"type": "definedCompound", "attributes": dc.initial_data}},
+    )
+
+    assert response.status_code == 201
+    assert response.data.get("created_at")
+    assert response.data.get("updated_at")
+    assert response.data["created_by"]["id"] == str(admin_user.pk)
+    assert response.data["updated_by"]["id"] == str(admin_user.pk)
+
+    # Logout (this prevents errors with is_admin on requests)
+    client.force_authenticate()
+    # Load data for id
+    full_response_data = json.loads(response.content)["data"]
+    # Assert related fields work
+    assert (
+        client.get(
+            full_response_data["relationships"]["createdBy"]["links"]["related"]
+        ).status_code
+        == 200
+    )
+    assert (
+        client.get(
+            full_response_data["relationships"]["updatedBy"]["links"]["related"]
+        ).status_code
+        == 200
+    )
+
+
+@pytest.mark.django_db
+def test_compound_retrieves_defined_compound_details(
+    admin_user, client, defined_compound_factory, user
+):
+    keys = [
+        "molecularWeight",
+        "molecularFormula",
+        "smiles",
+        "calculatedInchikey",
+    ]
+    client.force_authenticate(user=admin_user)
+    dc = defined_compound_factory().instance
+    url = reverse("basecompound-detail", [dc.pk])
+    resp = client.get(url).json()["data"]["attributes"]
+    for key in keys:
+        assert resp.get(key), f'{key} not found in response attributes using "{url}"'
 
 
 @pytest.mark.django_db
@@ -224,8 +320,6 @@ def test_nonexistent_qst_in_illdefined(
     admin_user, client, ill_defined_compound_factory, query_structure_type_factory
 ):
     client.force_authenticate(user=admin_user)
-    qst = apps.get_model("compound", "QueryStructureType")
-    nonexistent_pk = qst.objects.aggregate(Max("pk"))["pk__max"] + 1
     idc = ill_defined_compound_factory.build()
     post_data = {
         "data": {
@@ -233,7 +327,7 @@ def test_nonexistent_qst_in_illdefined(
             "attributes": idc.initial_data,  # mrvfile
             "relationships": {
                 "query_structure_type": {
-                    "data": {"type": "queryStructureType", "id": nonexistent_pk}
+                    "data": {"type": "queryStructureType", "id": "qst"}
                 },
             },
         }
@@ -241,8 +335,7 @@ def test_nonexistent_qst_in_illdefined(
     response = client.post("/illDefinedCompounds", post_data)
     assert response.status_code == 400
     assert (
-        str(response.data[0]["detail"])
-        == f'Invalid pk "{nonexistent_pk}" - object does not exist.'
+        str(response.data[0]["detail"]) == 'Invalid pk "qst" - object does not exist.'
     )
 
 
@@ -251,8 +344,6 @@ def test_patch_nonexistent_qst_in_illdefined(
     admin_user, client, ill_defined_compound_factory, query_structure_type_factory
 ):
     client.force_authenticate(user=admin_user)
-    qst = apps.get_model("compound", "QueryStructureType")
-    nonexistent_pk = qst.objects.aggregate(Max("pk"))["pk__max"] + 1
     idc = ill_defined_compound_factory.create()
     post_data = {
         "data": {
@@ -260,16 +351,16 @@ def test_patch_nonexistent_qst_in_illdefined(
             "id": idc.instance.pk,
             "relationships": {
                 "query_structure_type": {
-                    "data": {"type": "queryStructureType", "id": nonexistent_pk}
+                    "data": {"type": "queryStructureType", "id": "qst"}
                 },
             },
         }
     }
     response = client.patch(f"/illDefinedCompounds/{idc.instance.pk}", post_data)
+    print(response)
     assert response.status_code == 400
     assert (
-        str(response.data[0]["detail"])
-        == f'Invalid pk "{nonexistent_pk}" - object does not exist.'
+        str(response.data[0]["detail"]) == 'Invalid pk "qst" - object does not exist.'
     )
     assert (
         response.data[0]["source"]["pointer"] == "/data/attributes/queryStructureType"
@@ -287,13 +378,9 @@ def test_compound_soft_delete(user, admin_user, compound_factory, client):
     Soft delete of Compounds can only be done by an Admin user who
     is also providing a valid replacement CID and a QC note
     """
-    if compound_factory == DefinedCompoundFactory:
-        compound_json_type = "definedCompound"
-        model = DefinedCompound
-    elif compound_factory == IllDefinedCompoundFactory:
-        compound_json_type = "illDefinedCompound"
-        model = IllDefinedCompound
     compounds = [serializer.instance for serializer in compound_factory.create_batch(3)]
+    compound_json_type = compounds[0].serializer_name
+    model = compounds[0]._meta.model
 
     # Compound 1 will replace 2 and 3
     client.force_authenticate(user=admin_user)
@@ -312,15 +399,15 @@ def test_compound_soft_delete(user, admin_user, compound_factory, client):
     for endpoint in [f"{compound_json_type}s", "compounds"]:
         client.force_authenticate(user=admin_user)
         resp = client.get(f"/{endpoint}")
-        cid_set = set(c["cid"] for c in resp.data["results"])
+        cid_set = set(c["id"] for c in resp.data["results"])
         assert len(cid_set) == 3
         # it should NOT be visible to non-admin user
         client.force_authenticate(user=user)
         resp = client.get(f"/{endpoint}")
-        cid_set = set(c["cid"] for c in resp.data["results"])
+        cid_set = set(c["id"] for c in resp.data["results"])
         assert len(cid_set) == 1
-        assert compounds[1].cid not in cid_set
-        assert compounds[2].cid not in cid_set
+        assert compounds[1].id not in cid_set
+        assert compounds[2].id not in cid_set
 
 
 @pytest.mark.parametrize(
@@ -332,12 +419,9 @@ def test_compound_forbidden_soft_delete(user, compound_factory, client):
     Tests:
     A non-admin user cannot perform the soft-deleted done in the test above
     """
-    if compound_factory == DefinedCompoundFactory:
-        compound_json_type = "definedCompound"
-    elif compound_factory == IllDefinedCompoundFactory:
-        compound_json_type = "illDefinedCompound"
 
     serializers = compound_factory.create_batch(2)
+    compound_json_type = serializers[0].instance.serializer_name
     compound_1 = serializers[0].instance
     compound_2 = serializers[1].instance
 
@@ -355,12 +439,9 @@ def test_compound_forbidden_soft_delete(user, compound_factory, client):
 @pytest.mark.django_db
 def test_compound_redirect(user, admin_user, compound_factory, client):
     """Tests that soft-deleted compounds will redirect when non-admin."""
-    if compound_factory == DefinedCompoundFactory:
-        compound_json_type = "definedCompound"
-    elif compound_factory == IllDefinedCompoundFactory:
-        compound_json_type = "illDefinedCompound"
 
     serializers = compound_factory.create_batch(3)
+    compound_json_type = serializers[0].instance.serializer_name
     compound_1 = serializers[0].instance
     compound_2 = serializers[1].instance
     compound_3 = serializers[2].instance
@@ -380,10 +461,10 @@ def test_compound_redirect(user, admin_user, compound_factory, client):
         client.force_authenticate(user=user)
         resp = client.get(f"/{endpoint}/{compound_3.id}")
         assert resp.status_code == 301
-        assert compound_2.id == int(resp.url.split("/")[-1])
+        assert compound_2.id == (resp.url.split("/")[-1])
         resp = client.get(f"/{endpoint}/{compound_2.id}")
         assert resp.status_code == 301
-        assert compound_1.id == int(resp.url.split("/")[-1])
+        assert compound_1.id == (resp.url.split("/")[-1])
 
         # Admin should be able to retrieve it
         client.force_authenticate(user=admin_user)

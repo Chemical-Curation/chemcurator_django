@@ -6,7 +6,6 @@ local queryStructureType = import 'queryStructureType.libsonnet';
   type: 'illDefinedCompound',
   description: 'Compounds that cannot be defined with molfiles.',
   attributes: {
-    cid: baseCompound.attributes.cid,
     qcNote: baseCompound.attributes.qcNote,
     replacementCid: baseCompound.attributes.replacementCid,
     mrvfile: {

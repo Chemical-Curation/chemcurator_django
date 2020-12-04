@@ -33,11 +33,11 @@ def build_sid(i=None) -> str:
                 try:
                     Substance = apps.get_model("substance", "Substance")
                     last_id = Substance.objects.filter(
-                        sid__regex=fr"^{prefix}SID\d0([2-9]\d{{6}}|[1-9]\d{{7,}})$"
+                        id__regex=fr"^{prefix}SID\d0([2-9]\d{{6}}|[1-9]\d{{7,}})$"
                     ).aggregate(
                         max_sid=Max(
                             Cast(
-                                Substr("sid", len(prefix) + 5),
+                                Substr("id", len(prefix) + 5),
                                 output_field=IntegerField(),
                             )
                         )

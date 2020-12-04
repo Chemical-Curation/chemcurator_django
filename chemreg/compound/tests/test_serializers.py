@@ -46,7 +46,7 @@ def test_unique_inchikey(defined_compound_factory):
     serialized = defined_compound_factory.build(**serializer.initial_data)
     assert not serialized.is_valid()
     assert "links" in serialized.errors["detail"]
-    conflict = f"Inchikey conflicts with ['{compound.cid}']"
+    conflict = f"Inchikey conflicts with ['{compound.id}']"
     assert conflict in str(serialized.errors["detail"]["detail"])
 
 
@@ -60,7 +60,7 @@ def test_override_unique_inchikey(defined_compound_factory):
     )
     assert serialized.is_valid()
     two = serialized.save()
-    assert one.cid != two.cid
+    assert one.id != two.id
     assert one.inchikey == two.inchikey
 
 
@@ -124,7 +124,7 @@ def test_override_unique_inchikey_via_smiles(defined_compound_smiles_factory):
 
     assert serialized.is_valid()  # succeeds with override
     two = serialized.save()
-    assert one.cid != two.cid
+    assert one.id != two.id
     assert one.inchikey == two.inchikey
 
 
@@ -145,7 +145,7 @@ def test_defined_compound_prefix(defined_compound_factory):
     instance = serializer.save()
     # assert that the prefix of the serialized defined compound is equivalent to
     # the prefix generated in compound_settings
-    assert instance.cid[0 : instance.cid.find("CID")] == compound_settings.PREFIX
+    assert instance.id[0 : instance.id.find("CID")] == compound_settings.PREFIX
 
 
 @pytest.mark.django_db
@@ -156,7 +156,7 @@ def test_defined_compound_custom_prefix(defined_compound_factory):
     instance = serializer.save()
     # assert that the prefix of the serialized defined compound is equivalent to
     # the prefix assigned for testing purposes
-    assert instance.cid[0 : instance.cid.find("CID")] == compound_settings.PREFIX
+    assert instance.id[0 : instance.id.find("CID")] == compound_settings.PREFIX
 
 
 @pytest.mark.django_db
@@ -166,7 +166,7 @@ def test_ill_defined_compound_prefix(ill_defined_compound_factory):
     instance = serializer.save()
     # assert that the prefix of the serialized ill defined compound is equivalent to
     # the prefix generated in compound_settings
-    assert instance.cid[0 : instance.cid.find("CID")] == compound_settings.PREFIX
+    assert instance.id[0 : instance.id.find("CID")] == compound_settings.PREFIX
 
 
 @pytest.mark.django_db

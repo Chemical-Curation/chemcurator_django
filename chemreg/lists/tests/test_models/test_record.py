@@ -9,12 +9,12 @@ def test_record():
     """Tests the validity of the Record Model's attributes"""
 
     # Primitives
-    assert type(Record.rid.field) is models.CharField
-    assert Record.rid.field.max_length == 50
-    assert not Record.rid.field.blank
-    assert not Record.rid.field.null
-    assert Record.rid.field.unique
-    assert Record.rid.field.default is build_rid
+    assert type(Record.id.field) is models.CharField
+    assert Record.id.field.max_length == 50
+    assert not Record.id.field.blank
+    assert not Record.id.field.null
+    assert Record.id.field.unique
+    assert Record.id.field.default is build_rid
 
     assert type(Record.external_id.field) is models.CharField
     assert Record.external_id.field.max_length == 500

@@ -6,11 +6,6 @@ local substance = import 'substance/substance.libsonnet';
   type: 'record',
   description: 'Everything about Records.',
   attributes: {
-    rid: {
-      type: 'string',
-      maxLength: 50,
-      unique: true,
-    },
     external_id: {
       type: 'string',
       maxLength: 500,
@@ -42,6 +37,23 @@ local substance = import 'substance/substance.libsonnet';
           relationships: [] 
         },
       many: false,
+      default: 1,
+    },
+    {
+      object: {
+        app: 'Lists',
+        type: 'identifiers',
+        description: 'Everything about Record Identifiers.',
+        typePlural: 'identifers',
+        hasRelationships: false,
+        attributes: {
+          none: {
+            type: 'null',
+          }
+        },
+      },
+      many: true,
+      required: false,
       default: 1,
     },
   ]

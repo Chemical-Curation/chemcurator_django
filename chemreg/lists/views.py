@@ -54,6 +54,7 @@ class RecordViewSet(ModelViewSet):
 
     queryset = Record.objects.all()
     serializer_class = RecordSerializer
+    filterset_fields = ["substance__id"]
 
 
 class RecordIdentifierViewSet(ModelViewSet):

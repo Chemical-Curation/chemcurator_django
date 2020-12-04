@@ -1,3 +1,5 @@
+from django.apps import apps
+
 import factory
 
 from chemreg.common.factory import ControlledVocabularyFactory, DjangoSerializerFactory
@@ -44,6 +46,15 @@ class QCLevelsTypeFactory(DjangoSerializerFactory, ControlledVocabularyFactory):
 
     rank = factory.Sequence(lambda n: n)
 
+    @classmethod
+    def _setup_next_sequence(cls):
+        try:
+            return (
+                apps.get_model("substance.QCLevelsType").objects.latest("rank").rank + 1
+            )
+        except apps.get_model("substance.QCLevelsType").DoesNotExist:
+            return 1
+
     class Meta:
         model = QCLevelsTypeSerializer
 
@@ -54,7 +65,7 @@ class SubstanceFactory(DjangoSerializerFactory):
     preferred_name = factory.Sequence(
         lambda n: f"{factory.Faker('slug').generate()}-{n}"
     )
-    display_name = factory.LazyAttribute(lambda o: o.preferred_name.replace("-", " "))
+    display_name = factory.LazyAttribute(lambda o: o.preferred_name + " display")
     description = factory.Faker("text")
     public_qc_note = factory.Faker("text")
     private_qc_note = factory.Faker("text")

@@ -11,6 +11,7 @@ env = environ.Env(
     COMPOUND_PREFIX=(str, ""),
     DATABASE_URL=(str, "sqlite:///.sqlite3"),
     DEBUG=(bool, True),
+    RESOLUTION_URL=(str, ""),
     SESSION_COOKIE_AGE=(int, 900),
     SECRET_KEY=(str, "secret"),
     URL_CONF=(str, "api"),
@@ -62,6 +63,7 @@ INSTALLED_APPS = [
     "chemreg.compound.apps.CompoundConfig",
     "chemreg.lists.apps.ListsConfig",
     "chemreg.openapi.apps.OpenAPIConfig",
+    "chemreg.resolution.apps.ResolutionConfig",
     "chemreg.substance.apps.SubstanceConfig",
     "chemreg.users.apps.UsersConfig",
     "chemreg.utils.apps.UtilsConfig",
@@ -98,6 +100,12 @@ TEMPLATES = [
 TIME_ZONE = "UTC"
 USE_I18N = False
 WSGI_APPLICATION = "config.wsgi.application"
+
+###########################
+#    Resolver Settings    #
+###########################
+RESOLUTION_URL = env("RESOLUTION_URL")
+
 
 #######################
 #    Auth Settings    #
@@ -184,7 +192,7 @@ REST_FRAMEWORK = {
         "rest_framework_json_api.filters.QueryParameterValidationFilter",
         "rest_framework_json_api.filters.OrderingFilter",
         "rest_framework_json_api.django_filters.DjangoFilterBackend",
-        "rest_framework.filters.SearchFilter",
+        # "rest_framework.filters.SearchFilter",
     ],
     "DEFAULT_METADATA_CLASS": "rest_framework_json_api.metadata.JSONAPIMetadata",
     "DEFAULT_PAGINATION_CLASS": "chemreg.jsonapi.pagination.JsonApiPageNumberPagination",
@@ -195,7 +203,7 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ["chemreg.jsonapi.renderers.JSONRenderer"],
     "EXCEPTION_HANDLER": "rest_framework_json_api.exceptions.exception_handler",
     "PAGE_SIZE": 100,
-    "SEARCH_PARAM": "filter[search]",
+    # "SEARCH_PARAM": "filter[search]",
     "TEST_REQUEST_DEFAULT_FORMAT": "vnd.api+json",
     "TEST_REQUEST_RENDERER_CLASSES": ["chemreg.jsonapi.renderers.JSONRenderer"],
 }

@@ -13,5 +13,5 @@ def set_updated_by(sender, instance, **kwargs):
         sender: the model class.
         instance: the model instance.
     """
-    if isinstance(instance, CommonInfo):
+    if isinstance(instance, CommonInfo) and not kwargs.get("raw"):
         instance.updated_by_id = get_current_user_pk()

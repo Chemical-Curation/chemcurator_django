@@ -11,7 +11,6 @@ local baseCompound = import 'baseCompound.libsonnet';
     },
   ],
   attributes: {
-    cid: baseCompound.attributes.cid,
     qcNote: baseCompound.attributes.qcNote,
     replacementCid: baseCompound.attributes.replacementCid,
     molfileV3000: {
@@ -73,13 +72,13 @@ local baseCompound = import 'baseCompound.libsonnet';
     {
       status: 400,
       detail: 'Invalid format. Expected ' + std.extVar('COMPOUND_PREFIX') + 'CID$0######.',
-      pointer: '/data/attributes/cid',
+      pointer: '/data/attributes/id',
       code: 'invalid',
     },
     {
       status: 400,
       detail: 'Invalid checksum. Expected {real_checksum}.',
-      pointer: '/data/attributes/cid',
+      pointer: '/data/attributes/id',
       code: 'invalid',
     },
     {

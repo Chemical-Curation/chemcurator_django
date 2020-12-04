@@ -28,8 +28,8 @@ def test_build_rid():
     cache.delete(record_settings.SEQUENCE_KEY)
     cache.delete(record_settings.SEQUENCE_KEY + ".lock")
     test_i = 2345678
-    RecordFactory(rid=build_rid(test_i),)  # valid rid
-    RecordFactory(rid="FOO8")  # legacy rid
+    RecordFactory(id=build_rid(test_i),)  # valid rid
+    RecordFactory(id="FOO8")  # legacy rid
     rid = build_rid()
     assert rid_re.match(rid)
     assert extract_int(rid) == test_i + 1

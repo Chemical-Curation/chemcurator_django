@@ -1,5 +1,6 @@
 from chemreg.common.mixins import DeprecateDeleteMixin
 from chemreg.jsonapi.views import ModelViewSet
+from chemreg.substance.filters import SubstanceFilter, SubstanceRelationshipFilter
 from chemreg.substance.models import (
     QCLevelsType,
     RelationshipType,
@@ -46,6 +47,7 @@ class SubstanceViewSet(ModelViewSet):
 
     queryset = Substance.objects.all()
     serializer_class = SubstanceSerializer
+    filterset_class = SubstanceFilter
 
 
 class SubstanceTypeViewSet(DeprecateDeleteMixin, ModelViewSet):
@@ -70,9 +72,11 @@ class SynonymViewSet(ModelViewSet):
 
     queryset = Synonym.objects.all()
     serializer_class = SynonymSerializer
+    filterset_fields = ["substance__id"]
 
 
 class SubstanceRelationshipViewSet(ModelViewSet):
 
     queryset = SubstanceRelationship.objects.all()
     serializer_class = SubstanceRelationshipSerializer
+    filterset_class = SubstanceRelationshipFilter

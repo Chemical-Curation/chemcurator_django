@@ -43,15 +43,6 @@ class DefinedCompoundV2000Factory(DjangoSerializerFactory):
         model = DefinedCompoundSerializer
 
 
-class IllDefinedCompoundFactory(DjangoSerializerFactory):
-    """Manufactures `IllDefinedCompound` models."""
-
-    mrvfile = factory.Faker("mrvfile")
-
-    class Meta:
-        model = IllDefinedCompoundSerializer
-
-
 class QueryStructureTypeFactory(DjangoSerializerFactory):
     """Manufactures `QueryStructureType` models."""
 
@@ -63,3 +54,12 @@ class QueryStructureTypeFactory(DjangoSerializerFactory):
 
     class Meta:
         model = QueryStructureTypeSerializer
+
+
+class IllDefinedCompoundFactory(DjangoSerializerFactory):
+    """Manufactures `IllDefinedCompound` models."""
+
+    mrvfile = factory.Faker("mrvfile")
+
+    class Meta:
+        model = IllDefinedCompoundSerializer

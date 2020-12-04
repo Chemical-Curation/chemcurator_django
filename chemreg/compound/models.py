@@ -44,7 +44,7 @@ class SoftDeleteCompoundManager(PolymorphicManager):
         return super().get_queryset()
 
 
-class BaseCompound(CommonInfo, PolymorphicModel):
+class BaseCompound(PolymorphicModel, CommonInfo):
     """The base class for compounds.
 
     This model shouldn't exist on it's own. It will always be subclassed
@@ -54,13 +54,15 @@ class BaseCompound(CommonInfo, PolymorphicModel):
     applied to it.
 
     Attributes:
-        cid (str): The compound CID.
+        id (str): The compound CID.
         structure (str): Definitive structure string
         replaced_by (foreign key): A user deleted the compound and specified this CID as the replacement
         qc_note (str): An explanation of why the compound was deleted and replaced
     """
 
-    cid = models.CharField(default=build_cid, max_length=50, unique=True)
+    id = models.CharField(
+        default=build_cid, primary_key=True, max_length=50, unique=True
+    )
     structure = models.TextField()
     # soft delete functionality
     replaced_by = models.ForeignKey(
@@ -73,9 +75,18 @@ class BaseCompound(CommonInfo, PolymorphicModel):
     qc_note = models.TextField(blank=True, default="")
     objects = SoftDeleteCompoundManager.from_queryset(SoftDeleteCompoundQuerySet)()
 
+    class Meta:
+        ordering = ["pk"]
+
     @property
     def is_deleted(self):
         return self.replaced_by_id is not None
+
+    @property
+    def serializer_name(self):
+        """Camel cased string of model for serializer"""
+        s = self._meta.label.split(".")[-1]
+        return s[0].lower() + s[1:]
 
     def delete(self, force=False):
         if not force:

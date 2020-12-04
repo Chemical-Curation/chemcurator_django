@@ -38,13 +38,13 @@ def test_list_type_patch(client, admin_user, list_type_factory):
     client.force_authenticate(user=admin_user)
     listType = list_type_factory.create()
     pk = listType.instance.pk
-    new_name = {"name": "new-name"}
+    new_label = {"label": "new-label"}
     resp = client.patch(
         f"/listTypes/{pk}",
-        {"data": {"id": pk, "type": "listType", "attributes": new_name}},
+        {"data": {"id": pk, "type": "listType", "attributes": new_label}},
     )
     assert resp.status_code == 200
-    assert resp.data["name"] == "new-name"
+    assert resp.data["label"] == "new-label"
 
 
 def test_accessibility_type_view():
@@ -87,13 +87,13 @@ def test_accessibility_type_patch(client, admin_user, accessibility_type_factory
     client.force_authenticate(user=admin_user)
     accessibilityType = accessibility_type_factory.create()
     pk = accessibilityType.instance.pk
-    new_name = {"name": "new-name"}
+    new_label = {"label": "new-label"}
     resp = client.patch(
         f"/accessibilityTypes/{pk}",
-        {"data": {"id": pk, "type": "accessibilityType", "attributes": new_name}},
+        {"data": {"id": pk, "type": "accessibilityType", "attributes": new_label}},
     )
     assert resp.status_code == 200
-    assert resp.data["name"] == "new-name"
+    assert resp.data["label"] == "new-label"
 
 
 def test_identifier_type_view():
@@ -130,13 +130,13 @@ def test_identifier_type_patch(client, admin_user, identifier_type_factory):
     client.force_authenticate(user=admin_user)
     identifierType = identifier_type_factory.create()
     pk = identifierType.instance.pk
-    new_name = {"name": "new-name"}
+    new_label = {"label": "new-label"}
     resp = client.patch(
         f"/identifierTypes/{pk}",
-        {"data": {"id": pk, "type": "identifierType", "attributes": new_name}},
+        {"data": {"id": pk, "type": "identifierType", "attributes": new_label}},
     )
     assert resp.status_code == 200
-    assert resp.data["name"] == "new-name"
+    assert resp.data["label"] == "new-label"
 
 
 @pytest.mark.django_db
@@ -217,6 +217,48 @@ def test_record_post(client, admin_user, record_factory):
         },
     )
     assert resp.status_code == 201
+    # user can't POST the same external_id and list relationship
+    minted_rid = resp.data["id"]
+    resp = client.post(
+        "/records",
+        {
+            "data": {
+                "type": "record",
+                "attributes": rf,
+                "relationships": {
+                    "list": {"data": {"id": rf["list"]["id"], "type": "list"}},
+                    "substance": {
+                        "data": {"id": rf["substance"]["id"], "type": "substance"}
+                    },
+                },
+            }
+        },
+    )
+    assert resp.status_code == 400
+    assert resp.data[0]["detail"].code == "unique"
+    assert (
+        resp.data[0]["detail"]
+        == f"External IDs must be unique within a list. The External ID submitted is already associated with '{minted_rid}'"
+    )
+    # user can't PATCH the same external_id and list relationship
+    record1 = record_factory.create(list=rf["list"]).instance
+    assert record1.list_id == int(rf["list"]["id"])
+    resp = client.patch(
+        f"/records/{record1.pk}",
+        {
+            "data": {
+                "id": record1.pk,
+                "type": "record",
+                "attributes": {"external_id": rf["external_id"]},
+            }
+        },
+    )
+    assert resp.status_code == 400
+    assert resp.data[0]["detail"].code == "unique"
+    assert (
+        resp.data[0]["detail"]
+        == f"External IDs must be unique within a list. The External ID submitted is already associated with '{minted_rid}'"
+    )
 
 
 @pytest.mark.django_db
@@ -227,13 +269,29 @@ def test_record_get(client, admin_user, record_factory):
     assert resp.status_code == 200
     # Check that all results contain
     for result in resp.data["results"]:
-        assert "rid" in result
+        assert "id" in result
         assert "external_id" in result
         assert "list" in result
         assert "substance" in result
+        assert "identifiers" in result
         assert "score" in result
         assert "message" in result
         assert "is_validated" in result
+
+
+@pytest.mark.django_db
+def test_record_get_included(
+    client, admin_user, record_factory, record_identifier_factory
+):
+    client.force_authenticate(user=admin_user)
+
+    rec = record_factory().instance
+    record_identifier_factory(record={"type": "record", "id": rec.pk})
+
+    resp = client.get("/records", {"include": "identifiers,list,substance,createdBy"})
+    assert resp.status_code == 200
+    # Check that all results contain
+    assert "included" in resp.json()
 
 
 @pytest.mark.django_db

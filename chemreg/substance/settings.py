@@ -12,14 +12,14 @@ class SubstanceSettings:
     Attributes:
         defaults (dict): The default settings to fallback to.
         INCREMENT_START (int): Added to the substance primary key to derive
-            the SID. Defaults to 2,000,000.
+            the SID. Defaults to 20,000,000.
         PREFIX (str): The prefix to place in the SID. Defaults to "DTX".
         SEQUENCE_KEY (bool): The cache key to store the sequence under.
 
     """
 
     defaults = {
-        "INCREMENT_START": 2000000,
+        "INCREMENT_START": 20000000,
         "PREFIX": "DTX",
         "SEQUENCE_KEY": "substance_seq",
     }

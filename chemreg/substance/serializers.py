@@ -1,13 +1,14 @@
+from itertools import chain
+
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.validators import RegexValidator
 from rest_framework.exceptions import ValidationError
 
-from chemreg.common.serializers import ControlledVocabSerializer
+from chemreg.common.serializers import CommonInfoSerializer, ControlledVocabSerializer
 from chemreg.common.validators import validate_casrn_checksum
 from chemreg.compound.models import BaseCompound
 from chemreg.compound.serializers import CompoundSerializer
 from chemreg.jsonapi.relations import PolymorphicResourceRelatedField
-from chemreg.jsonapi.serializers import HyperlinkedModelSerializer
 from chemreg.substance.models import (
     QCLevelsType,
     RelationshipType,
@@ -142,14 +143,17 @@ class SubstanceTypeSerializer(ControlledVocabSerializer):
         model = SubstanceType
 
 
-class SubstanceSerializer(HyperlinkedModelSerializer):
+class SubstanceSerializer(CommonInfoSerializer):
     """The serializer for Substances."""
 
     included_serializers = {
-        "source": "chemreg.substance.serializers.SourceSerializer",
-        "substance_type": "chemreg.substance.serializers.SubstanceTypeSerializer",
-        "qc_level": "chemreg.substance.serializers.QCLevelsTypeSerializer",
-        "associated_compound": "chemreg.compound.serializers.CompoundSerializer",
+        **CommonInfoSerializer.included_serializers,
+        **{
+            "source": "chemreg.substance.serializers.SourceSerializer",
+            "substance_type": "chemreg.substance.serializers.SubstanceTypeSerializer",
+            "qc_level": "chemreg.substance.serializers.QCLevelsTypeSerializer",
+            "associated_compound": "chemreg.compound.serializers.CompoundSerializer",
+        },
     }
 
     source = SourceSerializer
@@ -162,10 +166,16 @@ class SubstanceSerializer(HyperlinkedModelSerializer):
         allow_null=True,
     )
 
-    class Meta:
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if not ret.get("display_name"):
+            ret["display_name"] = ret.get("preferred_name")
+        return ret
+
+    class Meta(CommonInfoSerializer.Meta):
         model = Substance
-        fields = [
-            "sid",
+        fields = CommonInfoSerializer.Meta.fields + [
+            "id",
             "preferred_name",
             "display_name",
             "description",
@@ -177,6 +187,33 @@ class SubstanceSerializer(HyperlinkedModelSerializer):
             "qc_level",
             "associated_compound",
         ]
+
+    def validate(self, data):
+        fields = (
+            ["preferred_name", "display_name", "casrn"]
+            if data.get("display_name")
+            else ["preferred_name", "casrn"]
+        )
+        field_data = [
+            data.get(f)  # get values in the serializer
+            for f in fields
+            if f in data.keys()
+        ]
+        if (duplicated := set([x for x in field_data if field_data.count(x) > 1])) :
+            raise ValidationError(f"{duplicated.pop()} is not unique in {fields}")
+        errors = []
+        for field in field_data:
+            restricted_identifiers = Synonym.objects.restricted().filter(
+                identifier=field
+            )
+            restricted_substance_fields = Substance.objects.restrictive_fields(field)
+            if set(chain(restricted_substance_fields, restricted_identifiers)):
+                errors.append(field)
+        if errors:
+            raise ValidationError(
+                f"The identifier/s {[e for e in errors]} is not unique in restrictive name fields."
+            )
+        return data
 
 
 class RelationshipTypeSerializer(ControlledVocabSerializer):
@@ -223,7 +260,7 @@ class SynonymQualitySerializer(ControlledVocabSerializer):
         return value
 
 
-class SynonymSerializer(HyperlinkedModelSerializer):
+class SynonymSerializer(CommonInfoSerializer):
     """The serializer for Synonyms."""
 
     source = SourceSerializer
@@ -231,9 +268,9 @@ class SynonymSerializer(HyperlinkedModelSerializer):
     synonym_quality = SynonymQualitySerializer
     synonym_type = SynonymTypeSerializer
 
-    class Meta:
+    class Meta(CommonInfoSerializer.Meta):
         model = Synonym
-        fields = [
+        fields = CommonInfoSerializer.Meta.fields + [
             "identifier",
             "qc_notes",
             "source",
@@ -252,6 +289,9 @@ class SynonymSerializer(HyperlinkedModelSerializer):
             Validated data dictionary.
         """
         synonym_type = data.get("synonym_type", None) or self.instance.synonym_type
+        synonym_quality = (
+            data.get("synonym_quality", None) or self.instance.synonym_quality
+        )
 
         # Validate data.identifier is a valid synonym_type.validation_regular_expression
         RegexValidator(
@@ -259,16 +299,28 @@ class SynonymSerializer(HyperlinkedModelSerializer):
             "The proposed Synonym identifier does not conform to "
             "the regexp for the associated Synonym Type",
             "format",
-        )(data.get("identifier"))
+        )(data.get("identifier", None) or self.instance.identifier)
 
-        # If the synonym type is casrn
         if synonym_type.is_casrn:
-            # Verify that the identifier has a valid casrn checksum
             validate_casrn_checksum(data["identifier"])
+        if not synonym_quality.is_restrictive:
+            # if not restricted, no need to check identifier uniqueness #263
+            return data
+
+        identifier = data.get("identifier", None) or self.instance.identifier
+        pk = self.instance.pk if self.instance else None
+        restricted_identifiers = (
+            Synonym.objects.restricted().exclude(id=pk).filter(identifier=identifier)
+        )
+        restricted_substance_fields = Substance.objects.restrictive_fields(identifier)
+        if set(chain(restricted_identifiers, restricted_substance_fields)):
+            raise ValidationError(
+                f"The identifier '{identifier}' is not unique in restrictive name fields."
+            )
         return data
 
 
-class SubstanceRelationshipSerializer(HyperlinkedModelSerializer):
+class SubstanceRelationshipSerializer(CommonInfoSerializer):
     """The serializer for Substance Relationships."""
 
     from_substance = SubstanceSerializer
@@ -276,9 +328,9 @@ class SubstanceRelationshipSerializer(HyperlinkedModelSerializer):
     source = SourceSerializer
     relationship_type = RelationshipTypeSerializer
 
-    class Meta:
+    class Meta(CommonInfoSerializer.Meta):
         model = SubstanceRelationship
-        fields = [
+        fields = CommonInfoSerializer.Meta.fields + [
             "from_substance",
             "to_substance",
             "source",

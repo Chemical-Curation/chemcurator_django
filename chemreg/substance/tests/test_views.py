@@ -1,11 +1,16 @@
 import json
 from collections import OrderedDict
+from datetime import datetime
+from unittest.mock import patch
 
 from django.contrib.auth.models import Permission
+from rest_framework.reverse import reverse
 
 import pytest
 from rest_framework_json_api.utils import get_included_serializers
 
+from chemreg.common.models import CommonInfo
+from chemreg.resolution.indices import SubstanceIndex
 from chemreg.substance.serializers import SubstanceSerializer
 from chemreg.substance.views import (
     ModelViewSet,
@@ -51,7 +56,9 @@ def test_qc_levels_type_fetch(client, admin_user, qc_levels_type_factory):
     original_model = qc_levels_type_factory.create().instance
     resp = client.get("/qcLevels/{}".format(original_model.pk))
     assert resp.status_code == 200
-    for key in resp.data.keys() - {"url"}:
+    invalid_keys = {f.name for f in CommonInfo._meta.fields}
+    invalid_keys.add("url")
+    for key in resp.data.keys() - invalid_keys:
         assert resp.data[key] == getattr(original_model, key)
 
 
@@ -71,7 +78,9 @@ def test_qc_levels_type_patch(client, admin_user, qc_levels_type_factory):
         },
     )
     assert resp.status_code == 200
-    for key in resp.data.keys() - {"url"}:
+    invalid_keys = {f.name for f in CommonInfo._meta.fields}
+    invalid_keys.add("url")
+    for key in resp.data.keys() - invalid_keys:
         assert resp.data[key] == model_dict[key]
 
 
@@ -167,13 +176,13 @@ def test_source_patch(client, admin_user, source_factory):
     client.force_authenticate(user=admin_user)
     source = source_factory.create()
     pk = source.instance.pk
-    new_name = {"name": "a-new-name"}
+    new_label = {"label": "new-label"}
     resp = client.patch(
         f"/sources/{pk}",
-        {"data": {"id": pk, "type": "source", "attributes": new_name}},
+        {"data": {"id": pk, "type": "source", "attributes": new_label}},
     )
     assert resp.status_code == 200
-    assert resp.data["name"] == "a-new-name"
+    assert resp.data["label"] == "new-label"
 
 
 @pytest.mark.django_db
@@ -224,6 +233,48 @@ def test_substance_post(client, admin_user, substance_factory):
         },
     )
     assert resp.status_code == 201
+
+
+@pytest.mark.django_db
+def test_substance_unique_fields_post(client, admin_user, substance_factory):
+    client.force_authenticate(user=admin_user)
+    model_dict = substance_factory.build(defined=True).initial_data
+    duplicator = model_dict["preferred_name"]
+    model_dict["display_name"] = duplicator
+    resp = client.post(  # POST w/ same "display_name" and "preferred_name"
+        "/substances",
+        {
+            "data": {
+                "type": "substance",
+                "attributes": model_dict,
+                "relationships": {
+                    "qcLevel": {
+                        "data": {"id": model_dict["qc_level"]["id"], "type": "qcLevel"}
+                    },
+                    "source": {
+                        "data": {"id": model_dict["source"]["id"], "type": "source"}
+                    },
+                    "substanceType": {
+                        "data": {
+                            "id": model_dict["substance_type"]["id"],
+                            "type": "substanceType",
+                        }
+                    },
+                    "associatedCompound": {
+                        "data": {
+                            "id": model_dict["associated_compound"]["id"],
+                            "type": "definedCompound",
+                        }
+                    },
+                },
+            }
+        },
+    )
+    assert resp.status_code == 400
+    assert (
+        resp.data[0]["detail"]
+        == f"{duplicator} is not unique in ['preferred_name', 'display_name', 'casrn']"
+    )
 
 
 @pytest.mark.django_db
@@ -314,7 +365,6 @@ def test_substance_list(client, admin_user, substance_factory):
     assert resp.status_code == 200
     # Check that all results contain
     for result in resp.data["results"]:
-        assert "sid" in result
         assert "preferred_name" in result
         assert "display_name" in result
         assert "description" in result
@@ -328,6 +378,21 @@ def test_substance_list(client, admin_user, substance_factory):
 
 
 @pytest.mark.django_db
+def test_substance_search(client, admin_user, substance_factory):
+    substance = substance_factory().instance
+    # Create result to be filtered out
+    substance_factory()
+    url = reverse("substance-list")
+
+    with patch.object(SubstanceIndex, "search") as mock_search:
+        mock_search.return_value = {"data": [{"id": substance.pk}]}
+
+        resp = client.get(url, {"filter[search]": substance.preferred_name})
+        assert resp.status_code == 200
+        assert len(resp.json()["data"]) == 1
+
+
+@pytest.mark.django_db
 def test_substance_fetch(client, admin_user, substance_factory):
     client.force_authenticate(user=admin_user)
     original_model = substance_factory.create(illdefined=True).instance
@@ -336,10 +401,14 @@ def test_substance_fetch(client, admin_user, substance_factory):
     for key in resp.data.keys() - {"url"}:
         # Verify Attributes
         if isinstance(resp.data[key], str):
-            assert resp.data[key] == getattr(original_model, key)
+            model_value = getattr(original_model, key)
+            if isinstance(model_value, datetime):
+                assert resp.data[key] == model_value.strftime("%Y-%m-%dT%H:%M:%S.%f")
+            else:
+                assert resp.data[key] == model_value
         # Verify Related Resources
         elif type(resp.data[key]) is OrderedDict:
-            assert resp.data[key]["id"] == str(getattr(original_model, key).id)
+            assert resp.data[key]["id"] == str(getattr(original_model, key).pk)
 
 
 @pytest.mark.django_db
@@ -347,6 +416,9 @@ def test_substance_fetch_includes(client, admin_user, substance_factory):
     client.force_authenticate(user=admin_user)
     model = substance_factory(illdefined=True).instance
     requested_includes = get_included_serializers(SubstanceSerializer)
+    # Pop common info related fields.
+    for field in ["created_by", "updated_by"]:
+        requested_includes.pop(field)
     resp = client.get(
         "/substances/{}".format(model.pk),
         data={"include": ",".join(requested_includes)},
@@ -362,7 +434,7 @@ def test_substance_patch(client, admin_user, substance_factory):
     client.force_authenticate(user=admin_user)
     original_model = substance_factory.create(defined=True).instance
     model_dict = substance_factory.build(illdefined=True).initial_data
-    model_dict.update(sid="DTXSID205000001")
+    model_dict.update(id="DTXSID205000001")
     resp = client.patch(
         "/substances/{}".format(original_model.pk),
         {
@@ -395,7 +467,9 @@ def test_substance_patch(client, admin_user, substance_factory):
     )
     original_model.refresh_from_db()
     assert resp.status_code == 200
-    for key in resp.data.keys() - {"url"}:
+    invalid_keys = {f.name for f in CommonInfo._meta.fields}
+    invalid_keys.add("url")
+    for key in resp.data.keys() - invalid_keys:
         # Verify Attributes
         if isinstance(resp.data[key], str):
             assert resp.data[key] == model_dict[key]
@@ -484,7 +558,9 @@ def test_relationship_type_fetch(client, admin_user, relationship_type_factory):
     original_model = relationship_type_factory.create().instance
     resp = client.get("/relationshipTypes/{}".format(original_model.pk))
     assert resp.status_code == 200
-    for key in resp.data.keys() - {"url"}:
+    invalid_keys = {f.name for f in CommonInfo._meta.fields}
+    invalid_keys.add("url")
+    for key in resp.data.keys() - invalid_keys:
         # Verify Attributes
         if isinstance(resp.data[key], str):
             assert resp.data[key] == getattr(original_model, key)
@@ -495,7 +571,7 @@ def test_relationship_type_patch(client, admin_user, relationship_type_factory):
     client.force_authenticate(user=admin_user)
     original_model = relationship_type_factory.create().instance
     model_dict = relationship_type_factory.build().initial_data
-    model_dict.update(sid="DTXSID205000001")
+    model_dict.update(id="DTXSID205000001")
     resp = client.patch(
         "/relationshipTypes/{}".format(original_model.pk),
         {
@@ -507,7 +583,9 @@ def test_relationship_type_patch(client, admin_user, relationship_type_factory):
         },
     )
     assert resp.status_code == 200
-    for key in resp.data.keys() - {"url"}:
+    invalid_keys = {f.name for f in CommonInfo._meta.fields}
+    invalid_keys.add("url")
+    for key in resp.data.keys() - invalid_keys:
         # Verify Attributes
         if isinstance(resp.data[key], str):
             assert resp.data[key] == model_dict[key]
@@ -588,6 +666,68 @@ def test_synonym_post(client, admin_user, synonym_factory):
 
 
 @pytest.mark.django_db
+def test_synonym_unique_identifier_post(
+    client, admin_user, substance_factory, synonym_factory, synonym_quality_factory
+):
+    client.force_authenticate(user=admin_user)
+    substance = substance_factory.create().instance
+    synonym_quality = synonym_quality_factory.create(is_restrictive=True).instance
+    synonym = synonym_factory.create(
+        synonym_quality={"type": "synonymQuality", "id": synonym_quality.pk},
+    ).instance
+    sf = synonym_factory.build().initial_data
+    sf["identifier"] = substance.preferred_name
+    resp = client.post(
+        "/synonyms",
+        {
+            "data": {
+                "type": "synonym",
+                "attributes": sf,
+                "relationships": {
+                    "source": {"data": {"id": sf["source"]["id"], "type": "source"}},
+                    "synonymQuality": {
+                        "data": {"id": synonym_quality.pk, "type": "synonymQuality"}
+                    },
+                    "synonymType": {
+                        "data": {"id": sf["synonym_type"]["id"], "type": "synonymType"}
+                    },
+                },
+            }
+        },
+    )
+    assert resp.status_code == 400
+    assert (
+        resp.data[0]["detail"]
+        == f"The identifier '{substance.preferred_name}' is not unique in restrictive name fields."
+    )
+    sf = synonym_factory.build().initial_data
+    sf["identifier"] = synonym.identifier
+    resp = client.post(
+        "/synonyms",
+        {
+            "data": {
+                "type": "synonym",
+                "attributes": sf,
+                "relationships": {
+                    "source": {"data": {"id": sf["source"]["id"], "type": "source"}},
+                    "synonymQuality": {
+                        "data": {"id": synonym_quality.pk, "type": "synonymQuality"}
+                    },
+                    "synonymType": {
+                        "data": {"id": sf["synonym_type"]["id"], "type": "synonymType"}
+                    },
+                },
+            }
+        },
+    )
+    assert resp.status_code == 400
+    assert (
+        resp.data[0]["detail"]
+        == f"The identifier '{synonym.identifier}' is not unique in restrictive name fields."
+    )
+
+
+@pytest.mark.django_db
 def test_synonym_list(client, admin_user, synonym_factory):
     client.force_authenticate(user=admin_user)
     synonym_factory.create()
@@ -601,6 +741,28 @@ def test_synonym_list(client, admin_user, synonym_factory):
         assert "substance" in result
         assert "synonym_quality" in result
         assert "synonym_type" in result
+
+
+@pytest.mark.django_db
+def test_synonym_filter(client, admin_user, synonym_factory):
+    client.force_authenticate(user=admin_user)
+    syn = synonym_factory.create()
+    sub = syn.instance.substance
+    resp = client.get(f"/synonyms?filter[substance.id]={sub.id}")
+    assert resp.status_code == 200
+    assert len(resp.data["results"]) == 1
+    # Check that all results contain
+    from django.db.models import Model
+
+    result = resp.data["results"][0]
+    for key in list(result.keys())[:-1]:
+        obj = getattr(syn.instance, key)
+        if issubclass(type(obj), Model):
+            result[key]["id"] = str(obj.pk)
+        elif isinstance(obj, datetime):
+            assert result[key] == obj.strftime("%Y-%m-%dT%H:%M:%S.%f")
+        else:
+            assert obj == result[key]
 
 
 @pytest.mark.django_db
@@ -688,6 +850,37 @@ def test_substance_relationship_list(
 
 
 @pytest.mark.django_db
+def test_substance_relationship_substance_id_filter(
+    client, admin_user, substance_relationship_factory, substance_factory
+):
+    client.force_authenticate(user=admin_user)
+
+    # Create Substance
+    substance = substance_factory().instance
+
+    # Create Substance Factories
+    substance_relationship_factory.create(
+        from_substance={"type": "substance", "id": substance.pk}
+    )  # forward
+    substance_relationship_factory.create(
+        to_substance={"type": "substance", "id": substance.pk}
+    )  # backwards
+    substance_relationship_factory.create(
+        from_substance={"type": "substance", "id": substance.pk},
+        to_substance={"type": "substance", "id": substance.pk},
+    )  # mirrored
+
+    # Unrelated relationship (To be filtered)
+    substance_relationship_factory()
+
+    resp = client.get("/substanceRelationships", {"filter[substance.id]": substance.pk})
+    print(resp.json())
+    assert resp.status_code == 200
+    # Check that only the correct response are returned
+    assert len(resp.data["results"]) == 3
+
+
+@pytest.mark.django_db
 def test_substance_relationship_post(
     client, admin_user, substance_relationship_factory
 ):
@@ -753,3 +946,116 @@ def test_is_restrictive_on_synonyms(
         resp.data[0]["detail"]
         == "Synonyms associated with this SynonymQuality do not meet uniqueness constraints. ['1234567-89-5']"
     )
+
+
+@pytest.mark.django_db
+def test_name_validation_bug_236(
+    client, admin_user, synonym_factory, synonym_quality_factory
+):
+    """ This test verifies that a restrictive synonymQuality can be PATCH'd
+    over another restrictive synonymQuality on the same synonym without an error
+    that was being thrown from the same synonym's identifier being included in
+    the set of restrictive fields. Bug is in issue #236.
+    """
+
+    restricted1 = synonym_quality_factory.create(is_restrictive=True).instance
+    restricted2 = synonym_quality_factory.create(is_restrictive=True).instance
+    synonym = synonym_factory.create(
+        identifier="foobar",
+        synonym_quality={"type": "synonymQuality", "id": restricted1.pk},
+    ).instance
+    client.force_authenticate(user=admin_user)
+
+    # Assert same synonym quality can be patched
+    resp = client.patch(
+        f"/synonyms/{synonym.pk}",
+        {
+            "data": {
+                "id": synonym.pk,
+                "type": "synonym",
+                "relationships": {
+                    "synonymQuality": {
+                        "data": {"id": restricted1.pk, "type": "synonymQuality"}
+                    }
+                },
+            }
+        },
+    )
+    assert resp.status_code == 200
+
+    # Assert different synonym quality can be patched
+    resp = client.patch(
+        f"/synonyms/{synonym.pk}",
+        {
+            "data": {
+                "id": synonym.pk,
+                "type": "synonym",
+                "relationships": {
+                    "synonymQuality": {
+                        "data": {"id": restricted2.pk, "type": "synonymQuality"}
+                    }
+                },
+            }
+        },
+    )
+    assert resp.status_code == 200
+
+
+@pytest.mark.django_db
+def test_substance_display_name_populated(client, admin_user, substance_factory):
+    """ This test verifies that when a Substance is created and the display_name is not set to
+    null, the result should not be modified and should be equal to that of the factory"""
+    client.force_authenticate(user=admin_user)
+    substance = substance_factory.create()
+    resp = client.get(f"/substances/{substance.instance.pk}")
+    assert resp.status_code == 200
+    assert resp.data["display_name"] == substance.instance.display_name
+
+
+@pytest.mark.django_db
+def test_substance_display_name_null(client, admin_user, substance_factory):
+    """ This test verifies that a Substance can be created with a null display_name.
+    display_name should be returned as the value of preferred_name"""
+    client.force_authenticate(user=admin_user)
+    substance = substance_factory.create(display_name=None)
+    resp = client.get(f"/substances/{substance.instance.pk}")
+    assert resp.status_code == 200
+    assert resp.data["display_name"] == substance.instance.preferred_name
+
+
+@pytest.mark.django_db
+def test_substance_display_name_null_post(client, admin_user, substance_factory):
+    """ This test verifies that a Substance can be created without a display_name
+    and that a valid request can be performed """
+    client.force_authenticate(user=admin_user)
+    substance = substance_factory.build(display_name=None, defined=True).initial_data
+    resp = client.post(
+        "/substances",
+        {
+            "data": {
+                "type": "substance",
+                "attributes": substance,
+                "relationships": {
+                    "qcLevel": {
+                        "data": {"id": substance["qc_level"]["id"], "type": "qcLevel"}
+                    },
+                    "source": {
+                        "data": {"id": substance["source"]["id"], "type": "source"}
+                    },
+                    "substanceType": {
+                        "data": {
+                            "id": substance["substance_type"]["id"],
+                            "type": "substanceType",
+                        }
+                    },
+                    "associatedCompound": {
+                        "data": {
+                            "id": substance["associated_compound"]["id"],
+                            "type": "definedCompound",
+                        }
+                    },
+                },
+            }
+        },
+    )
+    assert resp.status_code == 201

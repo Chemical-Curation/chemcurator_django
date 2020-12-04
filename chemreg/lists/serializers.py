@@ -1,5 +1,7 @@
-from chemreg.common.serializers import ControlledVocabSerializer
-from chemreg.jsonapi.serializers import HyperlinkedModelSerializer
+from django.utils.translation import gettext_lazy as _
+
+from chemreg.common.serializers import CommonInfoSerializer, ControlledVocabSerializer
+from chemreg.common.validators import ExternalIdUniqueTogetherValidator
 from chemreg.lists.models import (
     AccessibilityType,
     ExternalContact,
@@ -27,12 +29,12 @@ class IdentifierTypeSerializer(ControlledVocabSerializer):
         model = IdentifierType
 
 
-class ExternalContactSerializer(HyperlinkedModelSerializer):
+class ExternalContactSerializer(CommonInfoSerializer):
     """The serializer for External Contacts."""
 
-    class Meta:
+    class Meta(CommonInfoSerializer.Meta):
         model = ExternalContact
-        fields = [
+        fields = CommonInfoSerializer.Meta.fields + [
             "name",
             "email",
             "phone",
@@ -46,7 +48,7 @@ class ListTypeSerializer(ControlledVocabSerializer):
         model = ListType
 
 
-class ListSerializer(HyperlinkedModelSerializer):
+class ListSerializer(CommonInfoSerializer):
     """The serializer for Lists."""
 
     list_accessibility = AccessibilityTypeSerializer
@@ -54,9 +56,9 @@ class ListSerializer(HyperlinkedModelSerializer):
     owners = UserSerializer(read_only=True, many=True)
     types = ListTypeSerializer
 
-    class Meta:
+    class Meta(CommonInfoSerializer.Meta):
         model = List
-        fields = [
+        fields = CommonInfoSerializer.Meta.fields + [
             "name",
             "label",
             "short_description",
@@ -72,34 +74,52 @@ class ListSerializer(HyperlinkedModelSerializer):
         ]
 
 
-class RecordSerializer(HyperlinkedModelSerializer):
+class RecordSerializer(CommonInfoSerializer):
     """The serializer for Records."""
 
-    list = ListSerializer
-    substance = SubstanceSerializer
+    included_serializers = {
+        **CommonInfoSerializer.included_serializers,
+        "identifiers": "chemreg.lists.serializers.RecordIdentifierSerializer",
+        "list": ListSerializer,
+        "substance": SubstanceSerializer,
+    }
 
-    class Meta:
+    class Meta(CommonInfoSerializer.Meta):
         model = Record
-        fields = [
-            "rid",
+        fields = CommonInfoSerializer.Meta.fields + [
+            "id",
             "external_id",
             "message",
             "score",
             "is_validated",
             "list",
             "substance",
+            "identifiers",
         ]
+        validators = [
+            ExternalIdUniqueTogetherValidator(
+                queryset=model.objects.all(),
+                fields=("external_id", "list"),
+                message=_(
+                    "External IDs must be unique within a list. The External ID submitted is already associated with '{duplicate_field}'"
+                ),
+                duplicate_field="id",
+            )
+        ]
+        extra_kwargs = {
+            "identifiers": {"required": False},
+        }
 
 
-class RecordIdentifierSerializer(HyperlinkedModelSerializer):
+class RecordIdentifierSerializer(CommonInfoSerializer):
     """The serializer for Record Identifiers."""
 
     record = RecordSerializer
     identifier_type = IdentifierTypeSerializer
 
-    class Meta:
+    class Meta(CommonInfoSerializer.Meta):
         model = RecordIdentifier
-        fields = [
+        fields = CommonInfoSerializer.Meta.fields + [
             "record",
             "identifier",
             "identifier_type",
