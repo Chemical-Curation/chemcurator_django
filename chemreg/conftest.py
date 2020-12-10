@@ -1,7 +1,11 @@
+from unittest.mock import patch
+
 from django.apps import apps
 from django.conf import settings
+from django.contrib.auth.models import Permission
 from django.db import models
-from rest_framework.test import APIClient
+from django.test import RequestFactory
+from rest_framework.test import APIClient, APIRequestFactory
 
 import pytest
 
@@ -18,9 +22,38 @@ def client() -> APIClient:
     return APIClient()
 
 
+@pytest.fixture  # isn't this already in fixtures as "rf" | $ pytest --fixtures
+def request_factory() -> RequestFactory:
+    return RequestFactory()
+
+
+@pytest.fixture
+def api_request_factory() -> APIRequestFactory:
+    return APIRequestFactory(enforce_csrf_checks=True)
+
+
+def get_chemreg_models():
+    for model in apps.get_models():
+        if model.__module__.startswith("chemreg"):
+            yield model
+
+
 @pytest.fixture
 def user() -> settings.AUTH_USER_MODEL:
     return UserFactory()
+
+
+@pytest.fixture
+def admin_user() -> settings.AUTH_USER_MODEL:
+    admin = UserFactory(is_staff=True)
+    for p in Permission.objects.all():
+        admin.user_permissions.add(p.pk)
+    return admin
+
+
+@pytest.fixture
+def user_factory() -> UserFactory:
+    return UserFactory
 
 
 def is_chemreg_model(model: models.Model) -> bool:
@@ -32,3 +65,16 @@ def is_chemreg_model(model: models.Model) -> bool:
 def chemreg_model(request) -> models.Model:
     """A model from the chemreg application."""
     return request.param
+
+
+# Interrupt all external gets
+patcher = patch("requests.get")
+patcher.start()
+
+# Interrupt all external posts
+patcher = patch("requests.post")
+patcher.start()
+
+# Interrupt all external deletes
+patcher = patch("requests.delete")
+patcher.start()

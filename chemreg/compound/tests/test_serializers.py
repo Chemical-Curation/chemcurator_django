@@ -1,67 +1,178 @@
+import re
+
 import pytest
 
-
-def test_invalid_cid(compound, invalid_cid):
-    """Test that bad IDs will raise validation errors."""
-    serializer = compound["serializer"]
-    json_factory = compound["json_factory"]
-    json = json_factory.build()
-    json["id"] = invalid_cid
-    assert not serializer(data=json).is_valid()
-
-
-@pytest.mark.parametrize("compound", ["DefinedCompound"], indirect=["compound"])
-def test_invalid_inchikey(compound, invalid_inchikey):
-    """Test that bad InChIKeys will raise validation errors."""
-    serializer = compound["serializer"]
-    json_factory = compound["json_factory"]
-    json = json_factory.build()
-    json["inchikey"] = invalid_inchikey
-    assert not serializer(data=json).is_valid()
-
-
-@pytest.mark.parametrize("compound", ["IllDefinedCompound"], indirect=["compound"])
-def test_ill_Defined_compound(compound, mrvfile):
-    """Test that an ill-defined compound can be created with the provided mrvfile."""
-    serializer = compound["serializer"]
-    json_factory = compound["json_factory"]
-    json = json_factory.build()
-    json["mrvfile"] = mrvfile
-    assert serializer(data=json).is_valid()
+from chemreg.compound.serializers import (
+    CompoundSerializer,
+    DefinedCompoundSerializer,
+    IllDefinedCompoundSerializer,
+    PolymorphicModelSerializer,
+)
+from chemreg.compound.settings import compound_settings
 
 
 @pytest.mark.django_db
-def test_query_structure_type(query_structure_type):
-    """Test that a query structure type name with reserved chars is invalid"""
-    serializer = query_structure_type["serializer"]
-    json_factory = query_structure_type["json_factory"]
-    json = json_factory.build()
-    json["name"] = "query structure type"
-    assert not serializer(data=json).is_valid()
-
-    json["name"] = "querystructuretype1"
-    json["label"] = "Query Structure Type 1"
-    assert serializer(data=json).is_valid()
-
-    json["name"] = "query-structure-type-2"
-    json["label"] = "Query Structure Type 2"
-    assert serializer(data=json).is_valid()
+def test_defined_compound(defined_compound_factory):
+    serializer = defined_compound_factory.build()
+    assert serializer.is_valid()
+    instance = serializer.save()
+    # test inchikey creation
+    assert "inchikey" not in serializer.initial_data
+    assert re.match(r"^[A-Z]{14}-[A-Z]{10}-[A-Z]$", instance.inchikey)
 
 
 @pytest.mark.django_db
-def test_compound_deserialize(compound):
-    """Test that a compound JSON is properly deserialized."""
-    serializer = compound["serializer"]
-    json_factory = compound["json_factory"]
-    json = json_factory.build()
-    assert serializer(data=json).is_valid()
+def test_ill_defined_compound(ill_defined_compound_factory):
+    serializer = ill_defined_compound_factory.build()
+    assert serializer.is_valid()
+    instance = serializer.save()
+    # test default querystructuretype
+    assert "query_structure_type" not in serializer.initial_data
+    assert instance.query_structure_type.name == "ill-defined"
 
 
 @pytest.mark.django_db
-def test_compound_serialize(compound):
-    """Test that a compound model is properly serialized."""
-    serializer = compound["serializer"]
-    factory = compound["factory"]
-    model = factory.build()
-    serialized = serializer(model)
-    assert serialized.data["id"] == model.cid
+def test_query_structure_type(query_structure_type_factory):
+    serializer = query_structure_type_factory.build()
+    assert serializer.is_valid()
+    serializer.save()
+
+
+@pytest.mark.django_db
+def test_unique_inchikey(defined_compound_factory):
+    serializer = defined_compound_factory.build()
+    assert serializer.is_valid()
+    compound = serializer.save()
+    serialized = defined_compound_factory.build(**serializer.initial_data)
+    assert not serialized.is_valid()
+    assert "links" in serialized.errors["detail"]
+    conflict = f"Inchikey conflicts with ['{compound.id}']"
+    assert conflict in str(serialized.errors["detail"]["detail"])
+
+
+@pytest.mark.django_db
+def test_override_unique_inchikey(defined_compound_factory):
+    serializer = defined_compound_factory.build()
+    assert serializer.is_valid()
+    one = serializer.save()
+    serialized = defined_compound_factory.build(
+        **serializer.initial_data, admin_override=True
+    )
+    assert serialized.is_valid()
+    two = serialized.save()
+    assert one.id != two.id
+    assert one.inchikey == two.inchikey
+
+
+@pytest.mark.django_db
+def test_defined_compound_from_smiles(defined_compound_smiles_factory):
+    VALID_SMILES = (
+        "CC(=O)OC1=C(C=CC=C1)C(O)=O",
+        "CC(=O)NC1=CC=C(O)C=C1",
+        "CC(C)(C1=CC=C(O)C=C1)C1=CC=C(O)C=C1",
+        "ClC(Cl)=C(Cl)Cl",
+        "ClC=C(Cl)Cl",
+        "C=O",
+        # "[S]",       # test below
+        "CCNC1=NC(NC(C)C)=NC(Cl)=N1",
+        # "CC(=O)N1CCN(CC1)C1=CC=C(OC[C@H]2COC@@(O2)C2=CC=C(Cl)C=C2Cl)C=C1",        # test below
+    )
+    for smile in VALID_SMILES:
+        serializer = defined_compound_smiles_factory.build(smiles=smile)
+        assert serializer.is_valid()
+        instance = serializer.save()
+        # test inchikey creation
+        assert "inchikey" not in serializer.initial_data
+        assert re.match(r"^[A-Z]{14}-[A-Z]{10}-[A-Z]$", instance.inchikey)
+
+    invalid_smiles = "AN(INVALID(STRING"
+    serializer = defined_compound_smiles_factory.build(smiles=invalid_smiles)
+    assert not serializer.is_valid()
+    assert "Structure is not in SMILES format" in str(
+        serializer.errors.get("smiles")[0]
+    )
+
+    # Test a valence that partialsmiles doesn't like but we are accepting anyway
+    serializer = defined_compound_smiles_factory.build(smiles="[S]")
+    assert serializer.is_valid()
+
+    # There are some exotic SMILES strings that partialsmiles rejects
+    # CC(=O)N1CCN(CC1)C1=CC=C(OC[C@H]2COC@@(O2)C2=CC=C(Cl)C=C2Cl)C=C1
+    #                                    ^  this is rejected by partialsmiles
+
+    serializer = defined_compound_smiles_factory.build(
+        smiles="CC(=O)N1CCN(CC1)C1=CC=C(OC[C@H]2COC@@(O2)C2=CC=C(Cl)C=C2Cl)C=C1"
+    )
+    assert not serializer.is_valid()
+    assert "Structure is not in SMILES format" in str(
+        serializer.errors.get("smiles")[0]
+    )
+
+
+@pytest.mark.django_db
+def test_override_unique_inchikey_via_smiles(defined_compound_smiles_factory):
+    serializer = defined_compound_smiles_factory.build(
+        smiles="CC(=O)OC1=C(C=CC=C1)C(O)=O"
+    )
+    assert serializer.is_valid()
+    one = serializer.save()
+    data = serializer.initial_data
+    serialized = defined_compound_smiles_factory.build(**data)
+    assert not serialized.is_valid()  # fails without override
+
+    serialized = defined_compound_smiles_factory.build(**data, admin_override=True)
+
+    assert serialized.is_valid()  # succeeds with override
+    two = serialized.save()
+    assert one.id != two.id
+    assert one.inchikey == two.inchikey
+
+
+@pytest.mark.django_db
+def test_defined_compound_from_v2000_molfile(defined_compound_v2000_factory):
+    dc = defined_compound_v2000_factory.build()
+    assert dc.is_valid()
+    instance = dc.save()
+    # test inchikey creation
+    assert "inchikey" not in dc.initial_data
+    assert re.match(r"^[A-Z]{14}-[A-Z]{10}-[A-Z]$", instance.inchikey)
+
+
+@pytest.mark.django_db
+def test_defined_compound_prefix(defined_compound_factory):
+    serializer = defined_compound_factory.build()
+    assert serializer.is_valid()
+    instance = serializer.save()
+    # assert that the prefix of the serialized defined compound is equivalent to
+    # the prefix generated in compound_settings
+    assert instance.id[0 : instance.id.find("CID")] == compound_settings.PREFIX
+
+
+@pytest.mark.django_db
+def test_defined_compound_custom_prefix(defined_compound_factory):
+    compound_settings.PREFIX = "XTX"
+    serializer = defined_compound_factory.build()
+    assert serializer.is_valid()
+    instance = serializer.save()
+    # assert that the prefix of the serialized defined compound is equivalent to
+    # the prefix assigned for testing purposes
+    assert instance.id[0 : instance.id.find("CID")] == compound_settings.PREFIX
+
+
+@pytest.mark.django_db
+def test_ill_defined_compound_prefix(ill_defined_compound_factory):
+    serializer = ill_defined_compound_factory.build()
+    assert serializer.is_valid()
+    instance = serializer.save()
+    # assert that the prefix of the serialized ill defined compound is equivalent to
+    # the prefix generated in compound_settings
+    assert instance.id[0 : instance.id.find("CID")] == compound_settings.PREFIX
+
+
+@pytest.mark.django_db
+def test_compound_serializer():
+    assert issubclass(CompoundSerializer, PolymorphicModelSerializer)
+    assert CompoundSerializer.polymorphic_serializers == [
+        DefinedCompoundSerializer,
+        IllDefinedCompoundSerializer,
+    ]

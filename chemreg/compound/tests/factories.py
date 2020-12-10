@@ -1,89 +1,65 @@
 import factory
 
-from chemreg.compound.models import (
-    BaseCompound,
-    DefinedCompound,
-    IllDefinedCompound,
-    QueryStructureType,
+from chemreg.common.factory import DjangoSerializerFactory
+from chemreg.compound.serializers import (
+    DefinedCompoundSerializer,
+    IllDefinedCompoundSerializer,
+    QueryStructureTypeSerializer,
 )
-from chemreg.compound.tests.fakers import CIDFaker, InChIKeyFaker, MRVFileFaker
+from chemreg.compound.tests.fakers import CompoundFaker
 
-factory.Faker.add_provider(CIDFaker)
-factory.Faker.add_provider(InChIKeyFaker)
-factory.Faker.add_provider(MRVFileFaker)
+factory.Faker.add_provider(CompoundFaker)
 
 
-class BaseCompoundFactory(factory.DjangoModelFactory):
-    """Manufactures `BaseCompound` models."""
-
-    cid = factory.Faker("cid")
-    structure = factory.Faker("text")
-
-    class Meta:
-        model = BaseCompound
-
-
-class DefinedCompoundFactory(factory.DjangoModelFactory):
+class DefinedCompoundFactory(DjangoSerializerFactory):
     """Manufactures `DefinedCompound` models."""
 
-    cid = factory.Faker("cid")
-    molefile = factory.Faker("text")
-    inchikey = factory.Faker("inchikey")
+    molfile_v3000 = factory.Faker("molfile")
 
     class Meta:
-        model = DefinedCompound
+        model = DefinedCompoundSerializer
+
+    class Params:
+        V2000 = factory.Trait(molfile_v3000=factory.Faker("molfile", v2000=True))
 
 
-class DefinedCompoundJSONFactory(factory.DictFactory):
-    """Manufactures `DefinedCompound` dictionaries."""
+class DefinedCompoundSmilesFactory(DjangoSerializerFactory):
+    """Manufactures `DefinedCompound` models without molfile
+     input by passing in a `smiles` attribute."""
 
-    id = factory.Faker("cid")
-    molefile = factory.Faker("text")
-    inchikey = factory.Faker("inchikey")
+    smiles = factory.Faker("smile")
+
+    class Meta:
+        model = DefinedCompoundSerializer
 
 
-class QueryStructureTypeFactory(factory.DjangoModelFactory):
+class DefinedCompoundV2000Factory(DjangoSerializerFactory):
+    """Manufactures `DefinedCompound` models without molfile_v3000 input
+    by passing in a `molfile_v2000` attribute."""
+
+    molfile_v2000 = factory.Faker("molfile_v2000")
+
+    class Meta:
+        model = DefinedCompoundSerializer
+
+
+class QueryStructureTypeFactory(DjangoSerializerFactory):
     """Manufactures `QueryStructureType` models."""
 
     name = factory.Faker("slug")
-    label = factory.Sequence(lambda n: "label%s" % n)
+    label = factory.LazyAttribute(lambda o: o.name.replace("-", " "))
     short_description = factory.Faker("text")
     long_description = factory.Faker("text")
+    deprecated = False
 
     class Meta:
-        model = QueryStructureType
+        model = QueryStructureTypeSerializer
 
 
-class QueryStructureTypeJSONFactory(factory.DictFactory):
-    """Manufactures `QueryStructureType` dictionaries."""
-
-    name = factory.Faker("slug")
-    label = factory.Faker("text")
-    short_description = factory.Faker("text")
-    long_description = factory.Faker("text")
-
-
-class IllDefinedCompoundFactory(factory.DjangoModelFactory):
+class IllDefinedCompoundFactory(DjangoSerializerFactory):
     """Manufactures `IllDefinedCompound` models."""
 
-    cid = factory.Faker("cid")
     mrvfile = factory.Faker("mrvfile")
-    query_structure_type = factory.SubFactory(QueryStructureTypeFactory)
 
     class Meta:
-        model = IllDefinedCompound
-
-
-class IllDefinedCompoundJSONFactory(factory.DictFactory):
-    """Manufactures `IllDefinedCompound` dictionaries."""
-
-    id = factory.Faker("cid")
-    mrvfile = factory.Faker("text")
-    query_structure_type = factory.build(
-        QueryStructureType,
-        FACTORY_CLASS=QueryStructureTypeFactory,
-        name="ill-defined",
-        label="Ill Defined",
-        short_description="An ill-defined compound",
-        long_description="A longer description of an ill-defined compound",
-    )
+        model = IllDefinedCompoundSerializer

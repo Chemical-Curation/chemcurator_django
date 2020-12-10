@@ -1,0 +1,38 @@
+- model: users.user
+  pk: 1
+  fields:
+    password: argon2$argon2i$v=19$m=512,t=2,p=2$WTdIbUFXSldWa3VJ$0/ryv4z4Ela8EUqTtADcqQ
+    last_login: 2020-08-28 19:07:13.025102
+    is_superuser: true
+    username: karyn
+    first_name: Karyn
+    last_name: Blocksome
+    email: blocked@karyn.com
+    is_staff: true
+    is_active: true
+    date_joined: 2020-06-02 22:44:08
+    created_at: 2020-06-02 22:44:08.565675
+    created_by: 1
+    updated_at: 2020-07-07 20:23:28.010560
+    updated_by: 1
+    groups: []
+    user_permissions: []
+- model: users.user
+  pk: 3
+  fields:
+    password: argon2$argon2i$v=19$m=512,t=2,p=2$WnVVNDdHTmo3Y2py$PO2ihC6Eq+pbqdela+jEcw
+    last_login: null
+    is_superuser: false
+    username: anonymous
+    first_name: anonymous
+    last_name: user
+    email: anonymous@epa.gov
+    is_staff: false
+    is_active: true
+    date_joined: 2020-08-28 19:07:38
+    created_at: 2020-08-28 19:07:38.777072
+    created_by: 1
+    updated_at: 2020-08-28 19:08:15.185662
+    updated_by: 1
+    groups: []
+    user_permissions: []

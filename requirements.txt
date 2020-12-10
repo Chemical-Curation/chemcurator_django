@@ -1,30 +1,39 @@
 django[argon2]==3.0.3  # https://www.djangoproject.com/
+django-computed-property==0.3.0  # https://github.com/brechin/django-computed-property
 django-cors-headers==3.2.1  # https://github.com/adamchainz/django-cors-headers
+django-crum==0.7.5  # https://github.com/ninemoreminutes/django-crum
 django-environ==0.4.5  # https://github.com/joke2k/django-environ
-django-polymorphic==2.1.2  # https://github.com/django-polymorphic/django-polymorphic
 django-redis==4.11.0  # https://github.com/niwinz/django-redis
 djangorestframework==3.11.0  # https://github.com/encode/django-rest-framework
+djangorestframework-jsonapi[django-filter,django-polymorphic]==3.1.0  # https://github.com/django-json-api/django-rest-framework-json-api
+epam.indigo==1.4.0b0  # https://github.com/epam/Indigo
 gunicorn[gevent,setproctitle]==20.0.4  # https://github.com/benoitc/gunicorn
+html-sanitizer==1.9.1  # https://github.com/matthiask/html-sanitizer
+jsonnet==0.16.0; sys_platform == 'linux' or sys_platform == 'darwin'  # https://github.com/google/jsonnet
+jsonnetbin==0.16.0; sys_platform == 'win32' or sys_platform == 'cygwin' or sys_platform == 'msys'  # https://github.com/mcovalt/jsonnetbin
+partialsmiles==1.0 # https://github.com/baoilleach/partialsmiles
 psycogreen==1.0.2  # https://github.com/psycopg/psycogreen/
-psycopg2==2.8.4  # https://github.com/psycopg/psycopg2
+psycopg2-binary==2.8.4  # https://github.com/psycopg/psycopg2
 redis==3.4.1  # https://github.com/antirez/redis
 whitenoise==5.0.1  # https://github.com/evansd/whitenoise
 
 
-# Code quality, testing, and documentation
+# Code quality, testing, monitoring and documentation
 # ------------------------------------------------------------------------------
 black==19.10b0  # https://github.com/ambv/black
 coverage==5.0.3  # https://github.com/nedbat/coveragepy
+django-prometheus==2.0.0  # https://github.com/korfuri/django-prometheus
 factory-boy==2.12.0  # https://github.com/FactoryBoy/factory_boy
-flake8==3.7.9  # https://github.com/PyCQA/flake8
+flake8==3.8.3  # https://github.com/PyCQA/flake8
 flake8-black==0.1.1  # https://github.com/peterjc/flake8-black
 flake8-bugbear==20.1.4  # https://github.com/PyCQA/flake8-bugbear
-flake8-isort==2.8.0  # https://github.com/gforcada/flake8-isort
+flake8-isort==4.0.0  # https://github.com/gforcada/flake8-isort
 isort==4.3.21  # https://github.com/timothycrosley/isort
 mypy==0.761  # https://github.com/python/mypy
 pre-commit==2.1.1  # https://github.com/pre-commit/pre-commit
 pytest==5.3.5  # https://github.com/pytest-dev/pytest
 pytest-django==3.8.0  # https://github.com/pytest-dev/pytest-django
+pytest-factoryboy==2.0.3  # https://github.com/pytest-dev/pytest-factoryboy
 pytest-sugar==0.9.2  # https://github.com/Frozenball/pytest-sugar
 sphinx==2.4.3  # https://github.com/sphinx-doc/sphinx
 sphinx-rtd-theme==0.4.3  # https://github.com/readthedocs/sphinx_rtd_theme

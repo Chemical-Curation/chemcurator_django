@@ -22,6 +22,9 @@ def test_settings(settings):
     # Prevents CSRF attacks
     assert settings.SESSION_COOKIE_SAMESITE == "Strict"
 
+    # Allows credentials to be sent on other subdomains
+    assert settings.CORS_ALLOW_CREDENTIALS
+
     # SessionAuthentication must not require CSRF checking
     assert (
         "rest_framework.authentication.SessionAuthentication"
@@ -36,4 +39,12 @@ def test_settings(settings):
     assert (
         "rest_framework.authentication.BasicAuthentication"
         in settings.REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"]
+    )
+
+    # Authenticated users can perform any request.
+    # Unauthorised users will only be permitted if the request
+    # method is one of the "safe" methods; GET, HEAD or OPTIONS.
+    assert (
+        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
+        in settings.REST_FRAMEWORK["DEFAULT_PERMISSION_CLASSES"]
     )
