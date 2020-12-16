@@ -1,14 +1,12 @@
 import logging
 
-from config.settings import ALLOWED_HOSTS, DEBUG, LOGGING, WEB_CONCURRENCY
+from config.settings import ALLOWED_HOSTS, DEBUG, WEB_CONCURRENCY
 from gevent import monkey
 from psycogreen.gevent import patch_psycopg
 
 bind = ":8000"
 worker_class = "gevent"
 workers = WEB_CONCURRENCY
-logconfig_dict = LOGGING
-access_log_format = '"%(r)s" %(s)s %(b)s'
 
 
 def on_starting(server):

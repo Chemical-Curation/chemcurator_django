@@ -1,6 +1,5 @@
 from django.contrib.auth import login, logout
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -19,7 +18,6 @@ class LoginView(APIView):
     """
 
     permission_classes = [IsAuthenticated]
-    renderer_classes = [JSONRenderer]
 
     def get(self, request):
         """Get the currently logged in user."""
