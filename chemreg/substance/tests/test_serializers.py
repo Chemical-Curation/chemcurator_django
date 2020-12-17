@@ -155,10 +155,11 @@ def test_substance_unique_compound(substance_factory):
     compound = substance.associated_compound
     obj = {"id": compound.id, "type": "definedCompound"}
     serializer = substance_factory.build(associated_compound=obj)
-    assert 1 == 0
-    # run these 2 commands in the debugger
-    serializer.is_valid()
-    serializer.save()
+    assert not serializer.is_valid()
+    assert (
+        str(serializer.errors["associated_compound"][0])
+        == "Compound ID value violates unique constraint"
+    )
 
 
 @pytest.mark.django_db
