@@ -278,6 +278,46 @@ def test_substance_unique_fields_post(client, admin_user, substance_factory):
 
 
 @pytest.mark.django_db
+def test_substance_unique_compound_post(client, admin_user, substance_factory):
+    client.force_authenticate(user=admin_user)
+    substance = substance_factory.create(defined=True).instance
+    model_dict = substance_factory.build().initial_data
+    resp = client.post(  # POST w/ same "display_name" and "preferred_name"
+        "/substances",
+        {
+            "data": {
+                "type": "substance",
+                "attributes": model_dict,
+                "relationships": {
+                    "qcLevel": {
+                        "data": {"id": model_dict["qc_level"]["id"], "type": "qcLevel"}
+                    },
+                    "source": {
+                        "data": {"id": model_dict["source"]["id"], "type": "source"}
+                    },
+                    "substanceType": {
+                        "data": {
+                            "id": model_dict["substance_type"]["id"],
+                            "type": "substanceType",
+                        }
+                    },
+                    "associatedCompound": {
+                        "data": {
+                            "id": substance.associated_compound.id,
+                            "type": "definedCompound",
+                        }
+                    },
+                },
+            }
+        },
+    )
+    assert resp.status_code == 400
+    assert (
+        resp.data[0]["detail"] == "we need to get an error here but currently are not"
+    )
+
+
+@pytest.mark.django_db
 def test_required_subresource_not_specified(client, admin_user, substance_factory):
     client.force_authenticate(user=admin_user)
     model_dict = substance_factory.build(defined=True).initial_data
