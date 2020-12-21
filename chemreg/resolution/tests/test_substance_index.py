@@ -87,6 +87,7 @@ def test_substance_index_single_substance_add(substance_factory):
 def test_substance_index_identifiers(substance_factory):
     expected_identifier_keys = [
         "compound_id",
+        "inchikey",
         "preferred_name",
         "display_name",
         "casrn",
