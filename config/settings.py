@@ -29,7 +29,7 @@ if os.path.exists(ROOT_DIR(".env")):
 #################
 # https://docs.djangoproject.com/en/3.0/ref/settings/#core-settings
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["ccte-api-chemreg-dev.epa.gov"]
 if env.bool("WHITELIST_LOCAL"):
     ALLOWED_HOSTS += [
         "0.0.0.0",
