@@ -1,5 +1,7 @@
 import json
 
+from django.apps import apps
+
 from rest_framework.exceptions import APIException
 
 import requests
@@ -98,6 +100,12 @@ class SubstanceIndex(Index):
                 "attributes": {
                     "identifiers": {
                         "compound_id": instance.associated_compound_id,
+                        "inchikey": instance.associated_compound.inchikey
+                        if isinstance(
+                            instance.associated_compound,
+                            apps.get_model("compound.DefinedCompound"),
+                        )
+                        else None,
                         "preferred_name": instance.preferred_name,
                         "display_name": instance.display_name,
                         "casrn": instance.casrn,
