@@ -329,7 +329,3 @@ chemreg/media/
 .ipython/
 .env
 .sqlite3
-
-# docker-compose
-docker-compose.yaml
-docker-compose.yml
