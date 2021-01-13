@@ -14,6 +14,7 @@ router.register(views.SubstanceViewSet)
 router.register(views.SubstanceTypeViewSet)
 router.register(views.SynonymQualityViewSet, prefix="synonymQualities")
 router.register(views.SubstanceRelationshipViewSet)
+router.register(views.SubstanceSearchViewSet, prefix="search")
 
 urlpatterns = [
     path("", include(router.urls)),

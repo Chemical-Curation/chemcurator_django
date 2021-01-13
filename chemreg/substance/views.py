@@ -17,6 +17,7 @@ from chemreg.substance.serializers import (
     RelationshipTypeSerializer,
     SourceSerializer,
     SubstanceRelationshipSerializer,
+    SubstanceSearchSerializer,
     SubstanceSerializer,
     SubstanceTypeSerializer,
     SynonymQualitySerializer,
@@ -47,6 +48,13 @@ class SubstanceViewSet(ModelViewSet):
 
     queryset = Substance.objects.all()
     serializer_class = SubstanceSerializer
+    filterset_class = SubstanceFilter
+
+
+class SubstanceSearchViewSet(ModelViewSet):
+
+    queryset = Substance.objects.all()
+    serializer_class = SubstanceSearchSerializer
     filterset_class = SubstanceFilter
 
 
