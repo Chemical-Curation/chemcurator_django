@@ -2,6 +2,7 @@ from itertools import chain
 
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.validators import RegexValidator
+from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from chemreg.common.serializers import CommonInfoSerializer, ControlledVocabSerializer
@@ -214,6 +215,23 @@ class SubstanceSerializer(CommonInfoSerializer):
                 f"The identifier/s {[e for e in errors]} is not unique in restrictive name fields."
             )
         return data
+
+
+class SubstanceSearchSerializer(SubstanceSerializer):
+    matches = serializers.SerializerMethodField()
+    score = serializers.SerializerMethodField()
+
+    class Meta(SubstanceSerializer.Meta):
+        fields = SubstanceSerializer.Meta.fields + [
+            "matches",
+            "score",
+        ]
+
+    def get_matches(self, obj):
+        return ""
+
+    def get_score(self, obj):
+        return ""
 
 
 class RelationshipTypeSerializer(ControlledVocabSerializer):
