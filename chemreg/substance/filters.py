@@ -13,9 +13,13 @@ class SubstanceFilter(filters.FilterSet):
     def search_resolver(self, queryset, name, value):
         """Search resolver for the search value"""
         resp_json = SubstanceIndex().search(value)
-        ids = [row["id"] for row in resp_json["data"]]
-        # todo: This will need some reason + score annotating
-        return queryset.filter(pk__in=ids)
+        qs = queryset.none()
+        for row in resp_json["data"]:
+            obj = queryset.filter(pk=row["id"])
+            obj[0].matches = row["attributes"]["matches"]
+            obj[0].score = row["attributes"]["score"]
+            qs |= obj
+        return qs
 
     class Meta:
         model = apps.get_model("substance", "Substance")
