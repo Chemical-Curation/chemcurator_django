@@ -9,6 +9,7 @@ from chemreg.substance.serializers import (
     SourceSerializer,
     SubstanceRelationshipSerializer,
     SubstanceSerializer,
+    SubstanceSearchSerializer,
     SubstanceTypeSerializer,
     SynonymQualitySerializer,
     SynonymSerializer,
@@ -147,6 +148,11 @@ def test_substance_ill_defined_compound(substance_factory):
     serializer = substance_factory.build(illdefined=True)
     assert serializer.is_valid()
     serializer.save()
+
+
+@pytest.mark.django_db
+def test_substance_search_serializer():
+    assert issubclass(SubstanceSearchSerializer, SubstanceSerializer)
 
 
 @pytest.mark.django_db
