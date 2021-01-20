@@ -1,7 +1,6 @@
 import json
 
 from django.apps import apps
-
 from rest_framework.exceptions import APIException
 
 import requests
