@@ -14,17 +14,11 @@ class SubstanceFilter(filters.FilterSet):
         """Search resolver for the search value"""
         resp_json = SubstanceIndex().search(value)
         ids = [row["id"] for row in resp_json["data"]]
-        # todo: This will need some reason + score annotating
         qs = queryset.filter(pk__in=ids)
-
-        for obj in qs.all():
+        for obj in qs:
             row = resp_json["data"][ids.index(obj.pk)]
             obj.matches = row["attributes"]["matches"]
             obj.score = row["attributes"]["score"]
-
-        import pdb
-
-        pdb.set_trace()
         return qs
 
     class Meta:
