@@ -228,10 +228,10 @@ class SubstanceSearchSerializer(SubstanceSerializer):
         ]
 
     def get_matches(self, obj):
-        return ""
+        return obj.matches if hasattr(obj, "matches") else ""
 
     def get_score(self, obj):
-        return ""
+        return obj.score if hasattr(obj, "score") else ""
 
 
 class RelationshipTypeSerializer(ControlledVocabSerializer):
