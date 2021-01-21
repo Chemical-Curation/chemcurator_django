@@ -150,6 +150,19 @@ def test_substance_ill_defined_compound(substance_factory):
 
 
 @pytest.mark.django_db
+def test_substance_unique_compound(substance_factory):
+    substance = substance_factory.create(defined=True).instance
+    compound = substance.associated_compound
+    obj = {"id": compound.id, "type": "definedCompound"}
+    serializer = substance_factory.build(associated_compound=obj)
+    assert not serializer.is_valid()
+    assert (
+        str(serializer.errors["associated_compound"][0])
+        == "Compound ID value violates unique constraint"
+    )
+
+
+@pytest.mark.django_db
 def test_substance_type_serializer():
     assert issubclass(SubstanceTypeSerializer, CommonInfoSerializer)
 
